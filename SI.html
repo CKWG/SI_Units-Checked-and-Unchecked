@@ -1,0 +1,1206 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Language" content="en" />
+<meta http-equiv="Content-Type" content="text/html" />
+<meta name="keywords" lang="en" content="dimensional analysis, SI, units of measure, physical dimensions, Ada" />
+<link rel="shortcut icon" type="image/x-icon" href="Ada.ico" />
+<title>SI Units</title>
+<!-- Version  Date
+      1.0  02.08.2002
+      1.1  09.09.2002 Enhancements and typo corrections
+      1.2  12.09.2002 Silly me forgot to add the download URL
+      1.3  15.09.2002 Reference to NIST added; software update
+      1.4  27.09.2002 Gnat 3.14p bug work-arounds removed
+      1.5  11.10.2002 Temperature scales added
+      1.6  14.10.2002 zip file updated
+      2.0  21.10.2002 Run thru Validator http://validator.w3.org/
+      2.1  23.10.2002 Added meta keywords (proposal of Matthew Heaney)
+      2.2  09.11.2002 Added Item_Subtype for all variants, Vector_Space for
+                      unconstrained variant
+      2.3  19.11.2002 Added Vector_Space for constrained variant
+      2.4  20.12.2002 Added reference to publication in Softwaretechnik-Trends
+      2.5  04.02.2003 Syntax for reading unit symbols changed
+      2.6  26.02.2003 Generic_Polynomial_Numerics in the constrained family is new
+      2.7  12.03.2003 IO customization improved
+      2.8  12.05.2003 Correct validation errors
+      2.9  24.10.2003 Typo corrected
+      2.10 27.02.2004 Reference to C++ solution; list of prefix and unit name origins;
+                      (vector) prototypes also for unconstrained variant
+      2.11 08.05.2004 Vectors and matrices are private now also in unconstrained variant;
+                      Matrix rotation; Quaternions
+      2.12 12.05.2004 XHTML 1.0 Transitional corrected;
+                      Quaternion rotation
+      2.13 14.05.2004 Note about seeming invisibility added
+      2.14 22.05.2004 More XHTML 1.0 Transitional corrections
+      3.0  06.09.2004 Restructured; Rolf Sievert; quaternion rotation about given axis
+      3.1  08.09.2004 Renamed Quaternion_Space.Unit to Normalize to be consistent with
+                      naming in Vector_Space; link to Universe.html now uses full URL
+      3.2  25.06.2005 Measured speed quaternion vs. matrix rotation
+      3.3  27.06.2005 Link to homepage corrected
+      3.4  16.09.2005 Link to C++ SI units is broken
+      4.0  24.11.2005 Ada 2005
+      4.1  18.02.2006 Bug fix in Rational_Arithmetics.Value; documentation added
+      4.2  01.03.2006 Addition of conversion between constrained and unconstrained
+                      items; pragma Pure
+      4.3  29.03.2006 Use Ada.Numerics.Generic_Real_Arrays; newer execution time
+                      measurements added
+      4.4  14.04.2006 Generic_Vector_Space.Generic_Transformation now also for
+                      constrained variant; conversion between constrained and
+                      unconstrained for Vector_Space
+      4.5  07.07.2006 Also Gnat GPL 2006 cannot compile Ada 2005 version
+      4.6  03.02.2007 Add note about original paper and documentation
+      4.7  02.03.2007 Gnat 6.0.1 still cannot compile Ada 2005 version
+      4.8  05.03.2007 Gnat 6.0.1 can compile Ada 2005 version with caveat
+      4.9  06.03.2007 Gnat 6.0.1 can compile Ada 2005 (don't use -gnatN)
+      4.10 15.03.2007 Gnat 6.0.1 by mistake does not include libgnalasup.a for
+                      Generic_Real_Arrays
+      4.11 16.03.2007 Correct HTML syntax bug
+      4.12 18.06.2007 GNAT GPL 2007 can compile Ada 2005 version (does also not include
+                      linear algebra library)
+      4.13 05.11.2007 Very minor improvement in documentation
+      4.14 19.04.2008 Some remarks about new GNAT version 6.1.1
+      4.15 28.04.2008 Added Width to Get and IO with strings for constrained variants
+      4.16 06.05.2008 Minor update in Get
+      4.17 26.06.2008 GNAT GPL 2008
+      4.18 04.08.2008 Arbitrary units for Text_IO
+      4.19 03.03.2009 GNAT Pro 6.2.1
+      4.20 30.05.2009 GNAT GPL 2009
+      4.21 22.06.2010 Bug fix: cd=lm/sr
+      5.0  14.12.2011 Type Dimension and functions Dimension_of/as moved to subpackage
+                      for_Test_only
+      5.1  00.03.2013 meta keyword "dimensional analysis" added
+      6.0  13.03.2014 Shifted to new directory Dimension: links updated
+      6.1  26.09.2014 Corrected end tag for link
+      6.2  09.01.2017 Typo corrected
+      7.0  08.08.2018 Completely reworked - now uses unit strings
+      7.1  27.08.2018 Improve presentation
+      7.2  28.08.2018 Add some unconventional units
+      7.3  01.09.2018 Dimensionless ""
+      7.4  29.09.2018 Unit syntax changed
+      7.5  15.11.2018 Bug fix in test_checked_si_units
+      7.6  10.01.2019 Added remark about optimization and text input
+      7.7  16.02.2019 Code restructured to simplify addition of new units
+      8.0  12.03.2019 Severed from homepage
+      8.1  20.05.2019 World Metrology Day: SI Redefinition became effective
+                      on May 20, 2019.
+      8.2  07.03.2020 Correct some mistakes about exceptions; add a few subtypes for
+                      vectors and matrices
+      9.0  05.08.2020 Completely reworked - Dimensions are now generic parameters
+      9.1  08.08.2020 Typo: Corrected color with missing #, &euro;
+      9.2  15.10.2021 Code: Added eV; Item subtypes now with Predicate_Failure;
+                      Text: More on execution time measurements
+      9.3  06.12.2022 Alternative references to SI information; new prefixes QqRr
+      9.4  01.04.2025 Prelude new, link to http://archive.adaic.com/tools/CKWG/*
+      9.5  29.06.2025 Corrected HTML mistakes and text improved
+     10.0  29.06.2025 Variant edition: Completely reworked - Dimensions are now
+                      nested packages in different SI specification files; hope
+                      for reduced execution times is in vain - they are identical;
+                      thus this will not be relased
+     11.0  14.07.2025 Updated edition of 9.5 above; restructured for upload to
+                      GitHub
+//-->
+</head>
+
+<body text="#000000" bgcolor="#ffffff" background="../../Backgrounds/Paper.gif">
+
+<h1 align="center">SI Units<br />
+<font size="5">Checked and Unchecked</font></h1>
+
+<p align="center"><font size="5">Christoph Karl Walter Grein</font></p>
+
+<p align="center"><font size="+1">First edition 9 September 2002</font><br />
+<font size="+1" color="#ff00ff"> Edition using Predicates and pragma Assertion_Policy</font><br />
+<font size="+1" color="#ff0000"><a href="#Update">Last Update</a> 14 July 2025</font></p>
+
+<h3>Contents</h3>
+
+<ul>
+<li><a href="#Prelude">Prelude</a></li>
+<li><a href="#Overview">Overview</a></li>
+<li><a href="#Checked">1. Checked Variant</a></li>
+<li><a href="#Unchecked">2. Unchecked Variant</a></li>
+<li><a href="#Measurements">3. Execution Time Measurements</a></li>
+<li><a href="#Licencing">4. Licencing</a></li>
+<li><a href="#Publication">5. First Publication</a></li>
+<li><a href="#Appendix">Appendix</a></li>
+<li><a href="#History">History</a></li>
+</ul>
+
+<h3><a name="Prelude">Prelude</a></h3>
+
+<p>In <a href="http://archive.adaic.com/tools/CKWG/Dimension/Dimension.html">
+Handling Physical Dimensions in Ada</a>, there is an overview over methods
+how to deal with physical dimensions in Ada:</p>
+
+<ul>
+<li>Ada Europe Conference 2003<br/>
+    A paper presented about physical dimensions in Ada</li>
+<li>Ada 95 Issue 324<br/>
+    A link to a discontinued proposal to standardize handling physical
+    dimensions</li>
+<li>From the Big Bang to the Universe<br/>
+    A simple method successfully in use in several helicopter
+    avionics projects under hard real-time conditions,
+    ready to download</li>
+<li>Ada 2012: Physical units with GNAT (GPL 2013) &ndash; AUJ 35.1<br/>
+    A critical review of the achievements and shortcomings of the
+    GNAT method as of GPL 2013</li>
+<li>SI Units Checked and Unchecked<br/>
+    An outdated 2020 version of the method presented here</li>
+</ul>
+
+<p>The method presented here is an update of the last bullet above.
+It uses dimensions as runtime attributes.</p>
+
+<p>There is extensive documentation included as well as test and example
+code.
+This project has always been a challenge for the GNAT compiler, so there
+has been a plethora of bug reports and fixes on problems encountered with respect to many years of GNAT releases.
+If you use another compiler, I would be happy to hear about your findings.</p>
+
+<h3><a name="Overview">Overview</a></h3>
+
+<p>In <a href="http://archive.adaic.com/tools/CKWG/Dimension/Universe.html">
+From The Big Bang To The Universe</a>, I have shown that Ada is not suited
+to implementing physical dimensions with its type concept.
+Therefore a method was presented applicable also to hard real-time systems
+which gives up dimension checking within the SI units system, while keeping the
+advantages of strong typing in critical cases when units from different
+systems have to be mixed.
+And indeed, this method has been in use in several avionics projects.</p>
+
+<p>But the request to have full dimensional checking persists.
+There are two basic ways one can try to solve the problem, either by adding
+to the numeric value its dimension as an attribute, or by using different types
+for different dimensions.
+Since the first method is runtime and memory consuming, whereas the second one
+is only compiletime-consuming, all effort naturally concentrates on the second
+method.
+This is doomed to fail as is shown in the paper cited above &ndash; although a
+plethora of overloaded operations is used, the result is not really
+satisfactory. Also see the attempt by the Ada Rapporteur Group to standardize
+such a method
+(<a href="http://www.ada-auth.org/cgi-bin/cvsweb.cgi/ais/ai-00324.txt?rev=1.3&amp;raw=N">Ada 95 Issue 324</a>).
+Physical equations with all their powers and roots evade these attempts.</p>
+
+<p>Since Ada 2012, there has been a very clever compiler-specific method by
+<a href="https://www.adacore.com/">AdaCore</a>, which handles physical
+dimensions at compile-time with implementation defined aspects (see a critical
+review of this method's achievements and shortcomings in my paper
+<a href="http://archive.adaic.com/tools/CKWG/Dimension/Physical_units_with_GNAT_GPL_2013-AUJ35.1.pdf">
+Physical units with GNAT</a>, which has appeared in <i>Ada User Journal 35.1</i>).</p>
+
+<p>So here a different method is presented <b>to deal with physical items
+in full generality</b> by adding to the value its dimension as an attribute,
+i.e. the first way rejected above because of its runtime-expensiveness.
+Hence this method might appear prohibitive for use in hard real-time systems.
+This <b>might not be</b> the case!</p>
+
+<table align="center" border="8" width="80%" bgcolor="#00ffff">
+<tr><td align="center"><b><font color="#ff0000">By changing only the
+instantiation of one package, dimensions can be switched off, leaving the
+program, however big it may be, with only the pure numerics.</font></b></td></tr>
+</table>
+
+<p>The method comes in two variants, checked and unchecked, selected with
+a generic parameter:</p>
+
+<ul>
+  <li><font color="#800080"><i>Checked</i></font>: Physical items carry with
+      them their current dimension, so that all assignments and expressions
+      are checked with respect to correct dimensions.</li>
+  <li><font color="#800080"><i>Unchecked</i></font>: This variant has the
+      exact same specification, but physical items only carry their numerical
+      values, dimensions are stripped.</li>
+</ul>
+
+<p>Section one presents an overview of the method with its natural style to
+define dimensioned items.
+Dimension checking of course has runtime and storage
+effects, which might be prohibitive under hard realtime conditions.
+So its use is intended during software development and test phases only.
+When one hundred percent code coverage during unit testing is obtained,
+dimensions can safely be stripped, since dimensional correctness has then
+be proved.</p>
+
+<p>Section two shows the few differences between the checked and unchecked
+variants.
+It also explains how to instantiate the packages so that with only one
+change in a generic signature package, the dimensions may be removed;
+the code proper remains unchanged.</p>
+
+<p>Section three presents a comparison of computation time of the checked
+and unchecked variant.</p>
+
+<p>An extensive documentation is included in the download as well as a lot
+of test programs and examples of use.</p>
+
+<h3><a name="Checked">1. Checked Variant</a></h3>
+
+<p>A physical item is a private type</p>
+
+<pre>  <b>type</b> Item <b>is private</b>;</pre>
+
+<p>where the full declaration composes the item of a real value and a
+dimension, where the values for the seven SI base units <i>Meter</i>,
+<i>Kilogram</i>, <i>Second</i>, <i>Ampere</i>, <i>Kelvin</i>,
+<i>Candela</i>, <i>Mole</i> are rational numbers representing the
+exponent (e.g. m<sup>2</sup>).
+We have to use rational numbers because we want to be able to represent the
+most general physical equations.</p>
+
+<table>
+<tr>
+<td width="50%"><pre>  <b>type</b> Dimension <b>is record</b>
+    m, kg, s, A, K, cd, mol: Rational;
+  <b>end record</b>;
+
+  <b>type</b> Item <b>is record</b>
+    Unit : Dimension;
+    Value: Real;
+  <b>end record</b>;</pre></td>
+<td width="50%"><i>As a side note: With a package like this, I guess a
+compiler could evaluate the dimension strings in statements like
+<code>v:=5.0*"m/s";</code> at compile-time and also check the correct
+dimensioning during compile-time (as long as there is no text input,
+see below); in effect, this would mean a new kind of optimization
+could be applied to throw away the dimension components.
+This would remove the necessity of the unchecked variant (see below).<br/>
+(Most probably this is what
+<a href="http://archive.adaic.com/tools/CKWG/Dimension/Physical_units_with_GNAT_GPL_2013-AUJ35.1.pdf">
+GNAT</a> does with its unit system &ndash; note that GNAT provides only
+dimensioned output, but no input.)</i></td>
+</tr>
+</table>
+
+<p>The package Generic_SI is generic with respect to the numeric type, the type
+Real above is the generic parameter name.</p>
+
+<p>Subtypes are provided for all units defined by the SI system, for instance:</p>
+
+<pre><span>  <b>subtype</b> Length <b>is</b> Item <font color="#0000ff"><b>with</b> Dynamic_Predicate => has_Dimension (Length, "m"),
+                              Predicate_Failure => <b>raise</b> Unit_Error <b>with</b> "Length"</font>;
+  <b>subtype</b> Volume <b>is</b> Item <font color="#0000ff"><b>with</b> Dynamic_Predicate => has_Dimension (Volume, "m**3"),
+                              Predicate_Failure => <b>raise</b> Unit_Error <b>with</b> "Volume"</font>;
+  <b>subtype</b> Speed  <b>is</b> Item <font color="#0000ff"><b>with</b> Dynamic_Predicate => has_Dimension (Speed , "m/s"),
+                              Predicate_Failure => <b>raise</b> Unit_Error <b>with</b> "Speed"</font>;
+  <b>subtype</b> Force  <b>is</b> Item <font color="#0000ff"><b>with</b> Dynamic_Predicate => has_Dimension (Force , "N"),
+                              Predicate_Failure => <b>raise</b> Unit_Error <b>with</b> "Force"</font>;
+</span></pre>
+
+<p>Items (variables) are defined like this:</p>
+
+<pre>  T: Time := 5.0*"s";
+  X: Item;
+</pre>
+
+<p>Item T, since defined to be of subtype Time, now is constrained to any
+time unit like Second or Millisecond (initial values are optional).
+<font color="#00ff00">For this to be true, of course you have to make sure
+that <code>pragma Assertion_Policy (Check);</code> is set.</font>
+Item X is unconstrained and may assume any dimension.
+This kind of declaration is recommended only for intermediate results.</p>
+
+<p>Thus, provided that all items are dimensioned appropriately in their
+declarations, expressions like free fall or force on a charged particle in
+an electromagnetic field are checked for dimensional correctness - failures
+will raise exceptions:</p>
+
+<pre>  D := 0.5 * G * T**2;
+  F := Q * (E + Cross (V, B));
+</pre>
+
+<p>Here, Cross is the vector cross product, and E, V, and B are dimensioned
+three-dimensional vectors.</p>
+
+<p>Of course mathematical functions like exp, log, exponentiation are also
+provided; for instance:</p>
+
+<pre>  <b>function</b> Sin (X       : Angle) <b>return</b> Dimensionless;
+  <b>function</b> Sin (X, Cycle: Item ) <b>return</b> Dimensionless;
+</pre>
+
+<p>With one parameter only, the sine function requests parameter X to have
+unit "rad" (an angle, a pure number, i.e. dimension 1).
+With two arguments, it requests parameters X and Cycle to have the same
+dimension (this is checked by a <i>Precondition</i> of sine).
+Any violations will raise an exception.
+The result in any case is a pure number, an item of subtype Dimensionless.
+(In fact, "rad", "sr" and Dimensionless (the empty string is used "" to
+indicate the latter) are the same, the symbols "rad" and
+"sr" are only used to indicate that the numeric value denotes a plain or
+spherical angle.)
+Similar rules hold for the other trigonometric functions and their inverses.</p>
+ 
+<p>Of course, dimensioned IO is also provided:</p>
+
+<pre>  <b>procedure</b> Put (X   : <b>in</b> Item;
+                 Fore: <b>in</b> Field  := Default_Fore;
+                 Aft : <b>in</b> Field  := Default_Aft;
+                 Exp : <b>in</b> Field  := Default_Exp;
+                 Dim : <b>in</b> String := "");
+</pre>
+
+<p>Put for the numeric value is exactly like Ada.Text_IO.
+The Dim parameter may be used to provide a prefixed unit; if it is omitted,
+the unit will be output in a standard format:</p>
+
+<pre>  V := 1.0*"m/s";          -- output as
+  Put (V);                 -- 1.0*m*s**(-1)         (standard format)
+  Put (V, Dim => "km/h");  -- 3.6*km/h              (note the value adaptation)
+  Put (V, Dim => "s");     -- will raise exception  (wrong unit Second)
+</pre>
+
+<p>Note that there are no string quotes in the output.
+The unit follows after a '*' or '/' character without space characters.
+This is necessary for input or else there would be no way to see where to
+stop reading, e.g. 3.6&nbsp;km vs. 3.0&nbsp;&euro;. (3.0km is deemed ugly,
+and 1.0"km" is impossible in an Ada program.)</p>
+
+<p>As you have gleaned meanwhile, any prefixed SI units may be used; please
+take care of correct capitalization: "Ms" is megasecond, "mS" is millisiemens.
+Case sensitivity of the SI units and prefixes is the reason why units are
+given with strings.
+There are two functions allowing numbers to be multiplied with unit strings:</p>
+
+<pre>  <b>function</b> "*" (Left: Real'Base; Right: String) <b>return</b> Item;  -- 1.0*"km"
+  <b>function</b> "/" (Left: Real'Base; Right: String) <b>return</b> Item;  -- 1.0/"s"
+</pre>
+
+<p>Note that the first operator is between the number and the unit string,
+any others are inside the string: 1.0*"m/s", 1.0*"A/m**2"; this is incorrect:
+1.0*"m"/"s" and will not compile; of course 1.0*"m"/(0.5*"s") is correct.</p>
+
+<p>Any whole or fractional powers are allowed.</p>
+
+<pre>  <b>function</b> "**" (Base: Item; Exponent: Rational) <b>return</b> Item;</pre>
+
+<table>
+<tr>
+  <td width="20%"><img width="119" height="60" src="Schottky-Langmuir.gif" alt="Schottky-Langmuir" /></td>
+  <td width="80%">While in SI all physical items have whole powers in their dimensions,
+      intermediate values may have strange units as can be seen for the
+      constant part in the Schottky-Langmuir equation, which has the value<br />
+      2.33395*10<sup>-6</sup> m<sup>-3</sup>kg<sup>-3/2</sup>s<sup>9/2</sup>A<sup>5/2</sup>.</td>
+</tr>
+</table>
+<br/>
+<table align="center" border="1" width="560" bgcolor="#FEFED2">
+<tr>
+<td><i>&nbsp;Just for the fun of it, here are two unconventional units
+(not included):</i><br/><br/>
+&nbsp;1 furlong / fortnight = 0.99785714285714 cm/min<br/>
+&nbsp;1 inch = 2.54 cm<br/>
+&nbsp;1 foot = 12 in<br/>
+&nbsp;1 furlong = 660 ft = 201.168 m<br/>
+&nbsp;1 fortnight = 1_209_600 s (14 days)<br/>
+&nbsp;If 1 inch were (2+54/99) cm, 1 furlong / fortnight would be exactly 1 cm/min.<br/>
+&nbsp;1 km/h = 6 Mega furlong / fortnight<br/><br/>
+&nbsp;<i>In particle physics, the unit barn (which is allowed in mix with SI) is used for<br/>
+&nbsp;particle cross sections:</i><br/>
+&nbsp;1 barn = 1.0E-28 m<sup>2</sup> = (1.0E-14 m)<sup>2</sup> = 100 fm<sup>2</sup></td>
+</tr>
+</table>
+
+<p>Now a word in favour of the use clause is due.
+All examples you'll find in the download have been built with the
+use_package_clause in action for all instances.
+I can understand the reservation against the use_package_clause, but my personal
+feeling is neither use-hater nor use-lover.</p>
+
+<p>However with such basic packages like the SI packages, things are very
+different.
+Your whole project will be built on their instances as the very basis, so it
+seems wrong to me to not use the use_package_clause mandatorily in all units
+depending on them.
+They in fact have the same level as package Standard (RM A.1), which is visible
+everywhere by default.</p>
+
+<p>Thus your code should look like this:</p>
+
+<pre style='margin-left:25.45pt'><span><b>package</b> SI         <b>is new</b> Generic_SI (Float);
+<b>package</b> SI.Text_IO <b>is new</b> SI.Generic_Text_IO;
+... any others ...
+
+<b>with</b> SI.Text_IO;
+<font color="#009900"><b>use</b>  SI.Text_IO, SI;  -- <i>mandatory</i></font>
+<b>package</b> Application <b>is</b>
+  B: Magnetic_Flux_Density := 50.0 * "mT";
+  ...
+</span></pre>
+
+<p>rather than without use clause</p>
+
+<pre style='margin-left:25.45pt'><span>  B: <font color="#FF0000">SI.</font>Magnetic_Flux_Density := <font color="#FF0000">SI."*" (50.0, "mT")</font>;
+</span></pre>
+
+<p>or with only the use-type-clause
+<font color="#FF0000"><code><b>use type</b> SI.Items;</code></font> in action</p>
+
+<pre style='margin-left:25.45pt'><span>  B: <font color="#FF0000">SI.</font>Magnetic_Flux_Density := 50.0 * "mT";
+</span></pre>
+
+<h3><a name="Unchecked">2. Unchecked Variant</a></h3>
+
+<p>The <i>unchecked</i> variant is obtained by changing an actual generic
+parameter.
+In fact, the package Generic_SI has as second generic parameter a dimension
+signature package.</p>
+
+<pre>  <b>generic
+    type</b> Real <b>is digits</b> &lt;&gt;;
+    <b>with package</b> Dimensions <b>is new</b> Dimension_Signature (&lt;&gt;);
+  <b>package</b> Generic_SI <b>is</b> ...;</pre>
+
+<p>By selecting the appropriate
+<font color="#0000ff"><code>Dimensions</code></font> package
+(<font color="#00ff00"><code>True_Dimensions</code></font>,
+<font color="ff#0000"><code>Fake_Dimensions</code></font>),
+you obtain the checked or the unchecked version.
+Do not forget to set
+<font color="#0000ff"><code>pragma Assertion_Policy (...);</code></font>
+to the appropriate value <font color="#00ff00">Check</font> or
+<font color="#ff0000">Ignore</font>.</p>
+
+<p>Since the  type <code>Dimension</code> declared in
+<code>Fake_Dimensions</code> is a null record, the behaviour is different.
+Of course, in an assignment <code>D := 5.0*"km";</code> the prefix
+<code>'k'</code> will be evaluated, so that the numeric value of the distance
+is 5000.0; but dimensional correctness will no longer be checked in statements
+as shown above in section 1 since assertions are not checked (further, the
+subtype dynamic predicates are always true).
+Also output will differ:</p>
+
+<pre>  V := 1.0*"m/s";          -- output as
+  Put (V);                 -- 1.0           (no unit available)
+  Put (V, Dim => "km/h");  -- 3.6*km/h      (note the unit)
+  Put (V, Dim => "s");     -- 1.0*s         nonsense
+</pre>
+
+<p>Here, the Dim parameter is handy &ndash; the prefix 'k' and the unit 'h'
+will still be evaluated and the value adapted accordingly.
+Of course the last wrong unit output cannot be prevented.
+So use this variant only for production code after you have carefully
+tested your code in the checked variant.</p>
+
+<h3><a name="Measurements">3. Execution Time Measurements</a></h3>
+
+<p>The checked version is storage consuming, fourteen integers for the
+seven dimensions, one floating point number for the value.
+Calculating all these numbers with each operation is time consuming.
+Especially the dimension string evaluation is the most prominent time
+eater, although statements like <code>T&nbsp;:=&nbsp;20.0*"s";</code>
+are rare and occur mostly in initializing expressions.
+Compile-time evaluation of these strings would therefore get rid of
+only some part of the execution time.
+Another source of unnecessary execution time could be the plethora of
+functions in the generic dimension parameter packages, where the pragma
+Inline most probably does not work across the package boundaries.</p>
+
+<p>There is a program included to measure the computation time.
+Roughly, the unchecked variant is about 10 times slower than the pure
+numeric (only floating point) one.
+So do measure your program!</p>
+
+<p>The Schottky-Langmuir equation is used for measurements because it
+includes different kinds of operations.</p>
+
+<h3><a name="Licencing">4. Licencing</a></h3>
+
+<p>The software is published under the GNAT Modified GPL, version 3 or
+any later version.
+See <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">GPL</a> and
+the header of each compilation unit.</p>
+
+<h3><a name="Publication">5. First Publication</a></h3>
+
+<p>This work (for Ada 95) has been published in
+<i>Softwaretechnik-Trends</i> Vol. 22.4 (November 2002),
+the periodical of <a href="http://www.ada-deutschland.de/">Ada-Deutschland</a>,
+special interest group <i>2.1.5 Ada</i> within
+<a href="http://www.gi-ev.de/">Gesellschaft f&uuml;r Informatik</a>, the
+German Informatics Society.</p>
+
+<p>It has also been presented at the
+<a href="http://archive.adaic.com/tools/CKWG/Dimension/Dimension.html">
+Ada Europe Conference 2003</a> in Toulouse.</p>
+
+<hr width="100%" />
+
+<h3><a name="Appendix">Appendix</a></h3>
+
+<hr width="100%" />
+
+<p>A <b>C++</b> solution (it did however not include fractional powers) with
+templates was presented at
+<a href="http://www.fnal.gov/docs/working-groups/fpcltf/">
+http://www.fnal.gov/docs/working-groups/fpcltf/</a>.
+This page has disappeared meanwhile.
+The big difference to Ada's generics is that C++ templates with their
+implicit instantiations allow type checking during compile-time, so that
+no overhead neither in memory space nor in run-time is incurred.
+In this respect, C++ templates are more powerful than Ada generics.
+However at the time when the code was still there (11 February 2004),
+not all C++ compilers, although capable of compiling the code, were able
+to actually perform this type checking (as stated in the documentation
+of the method).</p>
+
+<hr width="100%" />
+
+<p>All about SI units and general information about the foundation of modern
+science and technology can be found at the <b>National Institute of Standards
+and Technology</b>
+<a href="http://physics.nist.gov/cuu/Units/">Interntional Sistem of Units (SI)</a>
+or <a href="https://www.nist.gov/pml/special-publication-811">Special Publication 811</a>
+and also at the <b>Bureau International des Poids et Mesures</b>
+<a href="https://www.bipm.org/en/measurement-units">The International System of Units (SI)</a>.</p>
+
+<table cellpadding="4">
+<tbody><tr>
+  <th colspan="5">Origin of prefix names</th>
+</tr>
+<tr>
+  <th>Name</th>
+  <th>Symbol</th>
+  <th>value</th>
+  <th align="left">derived from</th>
+  <th>meaning</th>
+</tr>
+<tr>
+  <td>quetta</td>
+  <td align="center">Q</td>
+  <td>1e+30</td>
+  <td></td>
+  <td></td>
+</tr>
+<tr>
+  <td>ronna</td>
+  <td align="center">R</td>
+  <td>1e+27</td>
+  <td></td>
+  <td></td>
+</tr>
+<tr>
+  <td>yotta</td>
+  <td align="center">Y</td>
+  <td>1e+24</td>
+  <td>octo (Latin, Greek)</td>
+  <td>eight</td>
+</tr>
+<tr>
+  <td>zetta</td>
+  <td align="center">Z</td>
+  <td>1e+21</td>
+  <td>septem (Latin)</td>
+  <td>seven</td>
+</tr>
+<tr>
+  <td>exa</td>
+  <td align="center">E</td>
+  <td>1e+18</td>
+  <td>hexa (Greek)</td>
+  <td>six</td>
+</tr>
+<tr>
+  <td>peta</td>
+  <td align="center">P</td>
+  <td>1e+15</td>
+  <td>pente (Greek)</td>
+  <td>five</td>
+</tr>
+<tr>
+  <td>tera</td>
+  <td align="center">T</td>
+  <td>1e+12</td>
+  <td>teras (Greek)</td>
+  <td>monster</td>
+</tr>
+<tr>
+  <td>giga</td>
+  <td align="center">G</td>
+  <td>1e+09</td>
+  <td>gigas (Greek)</td>
+  <td>giant</td>
+</tr>
+<tr>
+  <td>mega</td>
+  <td align="center">M</td>
+  <td>1e+06</td>
+  <td>megas (Greek)</td>
+  <td>large</td>
+</tr>
+<tr>
+  <td>kilo</td>
+  <td align="center">k</td>
+  <td>1e+03</td>
+  <td>chilioi (Greek)</td>
+  <td>thousand</td>
+</tr>
+<tr>
+  <td>hecto</td>
+  <td align="center">h</td>
+  <td>1e+02</td>
+  <td>hekaton (Greek)</td>
+  <td>hundred</td>
+</tr>
+<tr>
+  <td>deka</td>
+  <td align="center">da</td>
+  <td>1e+01</td>
+  <td>deka (Greek)</td>
+  <td>ten</td>
+</tr>
+<tr>
+  <td>deci</td>
+  <td align="center">d</td>
+  <td>1e-01</td>
+  <td>decimus (Latin)</td>
+  <td>tenth</td>
+</tr>
+<tr>
+  <td>centi</td>
+  <td align="center">c</td>
+  <td>1e-02</td>
+  <td>centum (Latin)</td>
+  <td>hundred</td>
+</tr>
+<tr>
+  <td>milli</td>
+  <td align="center">m</td>
+  <td>1e-03</td>
+  <td>mille (Latin)</td>
+  <td>thousand</td>
+</tr>
+<tr>
+  <td valign="top">micro</td>
+  <td valign="top" align="center"><a href="#mu">&micro;</a></td>
+  <td valign="top">1e-06</td>
+  <td>micro (Latin)<br />mikros (Greek)</td>
+  <td valign="top">small</td>
+</tr>
+<tr>
+  <td valign="top">nano</td>
+  <td valign="top" align="center">n</td>
+  <td valign="top">1e-09</td>
+  <td>nanus (Latin)<br />nanos (Greek)</td>
+  <td valign="top">dwarf</td>
+</tr>
+<tr>
+  <td>pico</td>
+  <td align="center">p</td>
+  <td>1e-12</td>
+  <td>pico (Spanish)</td>
+  <td>bit</td>
+</tr>
+<tr>
+  <td>femto</td>
+  <td align="center">f</td>
+  <td>1e-15</td>
+  <td>femten (Danish, Norwegian)</td>
+  <td>fifteen</td>
+</tr>
+<tr>
+  <td>atto</td>
+  <td align="center">a</td>
+  <td>1e-18</td>
+  <td>atten (Danish, Norwegian)</td>
+  <td>eighteen</td>
+</tr>
+<tr>
+  <td>zepto</td>
+  <td align="center">z</td>
+  <td>1e-21</td>
+  <td>septem (Latin)</td>
+  <td>seven</td>
+</tr>
+<tr>
+  <td>yocto</td>
+  <td align="center">y</td>
+  <td>1e-24</td>
+  <td>octo (Latin, Greek)</td>
+  <td>eight</td>
+</tr>
+<tr>
+  <td>ronto</td>
+  <td align="center">r</td>
+  <td>1e–27</td>
+  <td></td>
+  <td></td>
+</tr>
+<tr>
+  <td>quecto</td>
+  <td align="center">q</td>
+  <td>1e–30</td>
+  <td></td>
+  <td></td>
+</tr>
+</tbody></table>
+
+<p>R, r, Q, q were adopted by the General Conference on Weights and Measures
+(CGPM) in November 2022.</p>
+
+<p><font color="#800080"><a name="mu" id="mu">u</a> is normally used
+where the Greek character &micro; is not available.</font><br />
+Also note that all symbols, prefixes and units, are case-sensitive.</p>
+
+<table cellpadding="4">
+<tbody><tr>
+  <th colspan="3">Origin of unit names</th>
+</tr>
+<tr>
+  <th>Name</th>
+  <th>Symbol</th>
+  <th align="left">derived from</th>
+</tr>
+<tr>
+  <td>candela</td>
+  <td align="center">cd</td>
+  <td>candela (Latin) candle</td>
+</tr>
+<tr>
+  <td>gram</td>
+  <td align="center">g</td>
+  <td>gramma (a Greek mass unit)</td>
+</tr>
+<tr>
+  <td>lumen</td>
+  <td align="center">lm</td>
+  <td>lumen (Latin) light</td>
+</tr>
+<tr>
+  <td>lux</td>
+  <td align="center">lx</td>
+  <td>lux (Latin) light</td>
+</tr>
+<tr>
+  <td>meter</td>
+  <td align="center">m</td>
+  <td>metrum (Latin), metron (Greek) measure</td>
+</tr>
+<tr>
+  <td>mole</td>
+  <td align="center">mol</td>
+  <td>molecule</td>
+</tr>
+<tr>
+  <td>radian</td>
+  <td align="center">rad</td>
+  <td>?</td>
+</tr>
+<tr>
+  <td>second</td>
+  <td align="center"><a href="#sec">s</a></td>
+  <td>secunda pars (Latin) second part</td>
+</tr>
+</tbody></table>
+
+<p><font color="#800080"><a name="sec" id="sec">The symbols sec and S, often
+seen, are wrong.</a></font></p>
+
+<table cellpadding="4">
+<tbody><tr>
+  <th>Name</th>
+  <th>Symbol</th>
+  <th align="left">named in honor of</th>
+</tr>
+<tr>
+  <td><a href="#ampere">ampere</a></td>
+  <td align="center">A</td>
+  <td>Andr&eacute;-Marie Amp&egrave;re (1775-1836) France</td>
+</tr>
+<tr>
+  <td>becquerel</td>
+  <td align="center">Bq</td>
+  <td>Antoine-Henri Becquerel (1852-1908) France</td>
+</tr>
+<tr>
+  <td>coulomb</td>
+  <td align="center">C</td>
+  <td>Charles-Augustin de Coulomb (1736-1806) France</td>
+</tr>
+<tr>
+  <td>farad</td>
+  <td align="center">F</td>
+  <td>Michael Faraday (1791-1867) England</td>
+</tr>
+<tr>
+  <td>gray</td>
+  <td align="center">Gy</td>
+  <td>Louis Harold Gray, F.R.S. (1905-1965) England</td>
+</tr>
+<tr>
+  <td>henry</td>
+  <td align="center">H</td>
+  <td>Joseph Henry (1797-1878) United States</td>
+</tr>
+<tr>
+  <td>hertz</td>
+  <td align="center">Hz</td>
+  <td>Heinrich Rudolf Hertz (1857-1894) Germany</td>
+</tr>
+<tr>
+  <td>joule</td>
+  <td align="center">J</td>
+  <td>James Prescott Joule (1818-1889) England</td>
+</tr>
+<tr>
+  <td>kelvin</td>
+  <td align="center">K</td>
+  <td>William Thomson, Lord Kelvin (1824-1907) England</td>
+</tr>
+<tr>
+  <td>newton</td>
+  <td align="center">N</td>
+  <td>Sir Isaac Newton (1642-1727) England</td>
+</tr>
+<tr>
+  <td>ohm</td>
+  <td align="center"><a href="#omega">&Omega;</a></td>
+  <td>Simon Ohm (1787-1854) Germany</td>
+</tr>
+<tr>
+  <td>pascal</td>
+  <td align="center">Pa</td>
+  <td>Blaise Pascal (1623-1662) France</td>
+</tr>
+<tr>
+  <td valign="top">siemens</td>
+  <td valign="top" align="center"><a href="#siemens">S</a></td>
+  <td>Ernst Werner von Siemens (1816-1892) <i>or his brother</i><br />
+      Sir William (Karl Wilhelm von) Siemens (1823-1883)
+      Germany (England)</td>
+</tr>
+<tr>
+  <td>sievert</td>
+  <td align="center">Sv</td>
+  <td>Rolf Maximilian Sievert (1896-1966) Sweden</td>
+</tr>
+<tr>
+  <td>tesla</td>
+  <td align="center">T</td>
+  <td>Nikola Tesla (1856-1943) Croatia (United States)</td>
+</tr>
+<tr>
+  <td>volt</td>
+  <td align="center">V</td>
+  <td>Count Alessandro Volta (1745-1827) Italy</td>
+</tr>
+<tr>
+  <td>watt</td>
+  <td align="center">W</td>
+  <td>James Watt (1736-1819) Scotland</td>
+</tr>
+<tr>
+  <td>weber</td>
+  <td align="center">Wb</td>
+  <td>Wilhelm Eduard Weber (1804-1891) Germany</td>
+</tr>
+</tbody></table>
+
+<p><font color="#800080"><a name="ampere" id="ampere">
+A: Note that the unit ampere is written without a diacritical mark.</a><br />
+<a name="omega" id="omega">
+&Omega;: I do not know a common replacement for the Capital Greek Omega.</a><br />
+<a name="siemens" id="siemens">
+S: In older literature also the symbol mho is in use.</a></font></p>
+
+<hr width="100%" />
+
+<a name="History"></a>
+<table cellspacing="10"><tbody>
+<tr>
+  <td width="145"><b><a name="Update" id="Update"><font color="#800000" size="+1">Updates</font></a></b></td>
+  <td><b><font color="#800000" size="+1">Reason</font></b></td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">14 July 2025</font></b></td>
+  <td><b>Restructured for upload to GitHub.</b><br/>
+      <font color="#0000FF">Edition using Predicates and (new) pragma Assertion_Policy.</font><br/>
+      <u>Code:</u> Celsius temperature scale added; instantiation of Text_IO package
+      changed.<br/>
+      <u>Test:</u> Improved IO tests.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#808080">[29 June 2025]</font></b></td>
+  <td>[<font color="#888888"><b>Variant parallel edition of same date:<br/>
+      New design hiding the two different versions of the previous generic
+      signature package Dimensions in the private part of package Generic_SI.</b><br/>
+      Reason: The hope for better performance.
+      Nope! The execution times are identical!.<br/>
+      Note: The release dates of the two last versions are identical; nevertheless
+      both are different designs with identical visible parts.<br/>
+      <b>Thus this route will not be continued and this Variant will not be
+      relased.</b></font>]</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">29 June 2025</font></b></td>
+  <td>Code: Added eV; <b>Item subtypes now with Predicate_Failure;
+      operators with Preconditions;</b> new prefixes R r Q q;<br/>
+      Text: More on execution time measurements.<br/>
+      <font color="#0000FF">Will be relased later with some improvements.</font></td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">5 August 2020</font></b></td>
+  <td><b><font color="#0000FF">Complete new version using dimensions as
+      generic signature parameters.</font></b><br/>
+      Only the checked hierarchy left, the unchecked one is obsolete.
+      <b>The user interface is unchanged, only the instantiation changes,
+      so it's compatible with the previous version.</b><br/>
+      (From originally four hierarchies &quot;checked&quot; vs. &quot;unchecked&quot;
+      times &quot;constrained&quot; vs. &quot;unconstrained&quot;, just one
+      remains, named Generic_SI.)<br/>
+      There are work-arounds for two compiler bugs (reported to AdaCore).</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">7 March 2020</font></b></td>
+  <td>Correct some mistakes in documentation about which exceptions are raised;
+      add a few subtypes for vectors and matrices; add more natural constants.<br/>
+      <b>(This version was never published.)</b></td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">20 May 2019</font></b></td>
+  <td><b>SI Redefinition</b> became effective on <b>World Metrology Day</b>: May 20, 2019.<br />
+      No code change, only documentation about SI base unit redefinition added.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">16 February 2019</font></b></td>
+  <td>Code restructured to simplify addition of new units</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">15 November 2018</font></b></td>
+  <td>Bug fix in test_checked_si_units (treated /(s/m) as legal)</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">29 September 2018</font></b></td>
+  <td>Unit syntax improved - allow parentheses after /: "W/(m*K)".<br />
+      More than one / is ugly: "W/m/K";
+      mixing * and / is misleading: "kg/s**2*m" means "m*kg/s**2";
+      thus made illegal.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">1 September 2018</font></b></td>
+  <td>Added subtype dimensionless; math functions redefined accordingly.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">20 August 2018</font></b></td>
+  <td>Bug fix and complete documentation.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">8 August 2018</font></b></td>
+  <td><b><font color="#0000FF">Complete new version using Ada 2012 predicates;<br/>
+      unit indication with strings, 42.0*&quot;km/h&quot;.</font></b><br/>
+      Only the unconstrained versions left, the constrained ones removed
+      (replaced by predicate-checked subtypes).</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">14 December 2011</font></b></td>
+  <td>In variant Unconstrained_Checked_SI, type Dimension and functions
+      Dimension_of/as moved to subpackage for_Test_only in order to make
+      intention clear.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">22 June 2010</font></b></td>
+  <td><b>Bug fix:</b> cd=lm/sr.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">30 May 2009</font></b></td>
+  <td><b>GNAT GPL 2009</b> finally compiles without bugs.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">3 March 2009</font></b></td>
+  <td><b>GNAT Pro 6.2.1</b> finally compiles without bugs.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">4 August 2008</font></b></td>
+  <td>Text_IO now allows definition of arbitrary unit symbols.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">6 May 2008</font></b></td>
+  <td>Minor update in Get.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">28 April 2008</font></b></td>
+  <td>Added IO with strings for the constrained variants.<br />
+      Also added Width parameter to Get from file for all variants.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">19 April 2008</font></b></td>
+  <td>New GNAT Pro 6.1.1 has some bugs fixed.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">5 Nov 2007</font></b></td>
+  <td>Very minor improvement in documentation.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">18 Jun 2007</font></b></td>
+  <td>GNAT GPL 2007 can compile the Ada 2005 version (with caveat).<br />
+      Provide also a no RM chapter G version.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">15 Mar 2007</font></b></td>
+  <td>GNAT 6.0.1 by mistake does not include libgnalasup.a.
+      Prepared GNAT project files for work-around.<br />
+      Un/Constrained_Checked_SI.Generic_Item_Subtype made Pure again by a
+      simple code change.<br />
+      Bug fix: constrained_checked_si-generic_vector_space-generic_transformation.ads
+      had the wrong Ada name.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">6 March 2007</font></b></td>
+  <td>Changed the deprecated -gnatN to -gnatn in some project files.<br />
+      Removed the work-around introduced on 5 March (does not occur with
+      -gnatn).</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">5 March 2007</font></b></td>
+  <td>Un/Constrained_Checked_SI.Generic_Item_Subtype cannot be Pure.
+      (The unchecked variants <u>can</u> be Pure.)<br />
+      Bug fix in Constrained_Checked_SI.Generic_Item_Subtype: The wrong
+      instance of Unit_Error was raised.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">14 April 2006</font></b></td>
+  <td>Generic_Vector_Space.Generic_Transformation exists now also for the
+      constrained variant.<br />
+      Conversion between constrained and unconstrained Vector_Space.<br />
+      Directories have been restructured.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">29 Mar 2006</font></b></td>
+  <td><b>Another important update:</b><br />
+      Vectors and matrices are now defined via the RM numerics annex G.3.1.<br />
+      The previous definition is kept as an alternative if the compiler does
+      not implement the annex.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">1 Mar 2006</font></b></td>
+  <td><b>Important update:</b><br />
+      A conversion facility between constrained and unconstrained items has
+      been added.<br />
+      The pragma Pure has been added where applicable.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">18 Feb 2006</font></b></td>
+  <td>A detailed documentation for each package added.<br />
+      Polar coordinates are now also private, i.e. well implemented.
+      Bug fix in Rational_Arithmetics.Value.<br />
+      Test programs added.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">24 Nov 2005</font></b></td>
+  <td>The <b>Ada 2005 version</b> is new:<br />
+      Because Ada 2005 undefines non-dispatching abstract operations,
+      the package <tt><font color="#800080">Invisible</font></tt> could be
+      removed.<br />
+      In Ada 95, these operations were still visible, and thus the
+      use-type-clause for the type <tt><font color="#800080">Whole</font></tt>
+      was disallowed because it would have made unwanted operations hidden in
+      <tt><font color="#800080">Invisible</font></tt> directly visible again.<br />
+      The <b>Ada 95 version</b> (27 June 2005) is still available:</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">27 Jun 2005</font></b></td>
+  <td><b>Last Ada 95 version</b>, no longer maintained.
+      Link to homepage corrected.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">25 Jun 2005</font></b></td>
+  <td>Measured speed quaternion vs. matrix rotation.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">8 Sep 2004</font></b></td>
+  <td>Minor change for consistency reasons: Renamed function Unit in package
+      Quaternion_Space to Normalize to be consistent with naming in package
+      Vector_Space.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">6 Sep 2004</font></b></td>
+  <td>Origin of unit Sievert.
+      Quaternion rotation about given axis added; test programs and examples
+      improved.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">14 May 2004</font></b></td>
+  <td>Note about seeming invisibility added.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">12 May 2004</font></b></td>
+  <td>The quaternion rotation package has been added for the unconstrained
+      variant.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">8 May 2004</font></b></td>
+  <td>Vectors and matrices now are private even for the unconstrained variant, but
+      have prototypes like in the constrained variant.<br />
+      A matrix rotation package has been added for the unconstrained variant.<br />
+      A quaternion package has been added for the unconstrained variant.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">26 Feb 2004</font></b></td>
+  <td>Vector and matrix <i>prototypes</i> also for unconstrained variant.<br />
+      Reference to C++ solution and list of prefix and unit name origins added.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">12 Mar 2003</font></b></td>
+  <td>IO customization improved.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">26 Feb 2003</font></b></td>
+  <td>Generic_Polynomial_Numerics in the constrained family is new.<br />
+      With the advent of GNAT 3.16a, the last work-arounds could be removed
+      except one in program Measure in subdirectory Examples.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">4 Feb 2003</font></b></td>
+  <td>Syntax for reading unit symbols changed; it now resembles the reading of
+      enumeration literals.
+      Only input raising Data_Error is treated differently.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">20 Dec 2002</font></b></td>
+  <td>Added subtyping capability for all variants,
+      vector arithmetics for the unconstrained variant.<br />
+      Added the volume of Softwaretechnik-Trends in which this work was published.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">21 Oct 2002</font></b></td>
+  <td>XHTML successfully validated with W3C validation facility.
+      No functional change.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">14 Oct 2002</font></b></td>
+  <td>Graphic files were missing in zip file.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">11 Oct 2002</font></b></td>
+  <td>Temperature scales <i>Celsius</i>, <i>Fahrenheit</i>, <i>Rankine</i>,
+  <i>R&eacute;aumur</i> added.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">27 Sep 2002</font></b></td>
+  <td>Some of the work-arounds for a GNAT 3.14p bug could be removed with
+      the arrival of 3.16w.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">15 Sep 2002</font></b></td>
+  <td>Added unit Katal and a link to the NIST.<br />
+      The argument of trigonometric functions with cycle parameter can be
+      dimensioned.</td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">9 Sep 2002</font></b></td>
+  <td>First release.</td>
+</tr>
+</tbody></table>
+
+<hr width="100%" />
+
+<p align="center"><a href="http://validator.w3.org/check/referer">
+<img src="valid-xhtml10.gif" border="0" alt="Valid XHTML 1.0 Transitional!"
+height="31" width="88" /></a></p>
+
+</body>
+</html>
