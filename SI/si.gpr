@@ -1,0 +1,73 @@
+------------------------------------------------------------------------------
+-- Checked and Unchecked Computation with SI Units
+-- Copyright (C) 2002, 2004-2009, 2018, 2020, 2025 Christoph Karl Walter Grein
+--
+-- This program is free software; you can redistribute it and/or
+-- modify it under the terms of the GNU General Public License
+-- as published by the Free Software Foundation; either version 3
+-- of the License, or any later version.
+--
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+--
+-- You should have received a copy of the GNU General Public License
+-- along with this program; if not, write to the Free Software
+-- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+--
+-- Author's homepage and email address:
+--   http://www.christ-usch-grein.homepage.t-online.de/
+--   Christ-Usch.Grein@T-Online.de
+------------------------------------------------------------------------------
+
+project SI is
+
+  --====================================================================
+  -- Author    Christoph Grein
+  -- Version   7.0
+  -- Date      16 April 2025
+  --====================================================================
+  --
+  --====================================================================
+  -- History
+  -- Author Version   Date    Reason for change
+  --  C.G.    1.0  13.11.2002
+  --  C.G.    1.1  17.03.2004 Added -gnatN (inlining), removed -gnatx
+  --  C.G.    2.0  15.11.2005 Gnat GPL 2005: Enable Ada 2005
+  --  C.G.    2.1  09.04.2006 Code distributed in subdirectories
+  --  C.G.    2.2  02.12.2006 removed -gnatN (deprecated by AdaCore)
+  --  C.G.    2.3  15.03.2007 Add package Linker (for libgnalasup.a,
+  --                          missing in Gnat 6.0.1)
+  --  C.G.    3.0  26.04.2008 GNAT 6.1.1: package Linker no longer
+  --                          needed
+  --  C.G.    3.1  24.07.2009 More compiler options
+  --  C.G.    3.2  05.09.2015 GNAT GPL 2015: Enable Ada 2012
+  --  C.G.    4.0  26.07.2018 SI overhauled (unit strings are new)
+  --  C.G.    5.0  10.05.2020 SI overhauled (dimensions as generic par.)
+  --  C.G.    5.1  02.07.2020 -O3
+  --  C.G.    6.0  20.04.2024 GNAT CE 2021
+  --  C.G.    7.0  16.04.2025 Safety_Choice added
+  --====================================================================
+
+  for Source_Dirs use (".", "Rational_Arithmetics", "Dimensions");
+  for Object_Dir  use "GnatLib";
+
+  type Safety_Choice is ("Checked", "Unchecked");
+  Safety: Safety_Choice := external ("Safety");
+
+  Assertion := "";
+
+  case Safety is
+    when "Checked"   => Assertion := "-gnata";  -- assertions enabled
+    when "Unchecked" => Assertion := "";
+  end case;
+
+  package Compiler is
+    for Default_Switches ("ada") use ("-gnatn",  -- inlining
+                                      "-gnato",  -- overflow
+                                      "-O3", "-gnat12", "-fstack-check") &
+                                      Assertion;
+  end Compiler;
+
+end SI;
