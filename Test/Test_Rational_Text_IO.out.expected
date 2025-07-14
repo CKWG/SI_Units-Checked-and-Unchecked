@@ -1,0 +1,10 @@
+ 8
+-4
+-3
+ 1/5
+ADA.IO_EXCEPTIONS.DATA_ERROR => "      exception -"
+ADA.IO_EXCEPTIONS.DATA_ERROR => "/      exception /"
+ADA.IO_EXCEPTIONS.DATA_ERROR => " 8    exception - 8"
+ 7
+ADA.IO_EXCEPTIONS.DATA_ERROR => "/21  exception  /21"
+ADA.IO_EXCEPTIONS.DATA_ERROR => " 7 exception -21/ 7"

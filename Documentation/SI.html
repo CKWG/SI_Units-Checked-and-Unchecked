@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="shortcut icon" type="image/x-icon" href="Ada.ico" />
+<title>SI</title>
+<!-- Version  Date
+      1.0  16.02.2006
+      1.1  01.03.2006  pragma Pure; text improved
+      1.2  08.07.2006  µ for micro was missing; identifier at package end coloured
+                       like the defining_program_unit_name
+      1.3  14.03.2007  Note added about Unit_Error
+      1.4  03.04.2008  Correct error in link to binary prefixes
+      2.0  14.12.2011  subpackage for_Test_only
+      3.0  13.08.2018  Completely reworked; unit strings
+      3.1  21.08.2018  Validated
+      3.2  01.09.2018  Dimensionless ""
+      3.3  28.09.2018  Value returns Real'Base
+      3.4  02.10.2018  Note about adding further unit symbols
+      3.5  15.10.2018  kat replaces mol/s
+      3.6  16.02.2019  new units now in SI.Generic_Strings.Get_Item.Get_Unit.Symbols
+      3.7  18.02.2019  typo corrected
+      3.8  12.03.2020  New subtypes for electric and magnetic fields; paragraph about
+                       exceptions
+      4.0  22.05.2020  Completely reworked; dimensions generic parameter
+      4.1  09.08.2020  eV added
+      4.2  06.06.2021  Bugs [T303-018 public], [T520-013 public], [T521-020 public]
+                       fixed in GNAT CE 2021; new bug [T526-002 public]
+      5.0  21.10.2021  Predicate_Failure for subtypes;
+                       final notes on GNAT compiler bugs updated
+      5.1  08.12.2022  link to BIPM instead of NIST;
+                       notes on compiler bugs moved to separate file
+      6.0  01.04.2025  ToC Subheaders
+      6.1  18.04.2025  Preconditions replace check in body
+//-->
+</head>
+
+<body>
+
+<h2 align="center">SI</h2>
+
+<p>All packages are generic with respect to the underlying real number and
+the dimension signature package.
+In order to get the <font color="#008000">checked</font> variant, the package
+<font color="#008000"><code>True_Dimensions</code></font> has to be used for
+<a href="Dimension_Signature.html">instantiation</a>,
+for the <font color="#FF0000">unchecked</font> variant the
+package <font color="#FF0000"><code>Fake_Dimensions</code></font>.</p>
+
+<p>Unit_Error is raised whenever incompatible units clash.
+This only happens in the <font color="#008000">checked</font>
+variant, of course.</p>
+
+<p>Illegal_Unit is raised for wrong syntax in unit strings.</p>
+
+<p><a href="#Specification">Specification</a><br/>
+<a href="#Unit">Unit Subtpyes</a><br/>
+<a href="#Operators">Operators</a><br/>
+<a href="#Math">Mathematical Functions</a><br/>
+<a href="#Except">Exceptions</a></p>
+
+<h3 align="left"><a name="Specification">Specification</a></h3>
+
+<pre><b>with </b>Ada.Numerics;
+<b>private with </b>Ada.Numerics.Generic_Elementary_Functions;
+
+<b>with </b>Rational_Arithmetics;
+<b>use  </b>Rational_Arithmetics;
+
+<b>with </b>Dimension_Signature;
+
+<b>generic
+
+  type </b>Real <b>is digits </b>&lt;&gt;;
+
+  <b>with package </b>Dimensions <b>is new </b>Dimension_Signature <b>(</b>&lt;&gt;<b>)</b>;
+  <b>use </b>Dimensions;
+
+<b>package </b>Generic_SI <b>is
+
+  </b><b>type </b>Item <b>is private</b>;
+
+  Zero: <b>constant </b>Item;  <i>-- 0.0*&quot;&quot;</i>
+  One : <b>constant </b>Item;  <i>-- 1.0*&quot;&quot;</i>
+
+  <i>-- Check that the two items have the same dimension</i>
+  <b>function</b> Same_Dimension (X, Y: Item) <b>return</b> Boolean;
+  <i>-- Check that X has the dimension given by Symbol (ignoring all prefixes)</i>
+  <b>function </b>has_Dimension <b>(</b>X: Item; Symbol: String<b>) return </b>Boolean;
+
+  <b>function </b>Value <b>(</b>X: Item<b>) return </b>Real'Base;
+
+  Unit_Error: <b>exception</b>;
+
+  <i>-- Subtypes (add here, if needed, other units like angular momentum)</i>
+
+  <b>subtype </b>Dimensionless           <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Dimensionless          , &quot;&quot;        <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Dimensionless";
+  <b>subtype </b>Angle                   <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Angle                  , &quot;rad&quot;     <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Angle";
+  <b>subtype </b>Solid_Angle             <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Solid_Angle            , &quot;sr&quot;      <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Solid_Angle";
+
+  <b>subtype </b>Length                  <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Length                 , &quot;m&quot;       <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Length";
+  <b>subtype </b>Area                    <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Area                   , &quot;m**2&quot;    <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Area";
+  <b>subtype </b>Volume                  <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Volume                 , &quot;m**3&quot;    <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Volume";
+
+  <b>subtype </b>Time                    <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Time                   , &quot;s&quot;       <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Time";
+  <b>subtype </b>Frequency               <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Frequency              , &quot;Hz&quot;      <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Frequency";
+  <b>subtype </b>Angular_Frequency       <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Angular_Frequency      , &quot;rad/s&quot;   <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Angular_Frequency";
+  <b>subtype </b>Speed                   <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Speed                  , &quot;m/s&quot;     <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Speed";
+  <b>subtype </b>Acceleration            <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Acceleration           , &quot;m/s**2&quot;  <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Acceleration";
+
+  <b>subtype </b>Mass                    <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Mass                   , &quot;kg&quot;      <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Mass";
+  <b>subtype </b>Mass_Density            <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Mass_Density           , &quot;kg/m**3&quot; <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Mass_Density";
+  <b>subtype </b>Momentum                <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Momentum               , &quot;kg*m/s&quot;  <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Momentum";
+
+  <b>subtype </b>Force                   <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Force                  , &quot;N&quot;       <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Force";
+  <b>subtype </b>Torque                  <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Torque                 , &quot;N*m&quot;     <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Torque";
+  <b>subtype </b>Pressure                <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Pressure               , &quot;Pa&quot;      <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Pressure";
+  <b>subtype </b>Energy                  <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Energy                 , &quot;J&quot;       <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Energy";
+  <b>subtype </b>Power                   <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Power                  , &quot;W&quot;       <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Power";
+
+  <b>subtype </b>Current                 <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Current                , &quot;A&quot;       <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Current";
+  <b>subtype </b>Current_Density         <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Current_Density        , &quot;A/m**2&quot;  <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Current_Density";
+  <b>subtype </b>Charge                  <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Charge                 , &quot;C&quot;       <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Charge";
+  <b>subtype </b>Voltage                 <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Voltage                , &quot;V&quot;       <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Voltage";
+  <b>subtype </b>Capacitance             <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Capacitance            , &quot;F&quot;       <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Capacitance";
+  <b>subtype </b>Resistance              <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Resistance             , &quot;Ohm&quot;     <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Resistance";
+  <b>subtype </b>Conductance             <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Conductance            , &quot;S&quot;       <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Conductance";
+
+  <b>subtype </b>Electric_Field          <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Electric_Field         , &quot;V/m&quot;     <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Electric_Field";  <i>-- E field</i>
+
+  <b>subtype </b>Inductance              <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Inductance             , &quot;H&quot;       <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Inductance";
+  <b>subtype </b>Magnetic_Field_Strength <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Magnetic_Field_Strength, &quot;A/m&quot;     <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Magnetic_Field_Strength";  <i>-- H field</i>
+  <b>subtype </b>Magnetic_Flux           <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Magnetic_Flux          , &quot;Wb&quot;      <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Magnetic_Flux";
+  <b>subtype </b>Magnetic_Flux_Density   <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Magnetic_Flux_Density  , &quot;T&quot;       <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Magnetic_Flux_Density";  <i>-- B field</i>
+  <b>subtype </b>Magnetic_Field          <b>is      </b>Magnetic_Flux_Density;                                                          <i>-- just a renaming</i>
+
+  <b>subtype </b>Temperature             <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Temperature            , &quot;K&quot;       <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Temperature";
+
+  <b>subtype </b>Luminous_Intensity      <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Luminous_Intensity     , &quot;cd&quot;      <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Luminous_Intensity";
+  <b>subtype </b>Luminance               <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Luminance              , &quot;cd/m**2&quot; <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Luminance";
+  <b>subtype </b>Luminous_Flux           <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Luminous_Flux          , &quot;lm&quot;      <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Luminous_Flux";
+  <b>subtype </b>Illuminance             <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Illuminance            , &quot;lx&quot;      <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Illuminance";
+
+  <b>subtype </b>Amount_of_Substance     <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Amount_of_Substance    , &quot;mol&quot;     <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Amount_of_Substance;
+  <b>subtype </b>Concentration           <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Concentration          , &quot;mol/m**3&quot;<b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Concentration";
+  <b>subtype </b>Catalytic_Activity      <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Catalytic_Activity     , &quot;kat&quot;     <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Catalytic_Activity";
+
+  <b>subtype </b>Radio_Activity          <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Radio_Activity         , &quot;Bq&quot;      <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Radio_Activity";
+  <b>subtype </b>Absorbed_Dose           <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Absorbed_Dose          , &quot;Gy&quot;      <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Absorbed_Dose";
+  <b>subtype </b>Dose_Equivalent         <b>is </b>Item <b>with </b>Dynamic_Predicate <b>=&gt; </b>has_Dimension <b>(</b>Dose_Equivalent        , &quot;Sv&quot;      <b>)</b>, Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Dose_Equivalent";
+
+  <i>-- Operations</i>
+
+  <b>function </b>&quot;abs&quot; <b>(</b>Right: Item<b>) return </b>Item;
+
+  <b>function </b>&quot;+&quot; <b>(</b>Right: Item<b>) return </b>Item;
+  <b>function </b>&quot;-&quot; <b>(</b>Right: Item<b>) return </b>Item;
+
+  <b>function </b>&quot;+&quot; <b>(</b>Left, Right: Item<b>) return </b>Item <b>with</b> Pre =&gt; Same_Dimension (Left, Right) <b>or else raise</b> Unit_Error;
+  <b>function </b>&quot;-&quot; <b>(</b>Left, Right: Item<b>) return </b>Item <b>with</b> Pre =&gt; Same_Dimension (Left, Right) <b>or else raise</b> Unit_Error;
+
+  <b>function </b>&quot;*&quot; <b>(</b>Left, Right: Item<b>) return </b>Item;
+  <b>function </b>&quot;/&quot; <b>(</b>Left, Right: Item<b>) return </b>Item;
+
+  <b>function </b>&quot;*&quot; <b>(</b>Left: Item     ; Right: Real'Base<b>) return </b>Item;
+  <b>function </b>&quot;*&quot; <b>(</b>Left: Real'Base; Right: Item     <b>) return </b>Item;
+  <b>function </b>&quot;/&quot; <b>(</b>Left: Item     ; Right: Real'Base<b>) return </b>Item;
+  <b>function </b>&quot;/&quot; <b>(</b>Left: Real'Base; Right: Item     <b>) return </b>Item;
+
+  <b>function </b>&quot;**&quot; <b>(</b>Base: Item         ; Exponent: Whole    <b>) return </b>Item;
+  <b>function </b>&quot;**&quot; <b>(</b>Base: Item         ; Exponent: Rational <b>) return </b>Item;
+  <b>function </b>&quot;**&quot; <b>(</b>Base: Dimensionless; Exponent: Real'Base<b>) return </b>Dimensionless;
+
+  <b>function </b>&quot;&lt;&quot;  <b>(</b>Left, Right: Item<b>) return </b>Boolean <b>with</b> Pre =&gt; Same_Dimension (Left, Right) <b>or else raise</b> Unit_Error;
+  <b>function </b>&quot;&lt;=&quot; <b>(</b>Left, Right: Item<b>) return </b>Boolean <b>with</b> Pre =&gt; Same_Dimension (Left, Right) <b>or else raise</b> Unit_Error;
+  <b>function </b>&quot;&gt;=&quot; <b>(</b>Left, Right: Item<b>) return </b>Boolean <b>with</b> Pre =&gt; Same_Dimension (Left, Right) <b>or else raise</b> Unit_Error;
+  <b>function </b>&quot;&gt;&quot;  <b>(</b>Left, Right: Item<b>) return </b>Boolean <b>with</b> Pre =&gt; Same_Dimension (Left, Right) <b>or else raise</b> Unit_Error;
+
+  <i>-- Unit strings</i>
+
+  <b>function </b>&quot;*&quot; <b>(</b>Left: Real'Base; Right: String<b>) return </b>Item;  <i>-- 1.0*&quot;km&quot;</i>
+  <b>function </b>&quot;/&quot; <b>(</b>Left: Real'Base; Right: String<b>) return </b>Item;  <i>-- 1.0/&quot;s&quot;</i>
+
+  Illegal_Unit: <b>exception</b>;
+
+  <i>-- Mathematics</i>
+
+  Argument_Error: <b>exception renames </b>Ada.Numerics.Argument_Error;
+
+  Pi: <b>constant </b>:= Ada.Numerics.Pi;
+  e : <b>constant </b>:= Ada.Numerics.e;
+
+  <b>function </b>Sqrt <b>(</b>X: Item<b>) return </b>Item;  <i>-- X**(1/2)</i>
+  <b>function </b>Cbrt <b>(</b>X: Item<b>) return </b>Item;  <i>-- X**(1/3)</i>
+
+  <b>function </b>Log <b>(</b>X      : Dimensionless<b>) return </b>Dimensionless;
+  <b>function </b>Log <b>(</b>X, Base: Dimensionless<b>) return </b>Dimensionless;
+  <b>function </b>Exp <b>(</b>X      : Dimensionless<b>) return </b>Dimensionless;
+
+  <b>function </b>Sin <b>(</b>X       : Angle<b>) return </b>Dimensionless;
+  <b>function </b>Sin <b>(</b>X, Cycle: Item <b>) return </b>Dimensionless <b>with</b> Pre =&gt; Same_Dimension (X, Cycle) <b>or else raise</b> Unit_Error;
+  <b>function </b>Cos <b>(</b>X       : Angle<b>) return </b>Dimensionless;
+  <b>function </b>Cos <b>(</b>X, Cycle: Item <b>) return </b>Dimensionless <b>with</b> Pre =&gt; Same_Dimension (X, Cycle) <b>or else raise</b> Unit_Error;
+  <b>function </b>Tan <b>(</b>X       : Angle<b>) return </b>Dimensionless;
+  <b>function </b>Tan <b>(</b>X, Cycle: Item <b>) return </b>Dimensionless <b>with</b> Pre =&gt; Same_Dimension (X, Cycle) <b>or else raise</b> Unit_Error;
+  <b>function </b>Cot <b>(</b>X       : Angle<b>) return </b>Dimensionless;
+  <b>function </b>Cot <b>(</b>X, Cycle: Item <b>) return </b>Dimensionless <b>with</b> Pre =&gt; Same_Dimension (X, Cycle) <b>or else raise</b> Unit_Error;
+
+  <b>function </b>Arcsin <b>(</b>X: Dimensionless             <b>) return </b>Angle;
+  <b>function </b>Arcsin <b>(</b>X: Dimensionless; Cycle: Item<b>) return </b>Item;
+  <b>function </b>Arccos <b>(</b>X: Dimensionless             <b>) return </b>Angle;
+  <b>function </b>Arccos <b>(</b>X: Dimensionless; Cycle: Item<b>) return </b>Item;
+  <b>function </b>Arctan <b>(</b>Y    : Item;
+                   X    : Item := One<b>) return </b>Angle <b>with</b> Pre =&gt; Same_Dimension (Y, X) <b>or else raise</b> Unit_Error;
+  <b>function </b>Arctan <b>(</b>Y    : Item;
+                   X    : Item := One;
+                   Cycle: Item       <b>) return </b>Item  <b>with</b> Pre =&gt; Same_Dimension (Y, X) <b>or else raise</b> Unit_Error;
+  <b>function </b>Arccot <b>(</b>X    : Item;
+                   Y    : Item := One<b>) return </b>Angle <b>with</b> Pre =&gt; Same_Dimension (X, Y) <b>or else raise</b> Unit_Error;
+  <b>function </b>Arccot <b>(</b>X    : Item;
+                   Y    : Item := One;
+                   Cycle: Item       <b>) return </b>Item  <b>with</b> Pre =&gt; Same_Dimension (X, Y) <b>or else raise</b> Unit_Error;
+
+  <b>function </b>Sinh    <b>(</b>X: Dimensionless<b>) return </b>Dimensionless;
+  <b>function </b>Cosh    <b>(</b>X: Dimensionless<b>) return </b>Dimensionless;
+  <b>function </b>Tanh    <b>(</b>X: Dimensionless<b>) return </b>Dimensionless;
+  <b>function </b>Coth    <b>(</b>X: Dimensionless<b>) return </b>Dimensionless;
+  <b>function </b>Arcsinh <b>(</b>X: Dimensionless<b>) return </b>Dimensionless;
+  <b>function </b>Arccosh <b>(</b>X: Dimensionless<b>) return </b>Dimensionless;
+  <b>function </b>Arctanh <b>(</b>X: Dimensionless<b>) return </b>Dimensionless;
+  <b>function </b>Arccoth <b>(</b>X: Dimensionless<b>) return </b>Dimensionless;
+
+<b>private
+
+  </b><i>Not shown</i>
+
+<b>end </b>Generic_SI;</pre>
+
+<p>Dimensioned objects are of the private type Item.
+Two constants define the items 0.0 and 1.0 with dimension 1.
+Note that pure numbers like 1.0 (of type Real'Base) are different from items with value
+1.0 and dimension 1.
+These values may also be written as indicated in the comments, however
+because of elaboration reasons not here in this package.</p>
+
+<pre>  Zero: <b>constant</b> Item;  <i>-- 0.0*&quot;&quot;</i>
+  One : <b>constant</b> Item;  <i>-- 1.0*&quot;&quot;</i></pre>
+
+<p>The seven SI base units are represented by rational numbers (in the
+<font color="#008000">checked</font> variant) so that, although final
+results never have fractional units, any intermediate values can be
+represented.
+In the <font color="#FF0000">unchecked</font> variant, they are not
+there, only the numeric value remains.</p>
+
+<pre>  <b>function</b> Value (X: Item) <b>return</b> Real'Base;</pre>
+
+<p>Value returns the numeric value of the parameter X.</p>
+
+<h3><a name="Unit">Unit Subtypes</a></h3>
+
+<p>Unit subtypes are defined for all named SI units and a lot more.
+<font color="#008000">Variables defined with these subtypes are
+constrained to the dimension indicated; Unit_Error will be raised
+in case of violation.
+For this to be true, of course you have to make sure that
+<code>pragma&nbsp;Assertion_Policy&nbsp;(Check);</code> is set.</font>
+<font color="#FF0000">In the unchecked variant, this is of course not
+the case, <code>pragma&nbsp;Assertion_Policy&nbsp;(Ignore);</code>
+should be set.</font>
+Variables with subtype Item may assume any dimension.</p>
+
+<p>Note: Magnetic_Flux_Density is the classical name.
+Nowadays it's often just called Magnetic_Field because this is the
+fundamental one.
+The subtype name reflects this.
+If you find the name annoying, just remove it.</p>
+
+<pre>  <b>function</b> Same_Dimension (X, Y: Item) <b>return</b> Boolean;</pre>
+
+<p>returns True if both items have the same dimension, else False.</p>
+
+<pre>  <b>function </b>has_Dimension <b>(</b>X: Item; Symbol: String<b>) return </b>Boolean;</pre>
+
+<p><font color="#008000">returns True if the Symbol parameter is compatible with the dimension
+of X, else False.</font>
+It raises Illegal_Unit if Symbol does not have the syntax of a <i>dimension
+format modifier</i> (see package <a href="SI-Text_IO.html">SI.Text_IO</a>).
+<font color="#FF0000">In the unchecked variant, it returns always True.</font></p>
+
+<h3><a name="Value">Value Construction</a></h3>
+
+<p>Dimensioned values are constructed with a numeric value of type Real'Base,
+multplied or divided by the unit indication in a string:</p>
+
+<pre>  27.0*&quot;km/h&quot;   4.2/&quot;s&quot;</pre>
+
+<p>Any unit names and prefixes may be used as given for the SI unit system
+in <a href="https://www.bipm.org/en/measurement-units/">BIPM</a>.
+There are two exceptions: 'u' is used for micro instead of '&micro;';
+&quot;Ohm&quot; is used for &quot;&Omega;&quot;.
+Additionally allowed symbols are &quot;min&quot;, &quot;h&quot; for minute
+and hour (no prefixes allowed) and &quot;l&quot;, &quot;L&quot; for liter
+(prefixes allowed), &quot;eV&quot; for particle mass (prefixes allowed).
+Unit and prefix are case sensitive and written together like &quot;Ms&quot;,
+megasecond, or &quot;mS&quot;, millisiemens.
+The exact syntax for a unit indication is given in package
+<a href="SI-Text_IO.html">SI.Text_IO</a>.
+Internally, the numeric value will be converted to the base units, i.e.
+the speed example above will be 7.5*&quot;m/s&quot;.</p>
+
+<p>The <b>complete list of symbols</b> can be found in package body
+Generic_SI.Generic_Symbols.</p>
+
+<p>Further symbols may easily be added like for instance &quot;nmi&quot;
+for nautical miles (1.852 km) or &quot;kn&quot; for knots (1&nbsp;nmi/h, also
+&quot;kt&quot; is in use); another unit could be the enzyme unit
+&quot;U&quot;, 60 U = 1 &micro;kat.
+Just add them to the list in the body of the private package
+<code>Generic_SI.Generic_Symbols</code>.</p>
+
+<h3><a name="Operators">Operators</a></h3>
+
+<p>All standard operators have been defined, where it makes sense also for mixed
+parameters (in the latter case, Real'Base is used as in the Ada Reference Manual
+for the predefined floating point operators). Note that the exponentiation
+operator is threefold overloaded with whole, rational and real exponents.
+Unit_Error is raised where incompatible units are combined.</p>
+
+<p>No ordering operators have been defined for comparing dimensionless items and
+real values like <code>X&nbsp;&lt;&nbsp;18.15</code> (illegal; in a perfect method,
+they should be identical).
+This shortcoming can easily mended, for instance:
+<code>X&nbsp;&lt;&nbsp;18.15*&quot;&quot;</code>, which will raise Unit_Error if X is not
+dimensionless.</p>
+
+<p>By the way: Items with different dimensions are always unequal.
+(This follows from the Ada rules.)</p>
+
+<h3><a name="Math">Mathematical Functions</a></h3>
+
+<p>All basic mathematical functions are provided with their standard meanings.
+Most of them operate on items with dimension 1 only.
+Exceptions from this rule are: The square and cubic roots; the trigonometric
+functions with two parameters (both must then have the same dimension)
+and their inverses (Cycle and return value have the same dimension).
+Unit_Error is raised in case of wrong dimensions.</p>
+
+<h3><a name="Except">Exceptions</a></h3>
+
+<p>Illegal_Unit is raised for syntax errors in unit strings:</p>
+
+<pre>  181.5 * &quot;km|h&quot;</pre>
+
+<p>Unit_Error is raised for subtype violations:</p>
+
+<pre>  Y: Length := 42.0*&quot;km/h&quot;;
+
+  V: Speed := Arcsin (1.0*"", Cycle =&gt; 2.0*&quot;m&quot;);  -- <i>cycle must have a speed unit</i></pre>
+
+<p>Unit_Error is also raised when incompatible units are combined:</p>
+
+<pre>  4.0*&quot;km/h&quot; + 30.0*"min"  -- <i>wrong operator</i>
+
+  Sin (1.0*"", Cycle =&gt; 2.0*"m")  -- <i>both parameters must have same dimension</i>
+
+  Put (2.0*"m", Dim =&gt; "s");  -- <i>see Text_IO</i></pre>
+
+<p><a href="Table_of_Contents.html">Table_of_Contents</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="SI-Strings.html">SI.Strings</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="SI-Text_IO.html">SI.Text_IO</a></p>
+
+<p align="center"><a href="http://validator.w3.org/check?uri=referer">
+   <img src="valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a></p>
+
+</body>
+
+</html>

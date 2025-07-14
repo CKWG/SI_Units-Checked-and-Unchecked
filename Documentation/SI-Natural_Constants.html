@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="shortcut icon" type="image/x-icon" href="Ada.ico" />
+<title>SI.Natural_Constants</title>
+<!-- Version  Date
+      1.0  23.12.2005
+      1.1  27.02.2006  pragma Pure
+      2.0  10.08.2018  Completely reworked; unit strings
+      2.1  21.08.2018  Validated
+      3.0  02.10.2018  Newest data from NIST 2017
+      3.1  11.12.2018  Link to ArXiv
+      3.2  20.05.2019  World Metrology Day: new definitions become effective
+      3.3  07.03.2020  Stefan_Boltzmann and Gas constants
+      4.0  12.05.2020  Completely reworked; dimensions generic parameter
+      4.1  21.10.2021  Name Speed_of_Light added
+//-->
+</head>
+
+<body>
+
+<h2 align="center">SI.Natural_Constants</h2>
+
+<p>This package is where you can add any natural constants you need in your
+project.
+Most of the constants change their values with increasing measurement accuracy
+(except for the very basic ones).
+Just take the latest values.</p>
+
+<p><a href="https://www.nist.gov/si-redefinition">SI Redefinition</a> was fixed
+on November 16, 2018, in Versailles; however, the new definition became effective
+only on May 20, 2019: <a href="http://www.worldmetrologyday.org/">World Metrology Day</a>.
+As of this date, six SI base units are now defined via fixed natural constants
+(only the Candela has not been redefined).</p>
+
+<p>More information on the definition of the
+<a href="https://physics.nist.gov/cuu/Units/units.html">seven base units</a>
+is to be found here:</p>
+
+<ul>
+<li><a href="https://www.npl.co.uk/si-units/metre">Meter</a></li>
+<li><a href="https://www.npl.co.uk/si-units/kilogram">Kilogram</a></li>
+<li><a href="https://www.npl.co.uk/si-units/second">Second</a></li>
+<li><a href="https://www.npl.co.uk/si-units/ampere">Ampere</a></li>
+<li><a href="https://www.npl.co.uk/si-units/kelvin">Kelvin</a></li>
+<li><a href="https://www.npl.co.uk/si-units/mole">Mole</a></li>
+<li><a href="https://www.npl.co.uk/si-units/candela">Candela</a></li>
+</ul>
+
+<p>The numeric values of the newly fixed natural constants are from the
+<span style="background-color: #FFFF00">CODATA 2017 special adjustment</span>.
+They were calculated from data available before the 1st of July 2017.
+See <a href="https://arxiv.org/ftp/arxiv/papers/1512/1512.03668.pdf">ArXiv</a>,
+Table 1.</p>
+
+<h3 align="left">Specification</h3>
+
+<pre><b>generic
+
+package </b>Generic_<a href="SI.html">SI</a>.Generic_Natural_Constants <b>is</b>
+
+  -- <i>Speed of Light in Vacuum</i>
+
+  <span style="background-color: #cceeff">Speed_of_Light: <b>constant</b> Speed := 2.997_924_58E+8*&quot;m/s&quot;;  <i>-- exact (by definition)</i></span>
+  c: Speed <b>renames</b> Speed_of_Light;
+
+  -- <i>Particles</i>
+
+  <span style="background-color: #cceeff">Elementary_Charge: <b>constant </b>Charge := 1.602_176_634E-19*&quot;C&quot;;  <i>-- exact (by definition)</i></span>
+  e_e: Charge <b>renames </b>Elementary_Charge;
+
+  Electron_Mass: <b>constant </b>Mass := 9.109_382_6E-31 *&quot;kg&quot;;
+  Proton_Mass  : <b>constant </b>Mass := 1.672_621_71E-27*&quot;kg&quot;;
+
+  m_e: Mass <b>renames </b>Electron_Mass;
+  m_p: Mass <b>renames </b>Proton_Mass;
+
+  -- <i>Permittivity and Permeability of Vacuum</i>
+
+  Mu_0 : <b>constant </b>Item := 4.0E-7*Pi*&quot;kg*m/C**2&quot;;  <i>-- exact; c = 1/Sqrt(Eps_0*Mu_0)</i>
+  Eps_0: <b>constant </b>Item := 1.0/<b>(</b>Mu_0*c**2<b>)</b>;        <i>-- exact; 8.854_187_817E-12 F/m</i>
+
+  -- <i>Quantum Mechanics</i>
+
+  <span style="background-color: #cceeff">Planck: <b>constant </b>Item := 6.626_070_15E-34*&quot;J*s&quot;;  <i>-- exact (by definition)</i></span>
+  h     :          Item <b>renames </b>Planck;
+  h_bar : <b>constant </b>Item := h / <b>(</b>2.0*Pi<b>)</b>;
+
+  Alpha: <b>constant </b>Item := e_e**2/<b>(</b>2.0*Eps_0*h*c<b>)</b>;  <i>-- exact; 1/137.035_999_11</i>
+
+  -- <i>Thermodynamics</i>
+
+  <span style="background-color: #cceeff">Boltzmann: <b>constant </b>Item := 1.380_649E-23*&quot;J/K&quot;;     <i>-- exact (by definition)</i></span>
+  <span style="background-color: #cceeff">Avogadro : <b>constant </b>Item := 6.022_140_76E+23/&quot;mol&quot;;  <i>-- exact (by definition)</i></span>
+
+  k_B: Item <b>renames </b>Boltzmann;
+  N_A: Item <b>renames </b>Avogadro;
+
+  Gas_Constant: <b>constant</b> Item := N_A * k_B;  -- <i>exact; 8.314 J/(mol*K)</i>
+
+  -- <i>Black body radiation</i>
+
+  Stefan_Boltzmann: <b>constant</b> Item := (2.0*Pi**5/15.0)*(k_B/h)**3*(k_B/c**2);  -- <i>careful with underflow</i>
+  Sigma           :          Item <b>renames</b> Stefan_Boltzmann;  -- <i>exact; 5.670E-8*W/(m**2*K**4)</i>
+
+  -- <i>Gravity</i>
+
+  Gravity: <b>constant </b>Item := 6.674_2E-11*&quot;m**3/(kg*s**2)&quot;;
+
+<b>end </b>Generic_SI.Generic_Natural_Constants;</pre>
+
+<p>I didn't find a better abbreviation for the elementary charge than e_e, normally
+it's named just <i>e</i>, but this name conflicts with the Euler number <i>e</i>.
+e_e stands for <i>e</i><sub>elementary</sub> or <i>e</i><sub>Electron</sub>.</p>
+
+<p><a href="Table_of_Contents.html">Table_of_Contents</a></p>
+
+<p align="center"><a href="http://validator.w3.org/check?uri=referer">
+   <img src="valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a></p>
+
+</body>
+
+</html>

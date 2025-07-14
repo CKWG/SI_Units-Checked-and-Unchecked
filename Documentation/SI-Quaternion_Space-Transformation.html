@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="shortcut icon" type="image/x-icon" href="Ada.ico" />
+<title>SI.Quaternion_Space.Transformation</title>
+<!-- Version  Date
+      1.0  08.02.2006
+      1.1  27.02.2006  pragma Pure
+      2.0  20.08.2018  Completely reworked; unit strings
+      3.0  15.05.2020  Dimensions generic parameter
+//-->
+</head>
+
+<body>
+
+<h2 align="center">SI.Quaternion_Space.Transformation</h2>
+
+<p>Quaternions can be used as an alternative to matrices to rotate three-dimensional
+vectors.
+This package defines quaternions for special rotations.
+A rotation of a vector <b>v</b> via a quaternion Q is achieved by transforming <b>v</b>
+with the following equation:<br />
+&nbsp;&nbsp; <b>v</b><sub>q</sub>' := Q * <b>v</b><sub>q</sub> / Q<br/>
+which for a normalised quaternion (1/Q = Conjugate (Q)) is equivalent to<br />
+&nbsp;&nbsp; <b>v</b><sub>q</sub>' := Q * <b>v</b><sub>q</sub> * Conjugate (Q)<br/>
+where Re (<b>v</b><sub>q</sub>) = 0, Im (<b>v</b><sub>q</sub>) = <b>v</b>, and the
+rotated vector <b>v</b>' is the imaginary part of <b>v</b><sub>q</sub>':<br/>
+&nbsp;&nbsp; <b>v</b>' = Im (<b>v</b><sub>q</sub>')<br/>
+Note that the vector is rotated, not the coordinate system.</p>
+
+<h3>Specification</h3>
+
+<pre><b>generic
+package </b>Generic_<a href="SI.html">SI</a>.Generic_<a href="SI-Quaternion_Space.html">Quaternion_Space</a>.Generic_Transformation <b>is
+
+  use </b>Vectors;
+
+  <b>function </b>Rotation <b>(</b>Axis: Vector; By: Angle<b>) return </b>Quaternion;
+
+  <b>function </b>Rotation <b>(</b>Yaw, Pitch, Roll: Angle := 0.0 * &quot;rad&quot;<b>) return </b>Quaternion;
+
+<b>end </b>Generic_SI.Generic_Quaternion_Space.Generic_Transformation;</pre>
+
+<p>The functions provided deliver normalized quaternions. They are in fact the
+equivalents to the functions provided in package <a href="SI-Vector_Space-Transformation.html">SI.Vector_Space.Transformation</a>.</p>
+
+<h3>1. Rotation (right-handed) around an axis given by a vector</h3>
+
+<pre>  <b>function</b> Rotation (Axis: Vector; By: Angle) <b>return</b> Quaternion;</pre>
+
+<p>The Angle must be in radians.</p>
+
+<h3>2. Successive rotations (right-handed) around the three coordinate axes</h3>
+
+<pre>  <b>function</b> Rotation (Yaw, Pitch, Roll: Angle := 0.0 * "rad") <b>return</b> Quaternion;</pre>
+
+<p>The rotations are performed right to left so that this transformation Q
+fulfills the equation</p>
+
+<pre>  Q (Yaw, Pitch, Roll) = Q (Yaw) * Q (Pitch) * Q (Roll)</pre>
+
+<p>where Roll is the first rotation around the x-axis, Pitch the second around
+the y-axis, and Yaw the third around the z-axis.</p>
+
+<h3>Examples</h3>
+<pre>  Rot: <b>constant</b> Quaternion := ...;
+
+  Velocity           : Vector     := (400.0, 300.0, 0.0) * "m/s";
+  Velocity_Quaternion: Quaternion := Compose (Velocity);
+
+  Transformed_Quaternion: Quaternion;
+  Transformed_Vector    : Vector;
+
+  Transformed_Quaternion := Rot * Velocity_Quaternion * Inv (Rot);
+  Transformed_Vector     := Im (Transformed_Quaternion);</pre>
+
+<p>If however the Rot quaternion is constructed with one of the functions above
+or if it is normalized, the transformation may be written as</p>
+
+<pre>  Transformed_Quaternion := Rot * Velocity_Quaternion * Conjugate (Rot);</pre>
+
+<p>And since Rot * Conjugate (Rot) = Conjugate (Rot) * Rot = 1, the back transformation
+is</p>
+
+<pre>  Velocity_Quaternion := Conjugate (Rot) * Transformed_Quaternion * Rot;</pre>
+
+<p><a href="Table_of_Contents.html">Table_of_Contents</a></p>
+
+<p align="center"><a href="http://validator.w3.org/check?uri=referer">
+   <img src="valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a></p>
+
+</body>
+
+</html>

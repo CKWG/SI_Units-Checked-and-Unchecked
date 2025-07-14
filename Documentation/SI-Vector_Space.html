@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="shortcut icon" type="image/x-icon" href="Ada.ico" />
+<title>SI.Vector_Space</title>
+<!-- Version  Date
+      1.0  17.02.2006
+      1.1  27.02.2006  pragma Pure
+      2.0  21.03.2006  Ada.Numerics.Generic_Real_Arrays
+      2.1  08.07.2006  colouring mistake corrected
+      2.2  12.03.2007  typo corrected
+      3.0  19.08.2018  Completely reworked; unit strings
+      3.1  21.08.2018  Validated
+      3.2  26.08.2018  Proposal to insert subtypes of vectors and matrices
+      3.3  24.02.2020  Add some subtypes for vectors and matrices
+      4.0  14.05.2020  Dimensions generic parameter
+      4.1  14.10.2021  Predicate_Failure for subtypes
+      5.0  01.04.2025  ToC Subheaders
+      5.1  18.04.2025  Preconditions
+//-->
+</head>
+
+<body>
+
+<h2 align="center">SI.Vector_Space</h2>
+
+<p>This package defines three-dimensional vectors and operations on them.
+All elements of a vector and a matrix have the same dimension.</p>
+
+<p>Note: This is not a linear algebraics package.</p>
+
+<p>Vectors and matrices are defined via the RM numerics annex
+Generic_Real_Arrays to ease using the additional functionality of that
+package.</p>
+
+<p>Vectors and matrices are made private to prevent construction with
+differently dimensioned components; instead a way to define such objects
+indirectly via dimensionless prototypes is used.</p>
+
+<p><a href="#Spec">Specification</a><br/>
+<a href="#Proto">Prototypes</a><br/>
+<a href="#Vectors">Vectors</a><br/>
+<a href="#Matrices">Matrices</a><br/>
+<a href="#Algebra">Algebra</a><br/>
+<a href="#Conv">Conversion to Prototypes</a></p>
+
+<h3><a name="Spec">Specification</a></h3>
+
+<pre><b>with </b>Ada.Numerics.Generic_Real_Arrays;
+
+<b>generic
+
+  with package </b>Real_Arrays <b>is new </b>Ada.Numerics.Generic_Real_Arrays (Generic_SI.Real);
+  <b>use </b>Real_Arrays;
+
+<b>package </b>Generic_<a href="SI.html">SI</a>.Generic_Vector_Space <b>is
+
+  subtype </b>Axis <b>is </b>Integer <b>range </b>1 .. 3;
+
+  <i>-- Prototypes
+
+  </i><b>subtype </b>Proto_Vector <b>is </b>Real_Vector (Axis);
+
+  Null_Proto_Vector: <b>constant                 </b>Proto_Vector := (0.0, 0.0, 0.0);
+  Unit_Proto_Vector: <b>constant array</b> (Axis) <b>of </b>Proto_Vector := (Unit_Vector (Index =&gt; 1, Order =&gt; Axis'Last),
+                                                               Unit_Vector (Index =&gt; 2, Order =&gt; Axis'Last),
+                                                               Unit_Vector (Index =&gt; 3, Order =&gt; Axis'Last));
+  P1: Proto_Vector <b>renames </b>Unit_Proto_Vector (1);
+  P2: Proto_Vector <b>renames </b>Unit_Proto_Vector (2);
+  P3: Proto_Vector <b>renames </b>Unit_Proto_Vector (3);
+
+  <b>subtype </b>Proto_Matrix <b>is </b>Real_Matrix (Axis, Axis);
+
+  Null_Proto_Matrix: <b>constant </b>Proto_Matrix := ((0.0, 0.0, 0.0),
+                                               (0.0, 0.0, 0.0),
+                                               (0.0, 0.0, 0.0));
+  Proto_Unity      : <b>constant </b>Proto_Matrix := Unit_Matrix (Order =&gt; Axis'Last);
+
+  <i>-- Vector</i>
+
+  <b>type </b>Vector  <b>is private</b>;
+  <b>type </b>Vectors <b>is array</b> (Axis) <b>of </b>Vector;
+
+  -- <i>Check that X has the dimension given by Symbol (ignoring all prefixes)</i>
+  <b>function</b> has_Dimension (X: Vector; Symbol: String) <b>return</b> Boolean;
+
+  -- <i>Subtypes (add others here as needed)</i>
+
+  <b>subtype </b>Position              <b>is </b>Vector <b>with </b>Dynamic_Predicate =&gt; has_Dimension (Position             , &quot;m&quot;     ), Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Position";
+  <b>subtype </b>Velocity              <b>is </b>Vector <b>with </b>Dynamic_Predicate =&gt; has_Dimension (Velocity             , &quot;m/s&quot;   ), Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Velocity";
+  <b>subtype </b>Momentum_Vector       <b>is </b>Vector <b>with </b>Dynamic_Predicate =&gt; has_Dimension (Momentum_Vector      , &quot;kg*m/s&quot;), Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Momentum_Vector";
+  <b>subtype </b>Force_Vector          <b>is </b>Vector <b>with </b>Dynamic_Predicate =&gt; has_Dimension (Force_Vector         , &quot;N&quot;     ), Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Force_Vector";
+  <b>subtype</b> Electric_Field_Vector <b>is</b> Vector <b>with</b> Dynamic_Predicate =&gt; has_Dimension (Electric_Field_Vector, &quot;V/m&quot;   ), Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Electric_Field_Vector";
+  <b>subtype</b> Magnetic_Field_Vector <b>is</b> Vector <b>with</b> Dynamic_Predicate =&gt; has_Dimension (Magnetic_Field_Vector, &quot;T&quot;     ), Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Magnetic_Field_Vector";
+
+  Null_Vector: <b>constant </b>Vector;
+  U1, U2, U3 : <b>constant </b>Vector;   <i>-- the unit vectors</i>
+  Unit_Vector: <b>constant </b>Vectors;  <i>--   along the axes</i>
+
+  <b>function </b>&quot;*&quot; (Left: Item        ; Right: Proto_Vector) <b>return </b>Vector;
+  <b>function </b>&quot;*&quot; (Left: Proto_Vector; Right: Item        ) <b>return </b>Vector;
+  <b>function </b>&quot;/&quot; (Left: Proto_Vector; Right: Item        ) <b>return </b>Vector;
+  <b>function</b> &quot;*&quot; (Left: Proto_Vector; Right: String      ) <b>return</b> Vector;
+  <b>function</b> &quot;/&quot; (Left: Proto_Vector; Right: String      ) <b>return</b> Vector;
+
+  <b>function </b>Compose (V1, V2, V3: Item) <b>return </b>Vector <b>with</b> Pre =&gt; (Same_Dimension (V1, V2) <b>and</b> Same_Dimension (V2, V3)) <b>or else raise</b> Unit_Error;
+
+  <b>function </b>Normalize (X: Proto_Vector) <b>return </b>Vector;  <i>-- unit vector</i>
+
+  <b>function  </b>Get (V:        Vector; A:    Axis) <b>return </b>Item;
+  <b>procedure </b>Set (V: <b>in out </b>Vector; A: <b>in </b>Axis; To: <b>in </b>Item) <b>with</b> Pre =&gt; Same_Dimension (Get (V, A), To) <b>or else raise</b> Unit_Error;
+
+  <b>type </b>Polar <b>is private</b>;
+
+  <b>function </b>Compose_Polar (R    : Item;   <i>-- radius    non-negative</i>
+                          Phi  ,         <i>-- longitude no constraint</i>
+                          Theta: Angle<b>)  </b><i>-- latitude  0 .. Pi</i>
+    <b>return </b>Polar;
+  <b>function </b>Compose_Polar (R    : Item;   <i>-- constraints as above
+                          </i>Phi  ,
+                          Theta: Real<b>)
+    return </b>Polar;
+
+  <b>function </b>Radius    (P: Polar) <b>return </b>Item;   <i>-- non-negative</i>
+  <b>function </b>Longitude (P: Polar) <b>return </b>Angle;  <i>-- no constraint</i>
+  <b>function </b>Latitude  (P: Polar) <b>return </b>Angle;  <i>-- 0 .. Pi</i>
+
+  <b>procedure </b>Set_Radius    (P: <b>in out </b>Polar; R    : <b>in </b>Item ) <b>with</b> Pre =&gt; Same_Dimension (Radius (P), R) <b>or else raise</b> Unit_Error;
+  <b>procedure </b>Set_Longitude (P: <b>in out </b>Polar; Phi  : <b>in </b>Angle);  <i>-- constraints as in</i>
+  <b>procedure </b>Set_Latitude  (P: <b>in out </b>Polar; Theta: <b>in </b>Angle);  <i>--   Compose_Polar</i>
+
+  <b>function </b>To_Polar     (V: Vector) <b>return </b>Polar;  <i>-- longitude in -Pi .. Pi</i>
+  <b>function </b>To_Cartesian (P: Polar ) <b>return </b>Vector;
+
+  <i>-- Matrix</i>
+
+  <b>type </b>Matrix <b>is private</b>;
+
+  -- <i>Check that X has the dimension given by Symbol (ignoring all prefixes)</i>
+  <b>function</b> has_Dimension (X: Matrix; Symbol: String) <b>return</b> Boolean;
+
+  -- <i>Subtypes (add others here as needed)</i>
+
+  <b>subtype </b>Stress_Tensor <b>is </b>Matrix <b>with </b>Dynamic_Predicate =&gt; has_Dimension (Stress_Tensor, &quot;Pa&quot;), Predicate_Failure =&gt; <b>raise</b> Unit_Error <b>with</b> "Stress_Tensor";
+
+  Null_Matrix: <b>constant </b>Matrix;
+  Unity      : <b>constant </b>Matrix;
+
+  <b>function </b>&quot;*&quot; (Left: Item        ; Right: Proto_Matrix) <b>return </b>Matrix;
+  <b>function </b>&quot;*&quot; (Left: Proto_Matrix; Right: Item        ) <b>return </b>Matrix;
+  <b>function </b>&quot;/&quot; (Left: Proto_Matrix; Right: Item        ) <b>return </b>Matrix;
+  <b>function</b> &quot;*&quot; (Left: Proto_Matrix; Right: String      ) <b>return</b> Matrix;
+  <b>function</b> &quot;/&quot; (Left: Proto_Matrix; Right: String      ) <b>return</b> Matrix;
+
+  <b>function </b>Compose (M11, M12, M13,
+                    M21, M22, M23,
+                    M31, M32, M33: Item) <b>return </b>Matrix <b>with</b> Pre =&gt; (Same_Dimension (M11, M12) <b>and</b> Same_Dimension (M12, M13) <b>and</b>
+                                                                    Same_Dimension (M13, M21) <b>and</b> Same_Dimension (M21, M22) <b>and</b> Same_Dimension (M22, M23) <b>and</b>
+                                                                    Same_Dimension (M23, M31) <b>and</b> Same_Dimension (M31, M32) <b>and</b> Same_Dimension (M32, M33)) <b>or else raise</b> Unit_Error;
+
+  <b>function  </b>Get (M:        Matrix; A, B:    Axis) <b>return </b>Item;
+  <b>procedure </b>Set (M: <b>in out </b>Matrix; A, B: <b>in </b>Axis; To: <b>in </b>Item) <b>with</b> Pre =&gt; <b>not</b> Same_Dimension (Get (M, A, B), To) <b>or else raise</b> Unit_Error;
+
+  <i>-- Vector algebra
+
+  </i><b>function </b>&quot;abs&quot; (Right: Vector) <b>return </b>Item;
+
+  <b>function </b>&quot;+&quot; (Right: Vector) <b>return </b>Vector;
+  <b>function </b>&quot;-&quot; (Right: Vector) <b>return </b>Vector;
+
+  <b>function </b>&quot;+&quot; (Left, Right: Vector) <b>return </b>Vector <b>with</b> Pre =&gt; Same_Dimension (Get (Left, 1), Get (Right, 1)) <b>or else raise</b> Unit_Error;
+  <b>function </b>&quot;-&quot; (Left, Right: Vector) <b>return </b>Vector <b>with</b> Pre =&gt; Same_Dimension (Get (Left, 1), Get (Right, 1)) <b>or else raise</b> Unit_Error;
+
+  <b>function </b>&quot;*&quot; (Left: Real'Base; Right: Vector   ) <b>return </b>Vector;
+  <b>function </b>&quot;*&quot; (Left: Item     ; Right: Vector   ) <b>return </b>Vector;
+  <b>function </b>&quot;*&quot; (Left: Vector   ; Right: Real'Base) <b>return </b>Vector;
+  <b>function </b>&quot;*&quot; (Left: Vector   ; Right: Item     ) <b>return </b>Vector;
+  <b>function </b>&quot;/&quot; (Left: Vector   ; Right: Real'Base) <b>return </b>Vector;
+  <b>function </b>&quot;/&quot; (Left: Vector   ; Right: Item     ) <b>return </b>Vector;
+
+  <b>function </b>Inner (Left, Right: Vector) <b>return </b>Item;    <i>-- inner (dot) product</i>
+  <b>function </b>Cross (Left, Right: Vector) <b>return </b>Vector;  <i>-- cross product
+
+  -- Matrix algebra</i>
+
+  <b>function </b>&quot;+&quot; (Right: Matrix) <b>return </b>Matrix;
+  <b>function </b>&quot;-&quot; (Right: Matrix) <b>return </b>Matrix;
+
+  <b>function </b>&quot;+&quot; (Left, Right: Matrix) <b>return </b>Matrix <b>with</b> Pre =&gt; Same_Dimension (Get (Left, 1, 1), Get (Right, 1, 1)) <b>or else raise</b> Unit_Error;
+  <b>function </b>&quot;-&quot; (Left, Right: Matrix) <b>return </b>Matrix <b>with</b> Pre =&gt; Same_Dimension (Get (Left, 1, 1), Get (Right, 1, 1)) <b>or else raise</b> Unit_Error;
+
+  <b>function </b>&quot;*&quot; (Left: Real'Base; Right: Matrix   ) <b>return </b>Matrix;
+  <b>function </b>&quot;*&quot; (Left: Item     ; Right: Matrix   ) <b>return </b>Matrix;
+  <b>function </b>&quot;*&quot; (Left: Matrix   ; Right: Real'Base) <b>return </b>Matrix;
+  <b>function </b>&quot;*&quot; (Left: Matrix   ; Right: Item     ) <b>return </b>Matrix;
+  <b>function </b>&quot;/&quot; (Left: Matrix   ; Right: Real'Base) <b>return </b>Matrix;
+  <b>function </b>&quot;/&quot; (Left: Matrix   ; Right: Item     ) <b>return </b>Matrix;
+
+  <b>function </b>&quot;*&quot; (Left, Right: Matrix) <b>return </b>Matrix;
+
+  <b>function </b>Det  (M: Matrix) <b>return </b>Item;    <i>-- determinant
+  </i><b>function </b>Inv  (M: Matrix) <b>return </b>Matrix;  <i>-- inverse
+  </i><b>function </b>Tran (M: Matrix) <b>return </b>Matrix;  <i>-- transposed
+
+  -- Mixed operations</i>
+
+  <b>function </b>&quot;*&quot; (Left: Matrix; Right: Vector) <b>return </b>Vector;  <i>-- Sum (j) Lij * Rj</i>
+  <b>function </b>&quot;*&quot; (Left: Vector; Right: Matrix) <b>return </b>Vector;  <i>-- Sum (i) Li  * Rij
+
+  -- Conversion to prototypes (to_Proto (X) * Dim (X) = X)</i>
+
+  <b>function </b>to_Proto (V: Vector) <b>return </b>Proto_Vector;
+  <b>function </b>to_Proto (M: Matrix) <b>return </b>Proto_Matrix;
+
+  <b>function</b> Dim (V: Vector) <b>return</b> Item;  -- <i>1.0 with dimension</i>
+  <b>function</b> Dim (M: Matrix) <b>return</b> Item;  -- <i>    of argument</i>
+
+<b>private</b>
+
+  <i>Not shown</i>
+
+<b>end </b>Generic_SI.Generic_Vector_Space;</pre>
+
+<h3><a name="Proto">Prototypes</a></h3>
+
+<p>Vector (and matrix) objects can be defined via so-called prototypes, their
+dimensionless equivalents, which are taken from the RM numerics annex.
+This enables the common notation with aggregates.</p>
+
+<p>The type Axis denotes the coordinate axes, commonly denoted as x, y, z.</p>
+
+<p>Null_Proto_Vector is the zero vector prototype, Unit_Proto_Vector denotes the
+unit vectors along the axes.
+They may also be denoted by P1, P2, P3.</p>
+
+<p>Similar definitions exist for matrices.
+Null_Proto_Matrix is the zero matrix prototype, Proto_Unity the identity matrix
+prototype.</p>
+
+<h3><a name="Vectors">Vectors</a></h3>
+
+<p>Only a few dimensioned subtypes have been defined like in the base SI package.
+Definitions of further subtypes are left to the need of the user.</p>
+
+<pre>  <b>function</b> &quot;*&quot; (Left: Proto_Vector; Right: Item  ) <b>return</b> Vector;
+  <b>function</b> &quot;*&quot; (Left: Proto_Vector; Right: String) <b>return</b> Vector;</pre>
+
+<p>Multiplication operations &quot;*&quot; like above and the corresponding &quot;/&quot;
+create proper dimensioned vectors from the prototypes.
+All components obtain the same dimension, the one of item.</p>
+
+<pre>  <b>function</b> Normalize (X: Proto_Vector) <b>return</b> Vector;</pre>
+
+<p>Normalize returns the dimensioned unit vector parallel to the given prototype
+(with dimension 1).</p>
+
+<pre>  <b>function</b> Compose (V1, V2, V3: Item) <b>return</b> Vector;</pre>
+
+<p>Compose allows to define a vector via its components.
+Unit_Error is raised if the parameters V1, V2, V3 do not have the same dimension.</p>
+
+<pre>  <b>function</b>  Get (V:        Vector; A:    Axis) <b>return</b> Item;
+  <b>procedure</b> Set (V: <b>in out</b> Vector; A: <b>in</b> Axis; To: <b>in</b> Item);</pre>
+
+<p>Get and Set allow direct manipulation of the vector components.
+Set raises Unit_Error if the dimension of To does not match.</p>
+
+<h4>Examples:</h4>
+
+<pre>Particle_V: Velocity := (1.0, 3.9, 0.0) * &quot;m/s&quot;;
+E_Field   : Vector   := Normalize ((1.0, 3.9, 0.0)) * (4.5 * &quot;V/m&quot;);</pre>
+
+<h4>Special Vectors:</h4>
+
+<p>Null_Vector is the zero vector.
+U1, U2, U3 are the unit vectors along the respective axes.
+Unit_Vector (i) is the unit vector along axis i.</p>
+
+<pre>  Null_Vector: <b>constant</b> Vector;
+  U1, U2, U3 : <b>constant</b> Vector;   -- <i>the unit vectors</i>
+  Unit_Vector: <b>constant</b> Vectors;  --   <i>along the axes</i></pre>
+
+<p>They all have the (physical) dimension 1.</p>
+
+<h4>Polar Coordinates:</h4>
+
+<p>This is the normal mathematical polar coordinate system (0 latitude is the
+north pole, &pi; the south pole; the longitude is in mathematical positive
+direction in the XY-plane, plus or minus &pi; is near the negative X axis).</p>
+
+<pre>  <b>function</b> Compose_Polar (R: Item; Phi, Theta: Angle) <b>return</b> Polar;
+  <b>function</b> Compose_Polar (R: Item; Phi, Theta: Real ) <b>return</b> Polar;</pre>
+
+<p>Compose_Polar constructs a polar vector.
+The radius R may have any dimension but must be non-negative or else
+Constraint_Error will be propagated.
+There is no constraint on the longitude value &phi;.
+[Rotations about more than one full circle might be desired.]
+The latitude &theta; must be in the range 0&nbsp;..&nbsp;&pi; or else Constraint_Error will be
+propagated.</p>
+
+<pre>  <b>function</b> Radius    (P: Polar) <b>return</b> Item;
+  <b>function</b> Longitude (P: Polar) <b>return</b> Angle;
+  <b>function</b> Latitude  (P: Polar) <b>return</b> Angle;
+
+  <b>procedure</b> Set_Radius    (P: <b>in out</b> Polar; R    : <b>in</b> Item );
+  <b>procedure</b> Set_Longitude (P: <b>in out</b> Polar; Phi  : <b>in</b> Angle);
+  <b>procedure</b> Set_Latitude  (P: <b>in out</b> Polar; Theta: <b>in</b> Angle);</pre>
+
+<p>Radius, Longitude, Latitude return the corresponding components.
+Set_Radius, Set_Longitude, Set_Latitude set the corresponding components to
+the given value, where the same constraints as for Compose_Polar apply.
+Additionally R must have the same dimension as the radius component of P or
+else Unit_Error will be propagated.</p>
+
+<pre>  <b>function</b> To_Polar     (V: Vector) <b>return</b> Polar;
+  <b>function</b> To_Cartesian (P: Polar ) <b>return</b> Vector;</pre>
+
+<p>These functions transform polar vectors into cartesian ones and vice versa.
+The logitude computed by To_Polar is in the range -&pi; .. &pi;.</p>
+
+<h3><a name="Matrices">Matrices</a></h3>
+
+<p>Like for vectors, only a sample dimensioned subtype has been defined.
+Definitions of further subtypes are left to the need of the user.</p>
+
+<pre>  <b>function</b> &quot;*&quot; (Left: Proto_Matrix; Right: Item        ) <b>return</b> Matrix;
+  <b>function</b> &quot;*&quot; (Left: Proto_Matrix; Right: String) <b>return</b> Matrix;</pre>
+
+<p>Like those for vectors, these multiplication and division operations create proper
+dimensioned matrices from the prototypes.
+All components obtain the same dimension, the one of item.</p>
+
+<pre>  <b>function</b> Compose (M11, M12, M13,
+                    M21, M22, M23,
+                    M31, M32, M33: Item) <b>return</b> Matrix;</pre>
+
+<p>Compose allows to define a matrix via its components.
+Unit_Error is raised if the parameters Mij do not have the same dimension.</p>
+
+<pre>  <b>function</b>  Get (M:        Matrix; A, B:    Axis) <b>return</b> Item;
+  <b>procedure</b> Set (M: <b>in out</b> Matrix; A, B: <b>in</b> Axis; To: <b>in</b> Item);</pre>
+
+<p>Get and Set allow direct manipulation of the matrix components.
+Set raises Unit_Error if the dimension of To does not match.</p>
+
+<h4>Special Matrices:</h4>
+
+<p>Null_Matrix is the zero matrix; Unity is the identity matrix.
+Both have the dimension 1.</p>
+
+<h3><a name="Algebra">Algebra</a></h3>
+
+<p>All standard arithmetic operations are defined for vectors and matrices.</p>
+
+<h4>Vector Algebra:</h4>
+
+<pre>  <b>function</b> Inner (Left, Right: Vector) <b>return</b> Item;    -- <i>inner (dot) product</i>
+  <b>function</b> Cross (Left, Right: Vector) <b>return</b> Vector;  -- <i>cross product</i></pre>
+
+<p>The inner and the cross products are not defined as operators since they are not
+associative with themselves nor with any of the other multiplicative operators, and
+having both as operators would lead to ambiguities or errors.</p>
+
+<p>(There is also the outer product of two vectors V, W resulting in a
+matrix M: Mij := Vi*Wj.
+This is not provided since the necessity is not obvious.)</p>
+
+<h4>Matrix Algebra:</h4>
+
+<p>All standard arithmetic operations are defined for matrices.</p>
+
+<pre>  <b>function</b> Det  (M: Matrix) <b>return</b> Item;
+  <b>function</b> Inv  (M: Matrix) <b>return</b> Matrix;
+  <b>function</b> Tran (M: Matrix) <b>return</b> Matrix;</pre>
+
+<p>Det computes the determinant of the argument M, Inv its inverse.
+Tran is the transposed of M; for orthogonal matrices, this is the same as the
+inverse.</p>
+
+<h4>Mixed operations:</h4>
+
+<p>The standard mixed vector matrix multiplicative operators are defined.</p>
+
+<pre>  <b>function</b> &quot;*&quot; (Left: Matrix; Right: Vector) <b>return</b> Vector;  -- <i>Sum (j) Lij * Rj</i>
+  <b>function</b> &quot;*&quot; (Left: Vector; Right: Matrix) <b>return</b> Vector;  -- <i>Sum (i) Li  * Rij</i> </pre>
+
+<h3><a name="Conv">Conversion to Prototypes</a></h3>
+
+<p>Ada 2005 provides operations for vector algebra which provide some more
+interesting operations.
+The following functions may be used to ease interfacing to that package.</p>
+
+<pre>  <b>function</b> to_Proto (V: Vector) <b>return</b> Proto_Vector;
+  <b>function</b> to_Proto (M: Matrix) <b>return</b> Proto_Matrix;</pre>
+
+<p>The functions to_Proto return the numeric value of the argument.</p>
+
+<pre>  <b>function</b> Dim (V: Vector) <b>return</b> Item;
+  <b>function</b> Dim (M: Matrix) <b>return</b> Item;</pre>
+
+<p>The functions Dim return the value 1.0 with the dimension of the argument.</p>
+
+<p>These functions fulfil the equation <code>to_Proto (X) * Dim (X) = X</code>.</p>
+
+<h4>Example:</h4>
+
+<p>Solving linear equations M*V=W via matrix inversion is deprecated.
+Rather the following should be used:</p>
+
+<pre>  V := Inv (M) * W;  -- <i>deprecated</i>
+
+  V := Real_Arrays.Solve (to_Proto (M), to_Proto (W)) * Dim (W) / Dim (M);  -- <i>good</i></pre>
+
+<p>where Real_Arrays is the instantiation of Ada.Numerics.Generic_Real_Arrays
+as given in the generic parameters.</p>
+
+<p><a href="Table_of_Contents.html">Table_of_Contents</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="SI-Vector_Space-Transformation.html">SI.Vector_Space.Transformation</a></p>
+
+<p align="center"><a href="http://validator.w3.org/check?uri=referer">
+   <img src="valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a></p>
+
+</body>
+
+</html>

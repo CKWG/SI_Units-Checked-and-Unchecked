@@ -1,0 +1,34 @@
+1.0 2.0*A 3.0*mA 4.0*mA**2 5.0*mA**(4/2) 6.0*A*kA**(-3)
+7.0K
+1.0*Bq 2.0*Ba no Ba
+1.0E-3/mBqA no BqA
+1.0*Gy 2.0*Gh no prefix on h
+1.0*H  2.0*MH 3.0*Hz 4.0*MHz
+1.0*lm 2.0*lx 3.0*ly no ly
+1.0*m 2.0*dm 3.0*dam 4.0*cm 5.0*hm 6.0*mm 7.0*km 8.0*um 1.0*Mm
+1.0*g 2.0*dag 3.0*kg
+1.0*Pa 2.0*PPa
+1.0*rad 2.0*sr
+1.0*s
+1.0*S 2.0*Sv
+1.0*T 2.0*TT
+1.0*W 2.0*Wb
+1.0*Ohm
+2.0*S*MOhm*Hz*s**2*uBq
+1.0*ms**(-4/3)
+1.0*km**(-1/2)
+1.0*s**(-1)*m 2.0*s**-1*m  missing ()
+1.0*mA**(3/2)*s
+2.0*mA**3/2*s  missing ()
+3.0*mA**3/s
+1.0E-1/(dam**(-1)*s) 200.0*m/hs 3.0*km**2/s**2
+1.0*m**/s  missing exp
+5.0*kat 6.0*kkat 7.0*kd no kd
+1.0*mmol 2.0*mol 3.0*mole too long
+1.0/veryLongName_underline stops
+1.0*l 2.0*hL 3.0/ml
+-1.0*min 2.0*hmin no prefix allowed
+1.0*h 2.0*mh no prefix allowed
+1.0*W/(m*K)
+6.674_2E-11*m**3/(kg*s**2)
+9_ trailing underline

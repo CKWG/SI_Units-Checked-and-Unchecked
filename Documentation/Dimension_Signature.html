@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="shortcut icon" type="image/x-icon" href="Ada.ico" />
+<title>Dimension_Signature</title>
+<!-- Version  Date
+      1.0  20.05.2020  New
+      2.0  06.04.2025  ToC Subheaders; how to compile with GNAT;
+                       Fake_Dimensions now with private part
+      2.1  20.06.2025  Attribute Inline; rework instantation description
+      2.2  09.07.2025  GNAT project change: rework instantation description
+//-->
+</head>
+
+<body>
+
+<h2 align="center">Dimension_Signature</h2>
+
+<p>This package defines the interface of the dimension package to be used.
+Two packages are provided for the instantiation.</p>
+
+<p><a href="#Spec">Specification</a><br/>
+<a href="#Inst">Instantiation</a><br/>
+<a href="#Dim">The Dimension Packages</a></p>
+
+<h3 align="left"><a name="Spec">Specification</a></h3>
+
+<pre><b>with </b>Rational_Arithmetics;
+<b>use  </b>Rational_Arithmetics;
+
+<b>generic
+
+  type </b>Dimension <b>is private</b>;
+
+  uno: Dimension;
+
+  <b>with function </b>m   <b>return </b>Dimension <b>is </b>&lt;&gt;;
+  <b>with function </b>kg  <b>return </b>Dimension <b>is </b>&lt;&gt;;
+  <b>with function </b>s   <b>return </b>Dimension <b>is </b>&lt;&gt;;
+  <b>with function </b>A   <b>return </b>Dimension <b>is </b>&lt;&gt;;
+  <b>with function </b>K   <b>return </b>Dimension <b>is </b>&lt;&gt;;
+  <b>with function </b>cd  <b>return </b>Dimension <b>is </b>&lt;&gt;;
+  <b>with function </b>mol <b>return </b>Dimension <b>is </b>&lt;&gt;;
+
+  <b>with function </b>&quot;*&quot; (Left, Right: Dimension) <b>return</b> Dimension <b>is </b>&lt;&gt;;
+  <b>with function </b>&quot;/&quot; (Left, Right: Dimension) <b>return</b> Dimension <b>is </b>&lt;&gt;;
+
+  <b>with function </b>&quot;**&quot; (Base: Dimension; Exponent: Whole   ) <b>return</b> Dimension <b>is </b>&lt;&gt;;
+  <b>with function </b>&quot;**&quot; (Base: Dimension; Exponent: Rational) <b>return</b> Dimension <b>is </b>&lt;&gt;;
+
+  <i>-- Access to the components</i>
+
+  <b>with function </b>m   (X: Dimension) <b>return</b> Rational <b>is </b>&lt;&gt;;
+  <b>with function </b>kg  (X: Dimension) <b>return</b> Rational <b>is </b>&lt;&gt;;
+  <b>with function </b>s   (X: Dimension) <b>return</b> Rational <b>is </b>&lt;&gt;;
+  <b>with function </b>A   (X: Dimension) <b>return</b> Rational <b>is </b>&lt;&gt;;
+  <b>with function </b>K   (X: Dimension) <b>return</b> Rational <b>is </b>&lt;&gt;;
+  <b>with function </b>cd  (X: Dimension) <b>return</b> Rational <b>is </b>&lt;&gt;;
+  <b>with function </b>mol (X: Dimension) <b>return</b> Rational <b>is </b>&lt;&gt;;
+
+<b>package </b>Dimension_Signature <b>is
+end </b>Dimension_Signature;</pre>
+
+<h3 align="left"><a name="Inst">Instantiation</a></h3>
+
+<p>The <font color="#008000">checked</font> version is storage
+consuming:
+fourteen integers for the seven dimensions,
+one floating point number for the value.
+Calculating all these numbers with each operation is time consuming.
+The checked variant is very much slower than the
+<font color="#FF0000">unchecked</font> one, the exact value
+depends very much on the complexity of the formulae involved.</p>
+
+<p>This waste of storage could easily be reduced by using bytes
+instead of integers for the dimensions.
+You could also remove any unneeded dimensions (like mole
+and candela) and thus further reduce the amount of storage.
+However, if there is no storage shortage in your application and
+you're not doing hard real-time, why bother?
+On the other hand, the checked variant is meant to be used mainly
+during development of your application.
+As soon as you have unit tested your code with 100% coverage,
+you have proven that it is dimensionally correct; so for deployment,
+dimension checking can safely be switched off.</p>
+
+<p>It's easy to switch from the checked to the unchecked variant.
+How to do it is shown on the basis of the
+<code><font color="#0000FF">Examples</font></code>
+directory (the <code>Test</code> directory is sensible in the checked
+variant only).</p>
+
+<p>You find the instantiation of all SI packages in directory
+<code>Instantiations</code>.
+It has two subdirectories <code>Checked</code> and <code>Unchecked</code>,
+each holding a version of <code>Actual_Dimensions</code>, an instance of the
+<code>Dimension_Signature</code> package.</p>
+
+<h4 align="left">Checked Variant</h4>
+
+<p>Compile the SI library with <code>pragma Assertion_Policy (Check);</code>.</p>
+
+<p>For the compilation, binding and linking of your application, select
+<code><font color="#008000">True_Dimensions</font></code> for the
+instantiation of the <code>Dimension_Signature</code> package.
+Instantiate SI and any needed subpackages.
+Compile your application with <code>pragma Assertion_Policy (Check);</code>.</p>
+
+<pre><span>   <b>with </b><font color="#008000">True_Dimensions</font>;
+   <b>use  </b><font color="#008000">True_Dimensions</font>  -- <i>the use clause simplifies the parameter list</i>;
+   <b>with </b>Dimension_Signature;
+   <b>package </b>Actual_Dimensions <b>is new </b>Dimension_Signature (Dimension, uno);
+
+   <b>with</b> Generic_SI;
+   <b>with</b> Actual_Dimensions;
+   <b>package</b> SI <b>is new</b> Generic_SI (Float, Actual_Dimensions);</span></pre>
+
+<h4 align="left">Unchecked Variant</h4>
+
+<p>For transiting to the unchecked variant, clear the SI library and recompile
+it with <code>pragma Assertion_Policy (Ignore);</code>.</p>
+
+<p>Replace <code><font color="#008000">True_Dimensions</font></code>
+by <code><font color="#FF0000">Fake_Dimensions</font></code>.
+Recompile your application also with
+<code>pragma Assertion_Policy (Ignore);</code>.</p>
+
+<p><b>Everything else remains unchanged</b>, any instantiations of other
+SI packages and also your code.
+What changes is the representation of the dimension.
+<font color="#FF0000">In the unchecked version, dimensions are just not
+there, only the numerics remains.</font></p>
+
+<h4 align="left">Using GNAT</h4>
+
+<p>If you're using <b>GNAT</b>, the GNAT projects
+<font color="#0000FF"><code>SI</code></font> and
+<font color="#0000FF"><code>Examples</code></font>
+located in the homonymous directories
+<font color="#0000FF"><code>SI</code></font> and
+<font color="#0000FF"><code>Examples</code></font> do most of this for
+you:<br/>
+Start GPS with project <code>Examples</code>, open the Scenario View
+and select the appropriate value for the Safety scenario variable
+(values <font color="#008000">Checked</font> and
+<font color="#FF0000">Unchecked</font>.
+The command <code>gprbuild</code> will compile the directories
+<code>SI</code> respectively <code>Instantiations</code> and
+<code>Examples</code> and finally bind and link to produce your
+executable.<br/>
+Do not forget to clear the SI library before changing the scenario.</p>
+
+<h3 align="left"><a name="Dim">The Dimension Packages</a></h3>
+
+<p>The dimenison packages are located in subdirectory <code>Dimensions</code>
+of directory <code>SI</code>.</p>
+
+<pre><span><font color="#008000"><b>with </b>Rational_Arithmetics;
+<b>use  </b>Rational_Arithmetics;
+
+<b>package </b>True_Dimensions <b>is
+
+  type </b>Dimension <b>is private</b>;
+
+  uno: <b>constant </b>Dimension;  <i>-- 1</i>
+
+  <b>function </b>m   <b>return </b>Dimension <b>with</b> Inline;
+  <b>function </b>kg  <b>return </b>Dimension <b>with</b> Inline;
+  <b>function </b>s   <b>return </b>Dimension <b>with</b> Inline;
+  <b>function </b>A   <b>return </b>Dimension <b>with</b> Inline;
+  <b>function </b>K   <b>return </b>Dimension <b>with</b> Inline;
+  <b>function </b>cd  <b>return </b>Dimension <b>with</b> Inline;
+  <b>function </b>mol <b>return </b>Dimension <b>with</b> Inline;
+
+  <b>function </b>&quot;*&quot; (Left, Right: Dimension) <b>return </b>Dimension <b>with</b> Inline;
+  <b>function </b>&quot;/&quot; (Left, Right: Dimension) <b>return </b>Dimension <b>with</b> Inline;
+
+  <b>function </b>&quot;**&quot; (Base: Dimension; Exponent: Whole   ) <b>return</b> Dimension <b>with</b> Inline;
+  <b>function </b>&quot;**&quot; (Base: Dimension; Exponent: Rational) <b>return</b> Dimension <b>with</b> Inline;
+
+  <i>-- Access to the components</i>
+
+  <b>function </b>m   (X: Dimension) <b>return</b> Rational <b>with</b> Inline;
+  <b>function </b>kg  (X: Dimension) <b>return</b> Rational <b>with</b> Inline;
+  <b>function </b>s   (X: Dimension) <b>return</b> Rational <b>with</b> Inline;
+  <b>function </b>A   (X: Dimension) <b>return</b> Rational <b>with</b> Inline;
+  <b>function </b>K   (X: Dimension) <b>return</b> Rational <b>with</b> Inline;
+  <b>function </b>cd  (X: Dimension) <b>return</b> Rational <b>with</b> Inline;
+  <b>function </b>mol (X: Dimension) <b>return</b> Rational <b>with</b> Inline;
+
+<b>private
+
+  </b><i>Not shown</i>
+
+<b>end </b>True_Dimensions;</font></span></pre><p></p>
+
+<pre><span><font color="#FF0000"><b>with </b>Rational_Arithmetics;
+<b>use  </b>Rational_Arithmetics;
+
+<b>package </b>Fake_Dimensions <b>is
+
+  type </b>Dimension <b>is null record</b>;
+
+  uno: <b>constant </b>Dimension := (<b>null record</b>);
+
+  <b>function </b>m   <b>return </b>Dimension <b>is</b> (uno) <b>with</b> Inline;
+  <b>function </b>kg  <b>return </b>Dimension <b>is</b> (uno) <b>with</b> Inline;
+  <b>function </b>s   <b>return </b>Dimension <b>is</b> (uno) <b>with</b> Inline;
+  <b>function </b>A   <b>return </b>Dimension <b>is</b> (uno) <b>with</b> Inline;
+  <b>function </b>K   <b>return </b>Dimension <b>is</b> (uno) <b>with</b> Inline;
+  <b>function </b>cd  <b>return </b>Dimension <b>is</b> (uno) <b>with</b> Inline;
+  <b>function </b>mol <b>return </b>Dimension <b>is</b> (uno) <b>with</b> Inline;
+
+  <b>function </b>&quot;*&quot; (Left, Right: Dimension) <b>return</b> Dimension <b>is</b> (uno) <b>with</b> Inline;
+  <b>function </b>&quot;/&quot; (Left, Right: Dimension) <b>return</b> Dimension <b>is</b> (uno) <b>with</b> Inline;
+
+  <b>function </b>&quot;**&quot; (Base: Dimension; Exponent: Whole   ) <b>return</b> Dimension <b>is</b> (uno) <b>with</b> Inline;
+  <b>function </b>&quot;**&quot; (Base: Dimension; Exponent: Rational) <b>return</b> Dimension <b>is</b> (uno) <b>with</b> Inline;
+
+  <i>-- Access to the components</i>
+
+  <b>function </b>m   (X: Dimension) <b>return</b> Rational <b>with</b> Inline;
+  <b>function </b>kg  (X: Dimension) <b>return</b> Rational <b>with</b> Inline;
+  <b>function </b>s   (X: Dimension) <b>return</b> Rational <b>with</b> Inline;
+  <b>function </b>A   (X: Dimension) <b>return</b> Rational <b>with</b> Inline;
+  <b>function </b>K   (X: Dimension) <b>return</b> Rational <b>with</b> Inline;
+  <b>function </b>cd  (X: Dimension) <b>return</b> Rational <b>with</b> Inline;
+  <b>function </b>mol (X: Dimension) <b>return</b> Rational <b>with</b> Inline;
+
+<b>private
+
+  </b><i>Not shown</i>
+
+<b>end </b>Fake_Dimensions;</font></span></pre>
+
+<p>I'm full of doubt that the Inline attribute in a generic parameter package
+is effective.</p>
+
+<p><a href="Table_of_Contents.html">Table of Contents</a></p>
+
+<p align="center"><a href="http://validator.w3.org/check?uri=referer">
+   <img src="valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a></p>
+
+</body>
+
+</html>

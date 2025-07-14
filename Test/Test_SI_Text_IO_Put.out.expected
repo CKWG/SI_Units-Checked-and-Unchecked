@@ -1,0 +1,20 @@
+ 1.00000E+03*m*s**(-1)
+ 1.00000E+00*km/s
+ 1.00000E+00/(ms*m**(-1))
+Illegal_Unit wrong casing Dim Km/s
+Illegal_Unit wrong casing unit Km/s
+Illegal_Unit wrong format km/s   A
+Unit_Error wrong unit S (must be s)
+
+Compare Ada.Text_IO.Float_Text_IO with SI.Text_IO;
+number formats must be identical:
+
+|1000.00|     |1000.00*m*s**(-1)|
+|1.00E+3|     |1.00E+3*m*s**(-1)|
+|1.00E+03|    |1.00E+03*m*s**(-1)|
+|1000.00|     |1000.00*m*s**(-1)|
+|  1.00E+3|   |  1.00E+3*m*s**(-1)|
+|  1.00E+03|  |  1.00E+03*m*s**(-1)|
+| 1000.00|    | 1000.00*m*s**(-1)|
+|    1.00E+3| |    1.00E+3*m*s**(-1)|
+|    1.00E+03||    1.00E+03*m*s**(-1)|

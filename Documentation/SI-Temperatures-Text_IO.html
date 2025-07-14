@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="shortcut icon" type="image/x-icon" href="Ada.ico" />
+<title>SI.Temperatures.Text_IO</title>
+<!-- Version  Date
+      1.0  08.12.2005
+      2.0  03.07.2025  Redesign
+//-->
+</head>
+
+<body>
+
+<h2 align="center">SI.Temperatures.Text_IO</h2>
+
+<p>This package enables text input and output for Celsius degrees.</p>
+
+<p>Get and Put read and write the numeric value like standard Text_IO.</p>
+
+<p><u>Get</u>: If no exception is raised, reading continues until the next
+space character or line end (resp. string end), whichever comes first, is
+reached, which stays in the input stream.
+If any other string than &quot;°C&quot; has been read, Illegal_Unit will
+be raised.
+Last is the index of the last character read (for string).
+(Instead, we could just check whether &quot;°C&quot; follows.
+In order to be compatible with Get for Item, this is not done.)</p>
+
+<p><u>Put</u>: If no exception is raised, writes the unit °C with no leading
+(nor trailing) space &ndash; this is different to the SI units.</p>
+
+<h3 align="left">Specification</h3>
+
+<pre><b>with</b> Ada.Text_IO;
+<b>use</b>  Ada.Text_IO;
+
+<b>generic
+package</b> Generic_<a href="SI.html">SI</a>.Generic_<a href="SI-Temperatures.html">Temperatures</a>.Generic_Text_IO <b>is
+
+  pragma</b> Elaborate_Body;
+
+  Default_Fore: Field := 2;
+  Default_Aft : Field := Real'Digits - 1;
+  Default_Exp : Field := 3;
+
+  <b>procedure</b> Get (X    : <b>out</b> Celsius;
+                 Width: <b>in</b>  Field := 0);
+  <b>procedure</b> Get (File : <b>in</b>  File_Type;
+                 X    : <b>out</b> Celsius;
+                 Width: <b>in</b>  Field := 0);
+
+  <b>procedure</b> Put (X   : <b>in</b> Celsius;
+                 Fore: <b>in</b> Field := Default_Fore;
+                 Aft : <b>in</b> Field := Default_Aft;
+                 Exp : <b>in</b> Field := Default_Exp);
+  <b>procedure</b> Put (File: <b>in</b> File_Type;
+                 X   : <b>in</b> Celsius;
+                 Fore: <b>in</b> Field := Default_Fore;
+                 Aft : <b>in</b> Field := Default_Aft;
+                 Exp : <b>in</b> Field := Default_Exp);
+
+  <b>procedure</b> Get (From: <b>in</b>  String;
+                 X   : <b>out</b> Celsius;
+                 Last: <b>out</b> Positive);
+  <b>procedure</b> Put (To  : <b>out</b> String;
+                 X   : <b>in</b>  Celsius;
+                 Aft : <b>in</b>  Field  := Default_Aft;
+                 Exp : <b>in</b>  Field  := Default_Exp);
+
+<b>end</b> Generic_SI.Generic_Temperatures.Generic_Text_IO;</pre>
+
+<h4>Examples:</h4>
+
+<p><code>4.2*&quot;°C&quot;</code> is output as <code>4.2°C</code>;
+reading <code>4.2*°C</code> raises <code>Unit_Error</code>.</p>
+
+<p><a href="Table_of_Contents.html">Table_of_Contents</a></p>
+
+<p align="center"><a href="http://validator.w3.org/check?uri=referer">
+   <img src="valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a></p>
+
+</body>
+
+</html>

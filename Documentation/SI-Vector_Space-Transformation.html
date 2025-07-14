@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="shortcut icon" type="image/x-icon" href="Ada.ico" />
+<title>SI.Vector_Space.Transformation</title>
+<!-- Version  Date
+      1.0  08.01.2006
+      1.1  27.02.2006  pragma Pure
+      1.2  04.04.2006  Now also for checked variants
+      1.3  24.04.2012  Some details about Matrix M
+      2.0  20.08.2018  Completely reworked; unit strings
+      2.1  21.08.2018  Validated
+      2.2  03.12.2018  Indentation corrected
+      3.0  14.05.2020  Dimensions generic parameter
+//-->
+</head>
+
+<body>
+
+<h2 align="center">SI.Vector_Space.Transformation</h2>
+
+<p>This package defines matrices for special rotations.</p>
+
+<h3>Specification</h3>
+
+<pre><b>generic
+
+package </b>Generic_<a href="SI.html">SI</a>.Generic_<a href="SI-Vector_Space.html">Vector_Space</a>.Generic_Transformation <b>is
+
+  function </b>Rotation <b>(</b>Axis: Vector; By: Angle<b>) return </b>Matrix;
+
+  <b>function </b>Rotation <b>(</b>Yaw, Pitch, Roll: Angle := 0.0 * &quot;rad&quot;<b>) return </b>Matrix;
+
+<b>end </b>Generic_SI.Generic_Vector_Space.Generic_Transformation;</pre>
+
+<p>A rotation of a vector V via an orthogonal right-handed matrix M (det M = 1) is achieved by
+transforming a vector V with the following equation:</p>
+
+<pre>  V' := M * V</pre>
+
+<p>Note that the vector is rotated, not the coordinate system.</p>
+
+<h3>1. Rotation (right-handed) around an axis given by a vector.</h3>
+
+<pre>  <b>function</b> Rotation (Axis: Vector; By: Angle) <b>return</b> Matrix;</pre>
+
+<p>Axis must not be a null vector and Angle must be in radians.</p>
+
+<h3>2. Successive rotation (right-handed) around the three coordinate axes.</h3>
+
+<pre>  <b>function</b> Rotation (Yaw, Pitch, Roll: Item := 0.0 * Radian) <b>return</b> Matrix;</pre>
+
+<p>The rotations are performed right to left so that this transformation M fulfills
+the equation</p>
+
+<pre>  M (Yaw, Pitch, Roll) = M (Yaw) * M (Pitch) * M (Roll)</pre>
+
+<p>where Roll is the first rotation around the x-axis, Pitch the second around the
+y-axis (rotation) and Yaw the third  around the z-axis.</p>
+
+<p><a href="Table_of_Contents.html">Table_of_Contents</a></p>
+
+<p align="center"><a href="http://validator.w3.org/check?uri=referer">
+   <img src="valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a></p>
+
+</body>
+
+</html>

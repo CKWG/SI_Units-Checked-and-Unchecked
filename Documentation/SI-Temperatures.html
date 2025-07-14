@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="shortcut icon" type="image/x-icon" href="Ada.ico" />
+<title>SI.Ttemperatures</title>
+<!-- Version  Date
+      1.0  03.02.2006
+      1.1  27.02.2006  pragma Pure
+      2.0  02.07.2025  Redesign
+//-->
+</head>
+
+<body>
+
+<h2 align="center">SI.Temperatures</h2>
+
+<p>Additionally to the base SI unit <i>Kelvin</i>, there are four other temperature
+scales:
+<i>Celsius</i> (also called Centigrade), <i>Rankine</i>, <i>Fahrenheit</i>, and
+<i>Réaumur</i>.
+Only Celsius and Fahrenheit are in use nowadays.
+Of these, only the former is allowed parallel to SI units.</p>
+
+<p>Kelvin and Celsius use the same unit interval.
+So do Rankine and Fahrenheit.
+Kelvin and Rankine are thermodynamic temperatures (they use the absolute zero as zero
+points).</p>
+
+<p>Celsius and Réaumur use the same fundamental distance between the ice point and the
+vapour point, but divide it into 100 resp. 80 unit intervals.</p>
+
+<p>The following relations exist:</p>
+
+<table border="0" cellpadding="0" cellspacing="0">
+  <tbody>
+    <tr>
+      <td><u>Fahrenheit</u>&nbsp;&nbsp; </td>
+      <td><tt>&nbsp;0&deg;F = -17.78&deg;C</tt></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><tt>32&deg;F = 0&deg;C</tt></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><tt>&nbsp;x&deg;C = (9/5*x + 32)&deg;F</tt></td>
+    </tr>
+    <tr>
+      <td><u>Rankine</u></td>
+      <td><tt>&nbsp;0&deg;R = 0 K</tt></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><tt>&nbsp;x K = (9/5)*x&deg;R</tt></td>
+    </tr>
+    <tr>
+      <td><u>Celsius</u></td>
+      <td><tt>&nbsp;0&deg;C = 273.15 K</tt></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><tt>&nbsp;x K = (x - 273.15)&deg;C</tt></td>
+    </tr>
+    <tr>
+      <td><u>R&eacute;aumur</u></td>
+      <td><tt>&nbsp;0&deg;R =&nbsp;&nbsp; 0&deg;C</tt></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><tt>80&deg;R = 100&deg;C</tt></td>
+    </tr>
+    <tr>
+      <td></td>
+      <td><tt>&nbsp;x&deg;R = (5/4)*x&deg;C</tt></td>
+    </tr>
+  </tbody>
+</table>
+
+<p><i>Note:</i> Rankine and Réaumur use the same symbol °R in literature (formerly,
+Rankine was also denoted by °Rank resp. deg R).
+Since Réaumur has long been out of use, this does not lead to ambiguities.</p>
+
+<table border="0" cellpadding="0" cellspacing="10">
+  <tbody>
+    <tr>
+      <td rowspan="2">
+        <i>By the way: I actually own a<br/>
+        Réaumur thermometer (saved<br/>
+        over time from my grandparents<br/>
+        or my wife's), the kind that was<br/>
+        once used by washerwomen in<br/>
+        the washtubs.<br/><br/>
+        (It's a quicksilver thermometer,<br/>
+        has an overall length of 51 cm,<br/>
+        and is not easy to read.)</i>
+      </td>
+      <td rowspan="2">
+        <img src="Réaumur_Thermometer.png" alt="My Réaumur thermometer"
+             height="505" width="54" />
+      </td>
+      <td>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <img src="24.6°R.png" alt="24.6°R" height="190" width="117" />
+                                            <!-- h=379       b=233 -->
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        It's hot: 24.6°R!<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        My digital thermo-<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        meter shows 31.2°C.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <img src="R.png" alt="Unit Réaumur" height="145" width="87" />
+                                             <!-- h=289      b=174 -->
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        The unit indication<br/>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        Réaumur.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Temperatures measured in non-thermodynamic units have a very
+limited range of applications.
+They basically serve only as a scale, but cannot be used in physical
+equations.
+If defined naively, nonsensical equations can be written.
+<code>Ada.Calendar</code> with its use of the types <code>Time</code>
+and <code>Duration</code> serves as a model for specifying temperature
+operations:<br/>
+It is nonsensical to add Celsius degrees, their difference in fact is
+a value in Kelvin.</p>
+
+<p>Only the operations defined here seem to make sense to me:</p>
+
+<h3 align="left"><a name="Specification">Specification</a></h3>
+
+<pre><b>generic
+package </b>Generic_<a href="SI.html">SI</a>.Generic_Temperatures <b>is
+
+  type </b>Celsius <b>is private</b>;
+
+  <b>function </b>&quot;*&quot; <b>(</b>Left: Real'Base; Right: String<b>) return </b>Celsius <b>with </b>Pre =&gt; Right = &quot;°C&quot; <b>or else raise</b> Unit_Error;
+
+  <b>function </b>&quot;+&quot; <b>(</b>T: Celsius<b>) return </b>Celsius;
+  <b>function </b>&quot;-&quot; <b>(</b>T: Celsius<b>) return </b>Celsius;
+
+  <b>function </b>&quot;+&quot; <b>(</b>T: Celsius; Delta_T: Temperature<b>) return </b>Celsius;
+  <b>function </b>&quot;-&quot; <b>(</b>Left, Right: Celsius<b>) return </b>Temperature;
+
+  <b>function </b>&quot;&lt;&quot;  <b>(</b>Left, Right: Celsius<b>) return </b>Boolean;
+  <b>function </b>&quot;&lt;=&quot; <b>(</b>Left, Right: Celsius<b>) return </b>Boolean;
+  <b>function </b>&quot;&gt;=&quot; <b>(</b>Left, Right: Celsius<b>) return </b>Boolean;
+  <b>function </b>&quot;&gt;&quot;  <b>(</b>Left, Right: Celsius<b>) return </b>Boolean;
+
+  <b>function </b>to_Celsius <b>(</b>T: Temperature<b>) return </b>Celsius;
+  <b>function </b>to_Kelvin  <b>(</b>T: Celsius    <b>) return </b>Temperature;
+
+  <b>function </b>Value <b>(</b>T: Celsius<b>) return </b>Real'Base;
+
+<b>private</b>
+
+  <i>Not shown</i>
+
+<b>end </b>Generic_SI.Generic_Temperatures;</pre>
+
+<h3>Constructor</h3>
+
+<p>The cnstructor is formed in accordance with the one of the parent package.
+Of course, only this unit string is allowed.</p>
+
+<pre>  <b>function </b>&quot;*&quot; <b>(</b>Left: Real'Base; Right: String<b>) return </b>Celsius <b>with </b>Pre =&gt; Right = &quot;°C&quot;;
+  <b>function </b>&quot;*&quot; <b>(</b>Left: Real'Base; Right: String<b>) return </b>Item;  -- <i>SI</i>
+
+  TC: Celsius :=  30.40*&quot;°C&quot;;  -- <i>Celsius</i>
+  TK: Item    := 203.55*&quot;K&quot;;   -- <i>Kelvin</i>
+
+  TC: Celsius :=  30.40*&quot;K&quot;;   -- <i>raises Unit_Error</i>
+  TK: Item    := 203.55*&quot;°C&quot;;  -- <i>raises Unit_Error</i></pre>
+
+<h3>Operators</h3>
+
+<p>No preconditions are needed for the operators.</p>
+
+<p><a href="Table_of_Contents.html">Table_of_Contents</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="SI-Temperatures-Strings.html">SI.Temperatures.Strings</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="SI-Temperatures-Text_IO.html">SI.Temperatures.Text_IO</a></p>
+
+<p align="center"><a href="http://validator.w3.org/check?uri=referer">
+   <img src="valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a></p>
+
+</body>
+</html>

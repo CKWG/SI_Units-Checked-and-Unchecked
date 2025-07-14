@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="shortcut icon" type="image/x-icon" href="Ada.ico" />
+<title>SI.Polynomials</title>
+<!-- Version  Date
+      1.0  09.12.2005
+      1.1  27.02.2006  pragma Pure
+      2.0  27.08.2018  Completely reworked; unit strings
+      2.1  23.03.2020  Remove obsolete text about polynomials
+      3.0  14.05.2020  Dimensions generic parameter
+
+//-->
+</head>
+
+<body>
+
+<h2 align="center">SI.Polynomials</h2>
+
+<p>This package allows the handling of polynomials of any degree, construction
+of linear regression curves, and linear interpolation of tabular data.</p>
+
+<h3 align="left">Specification</h3>
+
+<pre><b>generic
+package </b>generic_<a href="SI.html">SI</a>.Generic_Polynomials <b>is
+
+  </b><i>-- Polynomials
+
+  </i><b>type </b>Coefficients <b>is array (</b>Natural_Whole <b>range </b>&lt;&gt;<b>) of </b>Item;
+  <b>subtype </b>Straight_Line <b>is </b>Coefficients <b>(</b>0 .. 1<b>)</b>;
+
+  <b>function </b>Polynomial <b>(</b>Coeff: Coefficients; X: Item<b>) return </b>Item;
+
+  <i>-- Linear Regression and Interpolation
+
+  </i><b>type </b>Pair <b>is record
+    </b>X, Y: Item;  <i>-- y=f(X)
+  </i><b>end record</b>;
+
+  <b>type </b>Sample <b>is array (</b>Positive <b>range </b>&lt;&gt;<b>) of </b>Pair;
+
+  <b>function </b>Linear_Regression <b>(</b>S: Sample<b>) return </b>Straight_Line;
+
+  <b>type </b>Interpolation_Table <b>(</b>Length: Positive<b>) is private</b>;
+  <b>function </b>Define <b>(</b>S: Sample<b>) return </b>Interpolation_Table;
+
+  <b>function </b>Linear_Interpolation
+               <b>(</b>Table: Interpolation_Table; X: Item<b>) return </b>Item;
+
+  Sample_Error: <b>exception</b>;
+
+<b>private</b>
+
+  <i>Not shown</i>
+
+<b>end</b> Generic_SI.Generic_Polynomials;</pre>
+
+<p>A polynomial has the general form</p>
+
+<pre>   f(x) := sum (Coeff (i) * X**i)</pre>
+
+<p>where i is in a subrange of Natural_Whole, say M .. N.
+The coefficients generally have different dimensions.</p>
+
+<pre>  <b>function</b> Polynomial (Coeff: Coefficients; X: Item) <b>return</b> Item;</pre>
+
+<p>Coeff'Range need not include 0, e.g. <code>Coeff := (1 => 1.0, 2 => 1.0);</code>
+defines the term x*(x+1).</p>
+
+<pre>  <b>function </b>Linear_Regression <b>(</b>S: Sample<b>) return </b>Straight_Line;</pre>
+
+<p>Linear_Regression computes the straight line approximating a given sample of points.
+The sample must be longer than 1 or else Sample_Error is propagated.</p>
+
+<pre>  <b>function</b> Define (S: Sample) <b>return</b> Interpolation_Table;</pre>
+
+<p>Define creates a table for linear interpolation.
+The length of the table returned is S'Length.
+The abscissa values of sample points must be strictly monotonic (increasing or decreasing)
+and there must be at least 2 pairs or else Sample_Error is propagated.</p>
+
+<pre>  <b>function</b> Linear_Interpolation
+             (Table: Interpolation_Table; X: Item) <b>return</b> Item;</pre>
+
+<p>Linear_Interpolation interpolates linearly for x in the Table range and extrapolates
+outside.
+Sample_Error is propagated if the table is undefined.</p>
+
+<p><a href="Table_of_Contents.html">Table_of_Contents</a></p>
+
+<p align="center"><a href="http://validator.w3.org/check?uri=referer">
+   <img src="valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a></p>
+
+</body>
+
+</html>

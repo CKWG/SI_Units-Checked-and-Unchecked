@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="shortcut icon" type="image/x-icon" href="Ada.ico" />
+<title>SI Measurements</title>
+<style type="text/css">table td {text-align: right;}</style>
+<!-- Version  Date
+      1.0  16.06.2025
+//-->
+</head>
+
+<body>
+
+<h2 align="center">Execution Time Measurements</h2>
+
+<p> Measurements of relative speeds are performed with GNAT CE 2021
+on Windows 8.1.</p>
+
+<p>The Schottky Langmuir equation is used for execution time
+measurements because it has a rational exponents.
+Quaternions may be used similarly to matrices for coordinate
+transformations but need much more time.</p>
+
+<p>For details, see the program <code>measure.adb</code> in directory
+<code>Examples</code>.</p>
+
+<p>Loops are used with one million repetitions.</p>
+
+<p><a href="#Assert">Assertion Effect</a><br/>
+<a href="#SchoLa">Schottky Langmuir</a><br/>
+<a href="#MxQu">Matrices and Quaternions</a></p>
+
+<!-- ============= Assertion Effect ============ -->
+
+<h3 align="center"><a name="Assert">Assertion Effect</a></h3>
+
+<p>Before the measurements are discussed, a strange effect has to be
+discussed.
+We are interested in the speed of the checked and unchecked versions
+in comparison with the pure mathematics, i. e. the time consumed for
+the <i>nude</i> Schottky Langmuir equation with only floating point
+data.</p>
+
+<p>This nude equation is compiled twice, once with Assertion Policy
+set to <code>Ignore</code> and once set to <code>Check</code>.
+Although the code is identical and there are no assertions, the
+execution time different by an astonishing big factor.
+This difference must be attributed to the executable produced by GNAT
+depending on the switch <code>-gnata</code>, which corresponds to the
+<code>Assertion_Policy</code> pragma.</p>
+
+<!-- ============= Assertion Effect ============ -->
+<table align="center">
+
+<colgroup>
+<col width=" 70"/>
+<col width="110"/>
+<col width=" 50"/>
+</colgroup>
+
+<tr>
+<th>Assertion</th>
+<th>Absolute</th>
+<th>Relative</th>
+</tr>
+
+<tr>
+<th>Ignore</th>
+<td>0.015771666 s</td>
+<td>1.00</td>
+</tr>
+
+<tr>
+<th>Check</th>
+<td>0.109398771 s</td>
+<td>
+6.94</td>
+</tr>
+
+</table>
+<!-- =========== Assertion Effect End ========== -->
+
+<p>In the measurements below, please take into account the
+distortion.</p>
+
+<!-- ============= Schottky Langmuir Equation ============ -->
+
+<h3 align="center"><a name="SchoLa">Schottky Langmuir</a></h3>
+
+<p>The Schottky Langmuir equation<br/>
+<img src="Schottky-Langmuir.gif" height="60" width="119" alt="Equation"/><br/>
+is ideal for measurements: It has a lot of dimensioned items, a root,
+and rational exponents.
+The reference is the evaluation time of the <b>nude</b> equation,
+i.e. the pure floating point version.</p>
+
+<p>In contrast, the <b>dressed</b> version is correctly dimensioned
+and called with parameters dimensioned with unit strings.
+Unit string evaluation is time consuming and heavily depends on the
+complexity of the string.
+However, unit strings are generally only used for initialization and
+do not normally occur in formulas.
+Thus in the <b>stringless</b> version, the parameter unit
+initialization is taken out of the loop.</p>
+
+<p>Last, the <b>optimized</b> version also precompiles the constant
+part outside the loop.
+This is what an optimizing compiler will do (in the nude version),
+but cannot here because of the dimension components.</p>
+
+<p>These four versions are computed once with unit checking enabled
+and once disabled.
+The results are quite astonishing.</p>
+
+<!-- ============= Schottky Langmuir Unchecked ============ -->
+<table align="center">
+
+<colgroup>
+<col width=" 70"/>
+<col width="110"/>
+<col width=" 60"/>
+<col width=" 50"/>
+<col width=" 50"/>
+</colgroup>
+
+<tr>
+<th>Unchecked</th>
+<th>Absolute</th>
+<th colspan="3">Relative</th>
+</tr>
+
+<tr>
+<th>Nude</th>
+<td>0.015771666 s</td>
+<td>1.0</td>
+<td></td>
+<td></td>
+</tr>
+
+<tr>
+<th>Optimized</th>
+<td>0.167998892 s</td>
+<td>10.7</td>
+<td>1.0</td>
+<td></td>
+</tr>
+
+<tr>
+<th>Stringless</th>
+<td>0.215526095 s</td>
+<td>13.7</td>
+<td>1.3</td>
+<td>1.0</td>
+</tr>
+
+<tr>
+<th>Dressed</th>
+<td>0.668961375 s</td>
+<td>42.4</td>
+<td>4.0</td>
+<td>3.1</td>
+</tr>
+
+</table>
+<!-- =========== Schottky Langmuir Unchecked End ========== -->
+
+<br/>
+
+<!-- ============= Schottky Langmuir Checked ============ -->
+<table align="center">
+
+<colgroup>
+<col width=" 70"/>
+<col width="110"/>
+<col width=" 60"/>
+<col width=" 50"/>
+<col width=" 50"/>
+</colgroup>
+
+<tr>
+<th>Checked</th>
+<th>Absolute</th>
+<th colspan="3">Relative</th>
+</tr>
+
+<tr>
+<th>Nude</th>
+<td>0.109398771 s</td>
+<td>1.0</td>
+<td></td>
+<td></td>
+</tr>
+
+<tr>
+<th>Optimized</th>
+<td>5.908864053 s</td>
+<td>54.0</td>
+<td>1.0</td>
+<td></td>
+</tr>
+
+<tr>
+<th>Stringless</th>
+<td>6.994078595 s</td>
+<td>63.9</td>
+<td>1.2</td>
+<td>1.0</td>
+</tr>
+
+<tr>
+<th>Dressed</th>
+<td>8.570521621 s</td>
+<td>78.3</td>
+<td>1.5</td>
+<td>1.2</td>
+</tr>
+
+</table>
+<!-- =========== Schottky Langmuir Checked End ========== -->
+
+<p>Comparing the <i>nude</i> and the <i>omptimized</i> versions in
+the <i>checked</i> variant, you can see that the dimension
+calculation makes the execution time explode.
+This melts down when checking is off.
+The rest must be attributed to the compiler ignoring the
+<code>Inline</code> pragma for the operations in the dimension
+signature package.</p>
+
+<p>Comparing the <i>stringless</i> and the <i>dressed</i> execution
+times, you can see that the dimension string evaluation is extremely
+expensive in the <i>unchecked</i> version, thus be careful to only
+use them for data initilization and avoid them in calculations.
+In the <i>checked</i> version, this effect is smaller since the
+computation of the dimension components consumes most of the time,
+whereas in the unchecked version, only the dimension string
+evaluation is left.</p>
+
+<!-- ============= Unchecked v. Checked ============ -->
+<table align="center">
+
+<colgroup>
+<col width=" 70"/>
+<col width="110"/>
+<col width=" 40"/>
+<col width="120"/>
+<col width=" 45"/>
+<col width="120"/>
+<col width=" 45"/>
+<col width="120"/>
+<col width=" 45"/>
+</colgroup>
+
+<tr>
+<th></th>
+<th colspan="2">Nude</th>
+<th colspan="2">Optimized</th>
+<th colspan="2">Stringless</th>
+<th colspan="2">Dressed</th>
+</tr>
+
+<tr>
+<th>Unchecked</th>
+<td>0.015771666 s</td>
+<td>1.00</td>
+<td>0.167998892 s</td>
+<td>1.00</td>
+<td>0.215526095 s</td>
+<td>1.00</td>
+<td>0.668961375 s</td>
+<td>1.00</td>
+</tr>
+
+<tr>
+<th>  Checked</th>
+<td>0.109398771 s</td>
+<td>6.94</td>
+<td>5.908864053 s</td>
+<td>35.17</td>
+<td>6.994078595 s</td>
+<td>32.45</td>
+<td>8.570521621 s</td>
+<td>12.81</td>
+</tr>
+
+</table>
+<!-- =========== Unchecked v. Checked End ========== -->
+
+<p>Last the <i>unchecked versus checked</i> equations.
+(The <i>Nude</i> column is the same as above.)
+You again can see the big effect of suppressing the dimension
+checking.</p>
+
+<!-- ============= Matrix and Quaternion ============ -->
+
+<h3 align="center"><a name="MxQu">Matrices and Quaternions</a></h3>
+
+<p>As expected, quaternion rotation is much slower to matrix rotation,
+and even more so in the checked version.</p>  
+
+<!-- ============= Matrix vs. Quaternion ============ -->
+<table align="center">
+
+<colgroup>
+<col width=" 70"/>
+<col width="120"/>
+<col width=" 40"/>
+<col width="120"/>
+<col width=" 40"/>
+</colgroup>
+
+<tr>
+<th></th>
+<th colspan="2">Matrix</th>
+<th colspan="2">Quaternion</th>
+</tr>
+
+<tr>
+<th>Unchecked</th>
+<td>0.110371887 s</td>
+<td>1.0</td>
+<td>0.600734540 s</td>
+<td>1.0</td>
+</tr>
+
+<tr>
+<th>Checked</th>
+<td>0.274695246 s</td>
+<td>2.5</td>
+<td>2.576114086 s</td>
+<td>4.3</td>
+</tr>
+
+</table>
+
+<br/>
+
+<table align="center">
+
+<colgroup>
+<col width=" 70"/>
+<col width="120"/>
+<col width=" 40"/>
+<col width="120"/>
+<col width=" 40"/>
+</colgroup>
+
+<tr>
+<th></th>
+<th colspan="2">Unchecked</th>
+<th colspan="2">Checked</th>
+</tr>
+
+<tr>
+<th>Matrix</th>
+<td>0.110371887 s</td>  <!-- mu -->
+<td>1.0</td>
+<td>0.274695246 s</td>  <!-- mc -->
+<td>1.0</td>
+</tr>
+
+<tr>
+<th>Quaternion</th>
+<td>0.600734540 s</td>
+<td>5.4</td>
+<td>2.576114086 s</td>
+<td>9.4</td>
+</tr>
+
+</table>
+<!-- =========== Matrix vs. Quaternion End ========== -->
+
+<p><a href="Table_of_Contents.html">Table_of_Contents</a></p>
+
+<p align="center"><a href="http://validator.w3.org/check?uri=referer">
+<img src="valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a></p>
+
+</body>
+
+</html>

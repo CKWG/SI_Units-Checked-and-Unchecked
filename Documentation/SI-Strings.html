@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="shortcut icon" type="image/x-icon" href="Ada.ico" />
+<title>SI.Strings</title>
+<!-- Version  Date
+      1.0  10.08.2018  Unit strings
+      1.1  21.08.2018  Validated
+      2.0  12.05.2020  Completely reworked; dimensions generic parameter
+//-->
+</head>
+
+<body>
+
+<h2 align="center">SI.Strings</h2>
+
+<p align="left">This package is a substitute for the 'Image and 'Value
+attributes of the numeric values.
+For the numeric part, they work exactly like the attributes.</p>
+
+<p>Image returns the argument as a string.
+It includes the unit in the
+<a href="SI-Text_IO.html#def">default representation</a>.</p>
+
+<p>Value returns the argument as an item ignoring any leading or
+trailing blanks.
+<font color="008000">In the checked variant, it takes into account
+the unit in any representation.</font>
+<font color="FF0000">In the unchecked variant, it takes into account
+only the prefixes and conversion factors.</font>
+Constraint_Error is raised if the numeric string does not have the
+correct format, Illegal_Unit is raised if the unit string does not
+have the correct format.</p>
+
+<h3 align="left">Specification</h3>
+
+<pre><b>generic
+
+package </b>Generic_<a href="SI.html">SI</a>.Generic_Strings <b>is
+
+  pragma </b>Elaborate_Body;
+
+  <b>function </b>Image <b>(</b>X: Item  <b>) return </b>String;
+  <b>function </b>Value <b>(</b>X: String<b>) return </b>Item;
+
+<b>end </b>Generic_SI.Generic_Strings;</pre>
+
+<h3 align="left">Examples</h3>
+
+<p><code>Value (&quot;3.6*km/h&quot;)</code> will result in
+<font color="008000">1.0*"m/s" in the checked variant</font>,
+as <font color="FF0000">1.0 in the unchecked variant</font>.<br/>
+<code>Image (3.6*&quot;km/h&quot;)</code> will result in
+<font color="008000">&quot; 1.0*m*s**(-1)&quot; in the checked variant</font>,
+as <font color="FF0000">&quot; 1.0&quot; in the unchecked variant</font>
+(with the default number of digits after the dot).</p>
+
+<p><a href="Table_of_Contents.html">Table_of_Contents</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="SI-Text_IO.html">SI.Text_IO</a></p>
+
+<p align="center"><a href="http://validator.w3.org/check?uri=referer">
+   <img src="valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a></p>
+
+</body>
+</html>

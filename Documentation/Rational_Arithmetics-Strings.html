@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="shortcut icon" type="image/x-icon" href="Ada.ico" />
+<title>Rational_Arithmetics.Strings</title>
+<!-- Version  Date
+      1.0  01.03.2006
+      1.1  10.08.2018  Ada.ico
+      1.2  21.08.2018  Validated
+      2.0  21.01.2020  Improved wording
+//-->
+</head>
+
+<body>
+
+<h2 align="center">Rational_Arithmetics.Strings</h2>
+
+<p>This package provides replacements for the 'Image and 'Value attributes.</p>
+
+<h3 align="left">Specification</h3>
+
+<pre><b>package</b> <a href="Rational_Arithmetics.html">Rational_Arithmetics</a>.Strings <b>is
+
+  pragma</b> Elaborate_Body;
+
+  <b>function</b> Image (X: Rational) <b>return</b> String;
+  <b>function</b> Value (X: String  ) <b>return</b> Rational;
+
+<b>end</b> Rational_Arithmetics.Strings;</pre>
+
+<p>Since the attributes 'Image and 'Value cannot be defined, corresponding
+functions are defined.
+They work similarly to the predefined attributes for the constituent parts.</p>
+
+<pre>  <b>function</b> Image (X: Rational) <b>return</b> String;</pre>
+
+<p>Image returns the argument as a string.
+If the denominator is 1, the string has the format &quot;sn&quot;,
+else it has the format &quot;sn/m&quot; where there is no white space around
+'/', and the sign 's' is blank for non-negative numbers, n is nonnegative and
+m positive.</p>
+
+<pre>  <b>function</b> Value (X: String) <b>return</b> Rational;</pre>
+
+<p>Value turns the argument into a (reduced) rational number ignoring any
+leading or trailing blanks.
+It raises Constraint_Error if the string does not have the aforementioned
+format.</p>
+
+<p><a href="Table_of_Contents.html">Table of Contents</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="Rational_Arithmetics-Text_IO.html">Rational_Arithmetics.Text_IO</a></p>
+
+<p align="center"><a href="http://validator.w3.org/check?uri=referer">
+   <img src="valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a></p>
+
+</body>
+
+</html>

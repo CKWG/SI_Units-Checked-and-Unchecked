@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="shortcut icon" type="image/x-icon" href="Ada.ico" />
+<title>SI.Temperatures.Strings</title>
+<!-- Version  Date
+      1.0  02.07.2025
+//-->
+</head>
+
+<body>
+
+<h2 align="center">SI.Temperatures.Strings</h2>
+
+<p>This package provides a sustitute for the homonymous attributes.</p>
+
+<p>For the numeric part, Image and Value behave like the corresponding
+attributes and may raise the appropriate exceptions.</p>
+
+<p>If no exception is raised, then:</p>
+
+<p>Image appends the unit "°C".</p>
+
+<p>Value checks if the numeric part is followed by the correct unit,
+else Unit_Error is raised. Trailing blanks are ignored.</p>
+
+<h3 align="left">Specification</h3>
+
+<pre><b>generic
+
+package </B>Generic_<a href="SI.html">SI</a>.Generic_<a href="SI-Temperatures.html">Temperatures</a>.Generic_Strings <b>is
+
+  pragma </b>Elaborate_Body;
+
+  <B>function </b>Image <b>(</B>X: Celsius<b>) return </b>String;
+  <B>function </b>Value <b>(</B>X: String <b>) return </b>Celsius;
+
+<b>end </b>Generic_SI.Generic_Temperatures.Generic_Strings;</pre>
+
+<h3 align="left">Examples</h3>
+
+<pre>Image (0.1*"°C") = " 1.00000E-01°C"
+
+Value (" 1.00E-01°C   ") = 0.1*"°C"  -- <i>trailing blanks are ignored</i>
+Value (" 1.00E-01°C x ")             -- <i>raise Unit_Error</i></pre>
+
+<p><a href="Table_of_Contents.html">Table_of_Contents</a></p>
+
+<p align="center"><a href="http://validator.w3.org/check?uri=referer">
+   <img src="valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a></p>
+
+</body>
+
+</html>

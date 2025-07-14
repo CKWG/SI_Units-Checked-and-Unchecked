@@ -1,0 +1,81 @@
+------------------------------------------------------------------------------
+-- Checked and Unchecked Computation with SI Units
+-- Copyright (C) 2003, 2005, 2007, 2009, 2018, 2020, 2025
+-- Christoph Karl Walter Grein
+--
+-- This program is free software; you can redistribute it and/or
+-- modify it under the terms of the GNU General Public License
+-- as published by the Free Software Foundation; either version 3
+-- of the License, or any later version.
+--
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+--
+-- You should have received a copy of the GNU General Public License
+-- along with this program; if not, write to the Free Software
+-- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+--
+-- Author's email address:
+--   christ-Usch.grein@t-online.de
+------------------------------------------------------------------------------
+
+with "../SI/si";
+
+project Examples is
+
+  --====================================================================
+  -- Author    Christoph Grein
+  -- Version   6.1
+  -- Date      9 July 2025
+  --====================================================================
+  --
+  --====================================================================
+  -- History
+  -- Author Version   Date    Reason for change
+  --  C.G.    1.0  26.02.2003
+  --  C.G.    2.0  10.10.2005 Gnat GPL 2005: Enable Ada 2005
+  --  C.G.    2.1  06.03.2007 removed -gnatN (deprecated by AdaCore)
+  --  C.G.    2.2  15.03.2007 Add package Linker (for libgnalasup.a,
+  --                          missing in Gnat 6.0.1)
+  --  C.G.    3.0  03.03.2009 package Linker no longer needed
+  --  C.G.    3.1  24.07.2009 More compiler options
+  --  C.G.    4.0  06.08.2018 -gnat12, examples reworked
+  --  C.G.    5.0  15.05.2020 Dimensions generic parameter
+  --  C.G.    6.0  19.04.2025 Preconditions; main measure
+  --  C.G.    6.1  09.07.2025 Import Safety from SI
+ --====================================================================
+
+  for Object_Dir use "GnatLib";
+
+  for Main use ("application",
+                "ambiguities",
+                "physical_computations",
+                "vector_algebra",
+                "polar_vectors",
+                "decompose_rotation",
+                "matrix_inversion",
+                --
+                "measure");
+  for Exec_Dir use ".";
+
+  --  type Safety_Choice is ("Checked", "Unchecked");
+  --  Safety: Safety_Choice := external ("Safety");
+
+  Assertion := "";
+
+  case SI.Safety is
+    when "Checked"   => Assertion := "-gnata";  -- assertions enabled
+    when "Unchecked" => Assertion := "";
+  end case;
+
+  for Source_Dirs use (".", "../Instantiations/", "../Instantiations/" & SI.Safety);
+
+  package Compiler is
+    for Default_Switches ("Ada") use ("-gnatn", "-O2", "-gnat12", "-gnatyOr",
+                                      "-gnato", "-fstack-check") &
+                                      Assertion;
+  end Compiler;
+
+end Examples;

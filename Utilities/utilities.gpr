@@ -1,0 +1,57 @@
+------------------------------------------------------------------------------
+-- Utilities
+-- Copyright (C) 2005, 2006 Christoph Karl Walter Grein
+--
+-- This program is free software; you can redistribute it and/or
+-- modify it under the terms of the GNU General Public License
+-- as published by the Free Software Foundation; either version 2
+-- of the License, or any later version.
+--
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+--
+-- You should have received a copy of the GNU General Public License
+-- along with this program; if not, write to the Free Software
+-- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+--
+-- Bug reports and proposals for improvements are welcome. Please send
+-- them to the eMail address below.
+--
+-- Author's homepage and email address:
+-- eMail:    Christ-Usch.Grein@T-Online.de
+-- Internet: http://www.christ-usch-grein.homepage.t-online.de/
+--
+-- Christoph Karl Walter Grein
+-- Hauptstr. 42
+-- D-86926 Greifenberg
+-- Germany
+------------------------------------------------------------------------------
+
+-- with "/Compiler/Gnat/lib/gnat/win32ada";
+
+project Utilities is
+
+  --====================================================================
+  -- Author    Christoph Grein
+  -- Version   1.1
+  -- Date      2 December 2006
+  --====================================================================
+  -- According to AdaCore, best results are obtained by "-O2", "-gnatn".
+  --====================================================================
+  -- History
+  -- Author Version   Date    Reason for change
+  --  C.G.    1.1  02.12.2006 ("-O2", "-gnatn") rather than deprecated
+  --                          ("-O3", "-gnatN")
+  --  C.G.    1.0  23.10.2005
+  --====================================================================
+
+   for Source_Dirs use (".");
+   for Object_Dir use "GnatLib";
+
+   package Compiler is
+     for Default_Switches ("ada") use ("-O2", "-gnatn");
+   end Compiler;
+
+end Utilities;

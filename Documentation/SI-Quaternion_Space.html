@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="shortcut icon" type="image/x-icon" href="Ada.ico" />
+<title>SI.Quaternion_Space</title>
+<!-- Version  Date
+      1.0  08.01.2006
+      1.1  27.02.2006  pragma Pure
+      2.0  28.03.2006  Ada.Numerics.Generic_Real_Arrays
+      2.1  08.07.2006  middle dot was missing in defining equations; also coloured [Un]Checked
+      3.0  10.08.2018  Completely reworked; unit strings
+      3.1  21.08.2018  Validated
+      4.0  14.05.2020  Dimensions generic parameter
+      5.0  01.04.2025  ToC Subheaders
+      5.1  18.04.2025  Preconditions
+//-->
+</head>
+
+<body>
+
+<h2 align="center">SI.Quaternion_Space</h2>
+
+<p>This package defines quaternions, a four-dimensional extension of real numbers.
+There are several representations for them, the most prominent being:
+a pair of complex numbers or a pair of a real number and a real three-dimensional vector.
+The latter method serves our purpose better.
+Like vectors, all elements of a quaternion have the same dimension.</p>
+
+<p><a href="#Spec">Specification</a><br/>
+<a href="#SpeQuat">Special Quaternions</a><br/>
+<a href="#Cons">Constructors</a><br/>
+<a href="#Oper">Operations</a></p>
+
+<p>Quaternions form the four-dimensional division algebra over real numbers. There
+are only four such algebras:
+the real numbers <b>R</b> (dimension 1), the complex numbers <b>C</b> (dimension 2),
+the quaternions <b>H</b> (dimension 4), and the octonions <b>O</b> (dimension 8).
+(They are all constructed with the Cayley-Dickson construction starting from the
+real numbers, which however on higher dimensions produces algebras which are no
+longer zero divisor free.)
+In our representation, quaternions are an extension of complex numbers:
+Instead of one imaginary part, they have three:<br/>
+&nbsp;&nbsp; Q = s + v<sub>1</sub> * i + v<sub>2</sub> * j + v<sub>3</sub> * k = (s, <b>v</b>)<br/>
+with ijk = i<sup>2</sup> = j<sup>2</sup> = k<sup>2</sup> = -1, <b>v</b> = (v<sub>1</sub>,
+v<sub>2</sub>, v<sub>3</sub>).
+They may be thought of being composed of a real scalar part (the real part),
+and an ordinary real three-dimensional vector (the imaginary part).
+Like for complex numbers, there is a complex conjugate Q' := (s, -<b>v</b>).</p>
+
+<p>Multiplication and inversion are defined as<br/>
+&nbsp;&nbsp; Q<sub>1</sub> * Q<sub>2</sub> := (s<sub>1</sub> * s<sub>2</sub> - <b>v<sub>1</sub></b>·<b>v<sub>2</sub></b>,
+s<sub>1</sub> * <b>v<sub>2</sub></b> + s<sub>2</sub> * <b>v<sub>1</sub></b> +
+<b>v<sub>1</sub></b> <font face="Arial">x</font> <b>v<sub>2</sub></b>);<br/>
+&nbsp;&nbsp; Q<sup>-1</sup> := Q' / (s<sup>2</sup> + <b>v</b> ·<b>v</b>)<br/>
+where &quot;·&quot; stands for the dot product, &quot;<font face="Arial">x</font>&quot;
+for the cross product, and &quot;*&quot; for the product between scalars and
+between scalars and vectors.
+(For any <b> v</b> with only one component different from 0, this results in ordinary
+complex numbers.)
+Thus multiplication is associative, but not commutative.
+Instead of Q<sup>-1</sup>, we generally use the division operator as in 1/Q.</p>
+
+<p>The basic rules are:<br/>
+&nbsp;&nbsp; abs Q := Sqrt (Q * Q') = Sqrt (s**2 + <b> v</b>·<b>v</b>)<br/>
+&nbsp;&nbsp; (Q<sub>1</sub> * Q<sub>2</sub>)' = Q<sub>2</sub>' * Q<sub>1</sub>'&nbsp; =&gt;&nbsp; abs (Q<sub>1</sub> * Q<sub>2</sub>) = abs Q<sub>1</sub> * abs Q<sub>2</sub></p>
+
+<p>The specification of the package follows closely the RM specification of complex
+numbers.</p>
+
+<p><font color="999999">(An aside: Chris Holmes sent me the quaternion version
+for coordinate transformation for the 2004 release of SI.
+I do not know why this should be used instead of matrices because it is so much
+slower.
+I myself have never used quaternions.
+Nevertheless I expanded it to this fully dimensiond form.
+May it be useful.
+And don't forget to send me your improvements if any.)</font></p>
+
+<h3><a name="Spec">Specification</a></h3>
+
+<pre><b>with </b>Ada.Numerics.Generic_Real_Arrays;
+
+<b>with </b>Generic_SI.Generic_<a href="SI-Vector_Space.html">Vector_Space</a>;
+
+<b>generic
+
+  with package </b>Real_Arrays <b>is new </b>Ada.Numerics.Generic_Real_Arrays  (Generic_SI.Real);
+  <b>with package </b>Vectors     <b>is new </b>Generic_SI  .Generic_Vector_Space (Real_Arrays);
+  <b>use </b>Real_Arrays, Vectors;
+
+<b>package </b>Generic_<a href="SI.html">SI</a>.Generic_Quaternion_Space <b>is
+
+  type </b>Quaternion <b>is private</b>;
+
+  Null_Quaternion: <b>constant </b>Quaternion;
+  One_Quaternion : <b>constant </b>Quaternion;
+  I_Quaternion   : <b>constant </b>Quaternion;
+  J_Quaternion   : <b>constant </b>Quaternion;
+  K_Quaternion   : <b>constant </b>Quaternion;
+
+  <b>function </b>Re (X: Quaternion) return Item;
+  <b>function </b>Im (X: Quaternion) return Vector;
+
+  <b>function </b>Compose (Re: Item; Im: Vector) return Quaternion <b>with</b> Pre =&gt; Same_Dimension (Re, Get (Im, 1)) <b>or else raise</b> Unit_Error;
+  <b>function </b>Compose (Re: Item            ) return Quaternion;
+  <b>function </b>Compose <b>(          </b>Im: Vector) return Quaternion;
+
+  <b>procedure </b>Set_Re (X : <b>in out </b>Quaternion; Re: <b>in </b>Item  ) <b>with</b> Pre =&gt; Same_Dimension (Get (Im (X), 1), Re) <b>or else raise</b> Unit_Error;
+  <b>procedure </b>Set_Im (X : <b>in out </b>Quaternion; Im: <b>in </b>Vector) <b>with</b> Pre =&gt; Same_Dimension (Re (X), Get (Im, 1)) <b>or else raise</b> Unit_Error;
+
+  <i>-- Quaternion operations</i>
+
+  <b>function </b>&quot;abs&quot;     (Right: Quaternion) return Item;        <i>-- sqrt (s**2 + v**2)</i>
+  <b>function </b>Conjugate (Q    : Quaternion) return Quaternion;  <i>-- (s, -v)</i>
+  <b>function </b>Inv       (Q    : Quaternion) return Quaternion;  <i>-- 1 / Q</i>
+  <b>function </b>Normalize (Q    : Quaternion) return Quaternion;  <i>-- abs = 1</i>
+
+  <b>function </b>&quot;+&quot; (Right: Quaternion) return Quaternion;
+  <b>function </b>&quot;-&quot; (Right: Quaternion) return Quaternion;
+
+  <b>function </b>&quot;+&quot; (Left, Right: Quaternion) return Quaternion;  <i>-- with Pre implicit</i>
+  <b>function </b>&quot;-&quot; (Left, Right: Quaternion) return Quaternion;  <i>-- as above</i>
+  <b>function </b>&quot;*&quot; (Left, Right: Quaternion) return Quaternion;
+  <b>function </b>&quot;/&quot; (Left, Right: Quaternion) return Quaternion;
+
+  <b>function </b>&quot;+&quot; (Left: Quaternion; Right: Item      ) return Quaternion;  <i>-- with Pre</i>
+  <b>function </b>&quot;+&quot; (Left: Item      ; Right: Quaternion) return Quaternion;  <i>--   implicit</i>
+  <b>function </b>&quot;-&quot; (Left: Quaternion; Right: Item      ) return Quaternion;  <i>--     as</i>
+  <b>function </b>&quot;-&quot; (Left: Item      ; Right: Quaternion) return Quaternion;  <i>--       above</i>
+
+  <b>function </b>&quot;*&quot; (Left: Quaternion; Right: Item      ) return Quaternion;
+  <b>function </b>&quot;*&quot; (Left: Item      ; Right: Quaternion) return Quaternion;
+  <b>function </b>&quot;/&quot; (Left: Quaternion; Right: Item      ) return Quaternion;
+  <b>function </b>&quot;/&quot; (Left: Item      ; Right: Quaternion) return Quaternion;
+
+<b>private</b>
+
+   <i>Not shown</i>
+
+<b>end </b>Generic_SI.Generic_Quaternion_Space;</pre>
+
+<p>Note: Preconditions have been left out where they are implicitly performed
+via calls to more basic operations.</p>
+
+<h3><a name="SpeQuat">Special Quaternions</a></h3>
+
+<pre>  Null_Quaternion: <b>constant</b> Quaternion;
+  One_Quaternion : <b>constant</b> Quaternion;
+  I_Quaternion   : <b>constant</b> Quaternion;
+  J_Quaternion   : <b>constant</b> Quaternion;
+  K_Quaternion   : <b>constant</b> Quaternion;</pre>
+
+<p>Null_Quaternion is the zero quaternion, i.e. all components are zero.
+One_Quaternion has as only component the real part 1, I_, J_, and K_Quaternion
+have a zero real part, the imaginary part is the respective unit vector.</p>
+
+<p>They all have the (physical) dimension 1.</p>
+
+<h3><a name="Cons">Constructors</a></h3>
+
+<pre>  <b>function</b>  Compose (Re: Item; Im: Vector) <b>return</b> Quaternion;&nbsp;
+  <b>function</b>  Compose (Re: Item            ) <b>return</b> Quaternion;
+  <b>function</b>  Compose (          Im: Vector) <b>return</b> Quaternion;</pre>
+
+<p>Compose returns the quaternion composed of the given real and imaginary parts.
+If only one part is given, the other one is implicitly zero (with the correct dimension).
+Unit_Error is propagated when the dimensions of the real and imaginary parts are
+not the same.</p>
+
+<pre>  <b>procedure</b>  Set_Re (X : <b>in out</b> Quaternion; Re: <b>in</b> Item  );
+  <b>procedure</b>  Set_Im (X : <b>in out</b> Quaternion; Im: <b>in</b> Vector);</pre>
+
+<p>Set_Re and Set_Im replace the designated component of a quaternion parameter
+with the given value.</p>
+
+<pre>  <b>function</b> Re (X: Quaternion) <b>return</b> Item;
+  <b>function</b> Im (X: Quaternion) <b>return</b> Vector;</pre>
+
+<p>Re and Im return the corresponding component of the quaternion parameter. </p>
+
+<h3><a name="Oper">Operations</a></h3>
+
+<p>The arithmetic operations and the Conjugate function have their conventional
+meaning.</p>
+
+<pre>  <b>function</b> Conjugate (Q: Quaternion) <b>return</b> Quaternion;
+  <b>function</b> Inv       (Q: Quaternion) <b>return</b> Quaternion;
+  <b>function</b> Normalize (Q: Quaternion) <b>return</b> Quaternion;</pre>
+
+<p>Inv returns the inverse of its parameter.
+Normalize (Q) is equivalent to Q/abs Q.</p>
+
+<p><a href="Table_of_Contents.html">Table_of_Contents</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="SI-Quaternion_Space-Transformation.html">SI.Quaternion_Space.Transformation</a></p>
+
+<p align="center"><a href="http://validator.w3.org/check?uri=referer">
+   <img src="valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a></p>
+
+</body>
+
+</html>

@@ -1,0 +1,84 @@
+------------------------------------------------------------------------------
+-- Checked and Unchecked Computation with SI Units
+-- Copyright (C) 2002, 2005-2009, 2018, 2020, 2025 Christoph Karl Walter Grein
+--
+-- This program is free software; you can redistribute it and/or
+-- modify it under the terms of the GNU General Public License
+-- as published by the Free Software Foundation; either version 3
+-- of the License, or any later version.
+--
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+--
+-- You should have received a copy of the GNU General Public License
+-- along with this program; if not, write to the Free Software
+-- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+--
+-- Author's email address:
+--   christ-Usch.grein@t-online.de
+------------------------------------------------------------------------------
+
+with "../Utilities/utilities";
+with "../SI/si";
+
+project SI.Test is
+
+  --====================================================================
+  -- Author    Christoph Grein
+  -- Version   6.0
+  -- Date      9 July 2025
+  --====================================================================
+  --
+  --====================================================================
+  -- History
+  -- Author Version   Date    Reason for change
+  --  C.G.    1.0  18.11.2002
+  --  C.G.    2.0  15.11.2005 Ada 2005 mode; added all test programs
+  --  C.G.    2.1  03.02.2006 Add further tests for rational IO and for
+  --                          polar vectors
+  --  C.G.    2.2  15.03.2007 Add package Linker (for libgnalasup.a,
+  --                          missing in Gnat 6.0.1)
+  --  C.G.    3.0  28.04.2008 GNAT 6.1.1: package Linker no longer
+  --                          needed;
+  --                          new tests Test_Text_IO_Get_Constrained_SI,
+  --                          Test_Text_IO_Put_String_Constrained_SI
+  --  C.G.    3.1  31.07.2008 New test test_text_io_additional_units
+  --  C.G.    3.2  24.07.2009 More compiler options
+  --  C.G.    4.0  04.08.2018 -gnat12, tests reworked
+  --  C.G.    4.1  10.08.2018 new test
+  --  C.G.    4.2  25.08.2018 new test polynomials
+  --  C.G.    5.0  13.05.2020 Dimensions generic parameter
+  --  C.G.    5.1  02.07.2020 -O3
+  --  C.G.    5.2  18.04.2025 measure.adb moved to Examples
+  --  C.G.    5.3  01.07.2025 new test_si_celsius
+  --  C.G.    6.0  09.07.2025 Make it a child project
+  --====================================================================
+
+  for Object_Dir use "GnatLib";
+
+  for Main use ("run_all",
+                --
+                "test_rational_arithmetics",
+                "test_rational_image_value",
+                "test_rational_text_io",
+                --
+                "test_si_units",
+                "test_si_math",
+                "test_si_poly",
+                "test_si_celsius",
+                "test_si_strings",
+                "test_si_text_io_strings",
+                "test_si_text_io_file",
+                "test_si_text_io_put");
+  for Exec_Dir use ".";
+
+  for Source_Dirs use (".", "../Instantiations/", "../Instantiations/" & SI.Safety);
+
+  package Compiler is
+    for Default_Switches ("ada") use ("-gnata", "-gnat12", "-gnatyOr",
+                                      "-gnato", "-O3", "-fstack-check");
+  end Compiler;
+
+end SI.Test;
