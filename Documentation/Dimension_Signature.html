@@ -11,7 +11,6 @@
       2.0  06.04.2025  ToC Subheaders; how to compile with GNAT;
                        Fake_Dimensions now with private part
       2.1  20.06.2025  Attribute Inline; rework instantation description
-      2.2  09.07.2025  GNAT project change: rework instantation description
 //-->
 </head>
 
@@ -143,14 +142,15 @@ located in the homonymous directories
 <font color="#0000FF"><code>SI</code></font> and
 <font color="#0000FF"><code>Examples</code></font> do most of this for
 you:<br/>
-Start GPS with project <code>Examples</code>, open the Scenario View
-and select the appropriate value for the Safety scenario variable
-(values <font color="#008000">Checked</font> and
-<font color="#FF0000">Unchecked</font>.
-The command <code>gprbuild</code> will compile the directories
-<code>SI</code> respectively <code>Instantiations</code> and
-<code>Examples</code> and finally bind and link to produce your
-executable.<br/>
+In GPS, open the Scenario View amd select the appropriate value for the
+Safety scenario variable (values <font color="#008000">Checked</font>
+and <font color="#FF0000">Unchecked</font>); take care to select the
+same value in both projects.
+The commands <code>gprbuild</code> will compile the directories
+<font color="#0000FF"><code>SI</code></font> respectively
+<font color="#0000FF"><code>Instantiations</code></font> and
+<font color="#0000FF"><code>Examples</code></font> and finally bind and link 
+to produce your executable.<br/>
 Do not forget to clear the SI library before changing the scenario.</p>
 
 <h3 align="left"><a name="Dim">The Dimension Packages</a></h3>

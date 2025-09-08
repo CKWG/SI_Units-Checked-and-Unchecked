@@ -31,8 +31,8 @@ package body Generic_SI.Generic_Temperatures.Generic_Text_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   2.1
-  -- Date      3 July 2025
+  -- Version   3.0
+  -- Date      30 August 2025
   --====================================================================
   --
   --====================================================================
@@ -45,6 +45,7 @@ package body Generic_SI.Generic_Temperatures.Generic_Text_IO is
   --                          generic_temperatures-generic_text_io and
   --                          rename; overhaul
   --  C.G.    2.1  03.07.2025 Get, Put for Strings
+  --  C.G.    3.0  30.08.2025 Reimplemented Get
   --====================================================================
 
   use Real_Text_IO;
@@ -58,24 +59,47 @@ package body Generic_SI.Generic_Temperatures.Generic_Text_IO is
   procedure Get (File : in  File_Type;
                  X    : out Celsius;
                  Width: in  Field := 0) is
-    Unit : String (1 .. 2);
-    C    : Character;
+    -- Look ahead and consume if acceptable, else raise exception.
+    C, G : Character;
     EoL  : Boolean;
     Count: Natural := 0;
   begin
-    Get (File, X.Value, Width);
-    -- Instead of this loop, we could just check whether "°C" follows.
-    -- In order to be compatible with Get for Item , this is not done.
-    loop
-      Look_Ahead (File, C, EoL);
-      exit when EoL or else C = ' ';
-      Count := Count + 1;
-      Get (File, Unit (Integer'Min (Unit'Last, Count)));
-    end loop;
-    if Count = 2 and Unit = "°C" then
-      return;
+    if Width = 0 then
+      Get (File, X.Value);        -- numeric value
+      Look_Ahead (File, C, EoL);  -- first character of unit
+      if EoL then  -- C is undefined in this case
+        raise Illegal_Unit with "missing unit";
+      elsif C /= '°' then
+        raise Illegal_Unit with "wrong unit begin";
+      end if;
+      Get (File, G);  -- consume C
+      loop
+        Look_Ahead (File, C, EoL);
+        exit when EoL or else C not in 'A' .. 'Z' | 'a' .. 'z';
+        Count := Count + 1;
+        Get (File, G);  -- consume C
+      end loop;
+      if Count = 1 and G = 'C' then
+        return;
+      end if;
+      raise Illegal_Unit with "unexpected character";
+    else
+      declare
+        Got  : String (1 .. Width);
+        Avail: Natural := 0;
+        Last : Natural;
+      begin
+        for C in 1 .. Width loop
+          exit when End_Of_Line (File);
+          Avail := Avail + 1;
+          Get (File, Got (C));
+        end loop;
+        Get (Got (1 .. Avail), X, Last);  -- may raise Data_Error
+        if Last < Avail then
+          raise Illegal_Unit with "string not exhausted";
+        end if;
+      end;
     end if;
-    raise Unit_Error;
   end Get;
 
   procedure Put (X   : in Celsius;
@@ -102,15 +126,18 @@ package body Generic_SI.Generic_Temperatures.Generic_Text_IO is
     Count: Natural := 0;
   begin
     Get (From, X.Value, Last);
-    for I in Last + 1 .. From'Last loop
-      exit when From (I) = ' ';
+    if From (Last + 1) /= '°' then
+      raise Illegal_Unit with "wrong unit start";
+    end if;
+    for I in Last + 2 .. From'Last loop
+      exit when From (I) not in 'A' .. 'Z' | 'a' .. 'z';
       Last  := I;
       Count := Count + 1;
     end loop;
-    if Count = 2 and From (Last - Count + 1 .. Last) = "°C" then
+    if Count = 1 and From (Last) = 'C' then
       return;
     end if;
-    raise Unit_Error;
+    raise Illegal_Unit with "unexpected characters";
   end Get;
 
   procedure Put (To  : out String;

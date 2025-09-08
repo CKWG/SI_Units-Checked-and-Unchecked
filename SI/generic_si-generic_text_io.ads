@@ -39,8 +39,8 @@ package Generic_SI.Generic_Text_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   8.0
-  -- Date      1 July 2025
+  -- Version   8.2
+  -- Date      29 August 2025
   --====================================================================
   -- For the numeric part, Put and Get work like the conventional
   -- operations in Ada.Text_IO, the formatting parameters apply to
@@ -53,111 +53,115 @@ package Generic_SI.Generic_Text_IO is
   --
   -- This is the syntax of an external item:
   --
-  -- external_item ::= value [dimension]
-  -- dimension     ::= * quotient | / divisor
-  -- quotient      ::= product [ / divisor]
-  -- divisor       ::= unit_factor | ( product )
-  -- product       ::= unit_factor {* unit_factor}
-  -- unit_factor   ::= [prefix] symbol [** exponent]
-  -- exponent      ::= ( [sign] rational ) | numeral
-  -- sign          ::= + | -
-  -- rational      ::= numeral [ / numeral]
-  -- numeral       ::= digit {digit}</pre>
+  --    external_item ::= value [dimension]
+  --    dimension     ::= * quotient | / divisor
+  --    quotient      ::= product [ / divisor]
+  --    divisor       ::= unit_factor | ( product )
+  --    product       ::= unit_factor {* unit_factor}
+  --    unit_factor   ::= identifier [** exponent]
+  --    identifier    ::= letter {letter}
+  --    exponent      ::= ( [sign] rational ) | numeral
+  --    sign          ::= + | -
+  --    rational      ::= numeral [ / numeral]
+  --    numeral       ::= digit {digit}</pre>
   --
   -- There may be no space in an external item.
   --
   -- This is the syntax of an internal item:
   --
-  -- internal_item ::= value * ""
-  --                 | value * "quotient"
-  --                 | value / "divisor"
+  --    internal_item   ::= value * quotient_string
+  --                      | value / product_string
+  --    quotient_string ::= ""
+  --                      | "quotient"
+  --    product_string  ::= "product"
   --
-  -- There may be no space in the quotient nor the divisor.
+  -- There may be no space between the string quotes.
+  --
+  -- A letter is a character that is in one of the ranges 'A'..'Z' or
+  -- 'a'..'z'. The identifier must be interpretable as [prefix] symbol.
+  -- [prefix] symbol.
   --
   -- prefix and symbol are as defined in SI (case sensitive);
-  -- 'u' is used for micro instead of 'µ'; "Ohm" is used for the
+  -- 'u' is used for micro instead of ' '; "Ohm" is used for the
   -- capital Omega.
-  -- (There may be no spaces in the unit nor before of after the
-  -- operator.)
-  -- Additionally allowed symbols:
-  --   min, h   for minute and hour      (no prefixes allowed)
-  --   l, L     for liter                (   prefixes allowed)
+  --
+  -- Any prefixed SI unit may be used as defined in The International
+  -- System of Units (SI) published by the Bureau International des
+  -- Poids et Mesures. Of the non-SI units listed in this document,
+  -- only hectare (ha), minute (min), hour (h), liter (l, L), and
+  -- electronvolt (eV) are currently allowed; of these, only the last
+  -- three may take prefixes.
+  --
+  -- Note: "ha" (10,000 m2) is a special case; it is composed of the
+  -- prefix hecto and the unit "are" ((10 m**2), but "are" is not
+  -- allowed with SI, thus no prefixes are allowed and neither e.g.
+  -- "ka" nor "hha" (allegedly 1 km**2) are legal units.
+  --
+  -- The complete list of symbols can be found in package body
+  -- Generic_SI.Generic_Symbols.
   --
   -- Deviations from the syntax will propagate Illegal_Unit.
   --
-  -- Examples: 1.0*"W/(m*K)"  correct
-  --           1.0*"W/m/K"    wrong
-  --           1.0 *"m"       wrong
-  --
-  -- The default representation of a unit is a product of all those
-  -- unit factors (m, kg, s, A, K, cd, mol) which have an exponent
-  -- different from 0, in that sequence.
-  -- Each unit factor is given either as the pure symbol (if the
-  -- exponent is 1), or as the symbol with integer or fractional
-  -- exponent. The exponent is included in parentheses as necessary
-  -- according to normal Ada rules.
-  -- If the unit is 1, the default representation is empty.
+  -- In the Checked variant, the default representation of the dimension
+  -- is a product of all base units (m, kg, s, A, K, cd, mol in that
+  -- sequence) with an exponent different from 0. If the dimension is 1,
+  -- the default representation is empty. Each base unit is given either
+  -- as the pure unit (if the exponent is 1), or as the unit with an
+  -- integer exponent if the exponent is a whole number (other than 1),
+  -- or as the unit with a fractional exponent. The exponent is included
+  -- in parentheses as necessary according to normal Ada rules.
+
+  -- In the Unchecked variant, the default representation of the
+  -- dimension is empty.
   --
   -- In the non-default representation, unit factors may be given with
   -- any prefixes and symbols in any sequence and with any exponents.
   --
+  -- Input and Output
+  --
+  -- This is the syntax of a dimension format modifier (there may be no
+  -- spaces between the string quotes):
+  --
+  --    modifier ::= "" | "[*]quotient" | "/divisor"
+  --
+  -- A dimension format modifier must be a valid representations of the
+  -- dimension.
+  --
   -- Input from files or strings:
+  --
   -- Items may be read in any representation.
+  --
+  -- If the value of the parameter Width is zero, first the value is
+  -- read as with Get of standard Text_IO.Float_IO (i.e. skipping any
+  -- leading blanks, line terminators, or page terminators;
+  -- see RM A.10.9(13)); Data_Error may be raised in this step. In case
+  -- Data_Error is not raised, then reads the longest possible sequence
+  -- of characters matching the syntax given above. [This sentence is an
+  -- exact copy of RM A.10.9(13), applied to the unit string.]
+  --
   -- If a nonzero value of Width is supplied, then exactly Width
   -- characters are input, or the characters (possibly none) up to a
   -- line terminator, whichever comes first; any skipped leading blanks
   -- are included in the count. [This sentence is an exact copy of
   -- RM A.10.9(19).]
-  -- If the value of the parameter Width is zero, first the value is
-  -- read as with Get of standard Text_IO.Float_IO (i.e. skipping any
-  -- leading blanks, line terminators, or page terminators); Data_Error
-  -- may be raised in this step. In case Data_Error was not raised,
-  -- reading stops if no '*' or '/' follows (the item's unit being 1).
-  -- Else characters are read as long as they belong to the set of
-  -- constituent characters: letters 'A' .. 'Z' and 'a' .. 'z', digits,
-  -- parentheses, operators, and signs. (This is similar to A.10.10(13)
-  -- for enumeration literals.)
-  -- The resulting sequence is evaluated according to the syntax.
-  -- Illegal_Unit is raised if the sequence is not a valid representa-
-  -- tion.
+  --
+  -- Returns in the parameter X the value of type Item that corresponds
+  -- to the sequence input. Illegal_Unit is raised if the sequence input
+  -- does not have the required syntax. [This sentence is an adaptation
+  -- of RM A.10.9(21).]
   --
   -- Output to files or strings:
-  -- If no dimension format modifier is given, the default represen-
-  -- tation is output.
-  -- A dimension format modifier Dim must be a valid unit, optionally
-  -- preceded by an operator (when omitted, implied as a '*'), and must
-  -- be compatible with the item's dimension; else Illegal_Unit will be
-  -- propagated.
-  -- For output to strings, first the length of the unit is calculated,
-  -- the remaining space will be used for the numeric part.
   --
-  -- Examples:
+  -- If the dimension format modifier is "", the numeric value and the
+  -- default representation are output. If a modifier is given, the
+  -- numeric value modified according to the prefixes is output followed
+  -- by the modifier. The precondition has been commented out because
+  -- otherwise the modifier would be evaluated at least twice.
   --
-  --   S: Length := 1.0*"m";    default output  1.0*m
-  --   V: Speed  := 1.0*"m/s";                  1.0*m*s**(-1)
-  --   B: Item   := 1.0*"T";                    1.0*kg*s**(-2)*A**(-1)
-  --
-  -- The speed V above, when output with a Dim format modifier "km/s" or
-  -- "*km/s", results in "1.0E-3*km/s".
-  --
-  -- The magnetic field B above may also be read as
-  --   1.0E+3*mT
-  --   1.0*m**(-2)*Wb
-  --
-  -- "1.0K" will be read a an item with value 1.0 and dimension 1,
-  -- the following character 'K' will be left unconsumed (no '*' after
-  -- the value). It will not be evaluated as one kelvin.
-  -- "1.0*mB " will raise Illegal_Unit with the offending character 'B'
-  -- (there is no unit symbol 'B'); the blank character will be left
-  -- unconsumed. It will not be read as one meter with the following
-  -- character 'B' left unconsumed.
-  -- "1.0*mBqA " will raise Illegal_Unit with the offending character
-  -- 'A'(there is no unit symbol 'BqA'); the blank character will be
-  -- left unconsumed. It will not be read as one Millibecquerel with the
-  -- following character 'A' left unconsumed.
-  --
-  -- Note: Precondition is commented out on Put procedures because they
-  --       call Put to String.
+  -- For output to files, the numeric part is output first, followed by
+  -- the dimension. For output to strings, first the length of the
+  -- dimension string is calculated, the remaining string part is used
+  -- for the numeric value.
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
@@ -172,6 +176,8 @@ package Generic_SI.Generic_Text_IO is
   --  C.G.    6.0  13.05.2020 Parent renamed to Generic_SI
   --  C.G.    7.0  18.04.2025 Precondition replaces check in body
   --  C.G.    8.0  01.07.2025 generic param. as in Text_IO for Celsius
+  --  C.G.    8.1  12.08.2025 Improved description
+  --  C.G.    8.2  29.08.2025 Preconditions commented out
   --====================================================================
 
   pragma Elaborate_Body;
@@ -207,6 +213,6 @@ package Generic_SI.Generic_Text_IO is
                  X  : in Item;
                  Aft: in Field  := Default_Aft;
                  Exp: in Field  := Default_Exp;
-                 Dim: in String := "") with Pre => Valid_Modifier (X, Dim) or else raise Unit_Error;
+                 Dim: in String := "");  -- with Pre => Valid_Modifier (X, Dim) or else raise Unit_Error
 
 end Generic_SI.Generic_Text_IO;

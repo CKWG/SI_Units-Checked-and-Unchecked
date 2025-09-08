@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2002, 2018, 2020 Christoph Karl Walter Grein
+-- Copyright (C) 2002, 2018, 2020, 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -23,34 +23,36 @@
 -- however invalidate any other reasons why the executable file might be
 -- covered by the GNU Public License.
 --
--- Source:
--- https://www.adaic.org/ada-resources/tools-libraries/
---   (see Christoph Grein's Essentials)
--- http://archive.adaic.com/tools/CKWG/Dimension/Dimension.html
---
 -- Author's email address:
 --   christ-usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Ada.Text_IO, Ada.Float_Text_IO;
+with Ada.Assertions;
+with Ada.Exceptions;
+with Ada.Strings.Fixed;
+
+with Ada.Text_IO;
 
 with Test_Support;
 use  Test_Support;
 
 with SI.IO;
 use  SI.IO, SI;
-with Ada.Assertions;
 
 procedure Test_SI_Text_IO_Put is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   3.1
-  -- Date      3 July 2020
+  -- Version   4.0
+  -- Date      19 August 2025
   --====================================================================
-  -- Test the Fore, Exp, Dim format modifiers of Put.
-  -- Compare the output in file Test_SI_Text_IO_Put.out with
-  -- that in file Test_SI_Text_IO_Put.out.expected.
+  -- The Fore, Aft, Exp format modifiers apply unchanged to the numeric
+  -- value only, so no test is neede.
+  -- Test output for the dim modifier is written to the file
+  -- Test_SI_Text_IO_Put.out, then compared with that in file
+  -- Test_SI_Text_IO_Put.out.expected.
+  -- Just a random sample suffices since the unit string test already
+  -- warrants the correctness of the Dim parameter.
   -- Note: The test cannot be run with the unchecked version since
   --       dimension output is vital.
   --====================================================================
@@ -61,16 +63,26 @@ procedure Test_SI_Text_IO_Put is
   --  C.G.    2.1  29.09.2018 Unit syntax changed
   --  C.G.    3.0  14.05.2020 Dimensions generic parameter
   --  C.G.    3.1  03.07.2020 Split a test string into two
+  --  C.G.    4.0  19.08.2025 New test: Put to file reimplemented
   --====================================================================
 
   package A renames Ada.Text_IO;
 
   Physic, Result: A.File_Type;
 
+  procedure Test_Case (X: Item; Dim: String := "") is
+    use Ada.Exceptions, Ada.Strings.Fixed;
+  begin
+    Put (Result, X, Dim => Dim);  A.New_Line (Result);
+  exception
+    when Ex: others =>
+      A.Put_Line (Result, '"' & Dim & '"' & (17 - Dim'Length) * ' ' & " => " & Exception_Name (Ex) & ": " & Exception_Message (Ex));
+  end Test_Case;
+
 begin
 
-  Test_Header (Title => "Test SI.Put",
-               Description => "Test formatting parameters.");
+  Test_Header (Title => "Test SI Put to file",
+               Description => "Test Dim formatting parameter.");
 
   Test_Step (Title => "Assertions",
              Description => "Test that Assertion_Policy is Check.");
@@ -80,7 +92,7 @@ begin
   begin
     T := 1.0*"S";
     Assert (Condition => False,
-            Message   => "Switch on Assertion_Policy and use checked instantiation",
+            Message   => "Switch on Assertion_Policy and use Checked instantiation",
             Only_Report_Error => False);
     Test_Result;
     return;
@@ -93,59 +105,44 @@ begin
 
   -----------------------------------------------------------
 
-  Test_Step (Title => "Compare",
-             Description => "Compare the actual with the expected output.");
-
   A.Create (Result, A.Out_File, "Test_SI_Text_IO_Put.out");
 
-  A.Set_Output (Result);
+  Test_Step (Title => "Modifiers that must fail",
+             Description => "Only a few random samples.");
 
-  Put (1.0 * "km/s");                          New_Line;
-  Put (1.0 * "km/s", Dim => "*km/s");          New_Line;
-  Put (1.0 * "km/s", Dim => "/(ms*m**(-1))");  New_Line;
+  A.Put_Line ("See file Test_SI_Text_IO_Put.out.expected");
+  A.Put_Line (Result, "Must fail");  A.New_Line (Result);
 
-  begin
-    Put (1.0 * "km/s", Dim => "Km/s");
-  exception
-    when Illegal_Unit => Put_Line ("Illegal_Unit wrong casing Dim Km/s");
-  end;
+  Test_Case (1.0 * ""    , Dim => "/");
+  Test_Case (1.0 * "km/s", Dim => "km/s;");
+  Test_Case (1.0 * "km/s", Dim => "*M/ms");
+  Test_Case (1.0 * "km/s", Dim => "/(ms*m**(-1))s");
+  Test_Case (1.0 * "s"   , Dim => "S");
 
-  begin
-    Put (1.0 * "Km/s", Dim => "km/s");
-  exception
-    when Illegal_Unit => Put_Line ("Illegal_Unit wrong casing unit Km/s");
-  end;
+  Test_Step (Title => "Modifiers that must pass",
+             Description => "Only a few random samples.");
 
-  begin
-    Put (1.0 * "km/s", Dim => "km/s   A");
-  exception
-    when Illegal_Unit => Put_Line ("Illegal_Unit wrong format km/s   A");
-  end;
+  A.Put_Line ("See file Test_SI_Text_IO_Put.out.expected");
+  A.New_Line (Result);
+  A.Put_Line (Result, "Must pass");  A.New_Line (Result);
 
-  begin
-    Put (1.0 * "s", Dim => "S");
-  exception
-    when Unit_Error => Put_Line ("Unit_Error wrong unit S (must be s)");
-  end;
+  Test_Case (1.0 * "");
+  Test_Case (1.0 * ""    , Dim => " ");         -- leading and trailing spaces
+  Test_Case (1.0 * "km/s", Dim => "  km/s  ");  -- are ignored in Dim
+  Test_Case (1.0 * "km/s");
+  Test_Case (1.0 * "km/s", Dim => "*m/ms");
+  Test_Case (1.0 * "km/s", Dim => "/(ms*dm**(-1))");
 
-  -- Currently illegal, might be implemented some day
-  -- Put (1.0 * "(km/s)**2", Dim => "km**2/s**2");  New_Line;
-  -- Put (1.0 * "km/s"**2  , Dim => "(km/s)**2" );  New_Line;  Bad idea?
+  Test_Case (2.33395*10.0**(-6)*"m**(-3)*kg**(-3/2)*s**(9/2)*A**(5/2)");  -- output lines must
+  Test_Case (2.33395*10.0**(-6)*"m**(-3)*kg**(-3/2)*s**(9/2)*A**(5/2)",
+             Dim =>"hs**(9/2)*dam**(-3)*mA**(5/2)*dag**(-3/2)");
+  Test_Case (7.38060E-08*"dam**(-3)*hs**(9/2)*dag**(-3/2)*mA**(5/2)",     -- be identical
+             Dim => "*m**(-3)*kg**(-3/2)*s**(9/2)*A**(5/2)");
 
-  New_Line;
-  Put_Line ("Compare Ada.Text_IO.Float_Text_IO with SI.Text_IO;");
-  Put_Line ("number formats must be identical:");
-  New_Line;
+  -----------------------------------------------------------
 
-  A.Put ('|');  Ada.Float_Text_IO.Put (1000.0, Fore => 0, Aft => 2, Exp => 0);  A.Put ('|');  A.Set_Col (15);  A.Put ('|');  Put (1.0 * "km/s", Fore => 0, Aft => 2, Exp => 0);  A.Put ('|');  New_Line;
-  A.Put ('|');  Ada.Float_Text_IO.Put (1000.0, Fore => 0, Aft => 2, Exp => 1);  A.Put ('|');  A.Set_Col (15);  A.Put ('|');  Put (1.0 * "km/s", Fore => 0, Aft => 2, Exp => 1);  A.Put ('|');  New_Line;
-  A.Put ('|');  Ada.Float_Text_IO.Put (1000.0, Fore => 0, Aft => 2, Exp => 3);  A.Put ('|');  A.Set_Col (15);  A.Put ('|');  Put (1.0 * "km/s", Fore => 0, Aft => 2, Exp => 3);  A.Put ('|');  New_Line;
-  A.Put ('|');  Ada.Float_Text_IO.Put (1000.0, Fore => 3, Aft => 2, Exp => 0);  A.Put ('|');  A.Set_Col (15);  A.Put ('|');  Put (1.0 * "km/s", Fore => 3, Aft => 2, Exp => 0);  A.Put ('|');  New_Line;
-  A.Put ('|');  Ada.Float_Text_IO.Put (1000.0, Fore => 3, Aft => 2, Exp => 1);  A.Put ('|');  A.Set_Col (15);  A.Put ('|');  Put (1.0 * "km/s", Fore => 3, Aft => 2, Exp => 1);  A.Put ('|');  New_Line;
-  A.Put ('|');  Ada.Float_Text_IO.Put (1000.0, Fore => 3, Aft => 2, Exp => 3);  A.Put ('|');  A.Set_Col (15);  A.Put ('|');  Put (1.0 * "km/s", Fore => 3, Aft => 2, Exp => 3);  A.Put ('|');  New_Line;
-  A.Put ('|');  Ada.Float_Text_IO.Put (1000.0, Fore => 5, Aft => 2, Exp => 0);  A.Put ('|');  A.Set_Col (15);  A.Put ('|');  Put (1.0 * "km/s", Fore => 5, Aft => 2, Exp => 0);  A.Put ('|');  New_Line;
-  A.Put ('|');  Ada.Float_Text_IO.Put (1000.0, Fore => 5, Aft => 2, Exp => 1);  A.Put ('|');  A.Set_Col (15);  A.Put ('|');  Put (1.0 * "km/s", Fore => 5, Aft => 2, Exp => 1);  A.Put ('|');  New_Line;
-  A.Put ('|');  Ada.Float_Text_IO.Put (1000.0, Fore => 5, Aft => 2, Exp => 3);  A.Put ('|');  A.Set_Col (15);  A.Put ('|');  Put (1.0 * "km/s", Fore => 5, Aft => 2, Exp => 3);  A.Put ('|');  New_Line;
+  Test_Step (Title => "Compare actual and expected output",
+             Description => "Failing lines in actual result will be output.");
 
   A.Set_Output (A.Standard_Output);  -- else Reset raises Mode_Error
   A.Reset (Result, A.In_File);
@@ -159,8 +156,8 @@ begin
       A.Get_Line (Physic, Line_P, Last_P);
       A.Get_Line (Result, Line_R, Last_R);
       Assert (Condition => Line_P (1 .. Last_P) = Line_R (1 .. Last_R),
-              Message   => Line_R (1 .. Last_R),
-              Only_Report_Error => False);
+              Message   => Line_R (1 .. Last_R),  -- actual result
+              Only_Report_Error => True);
     end loop;
   exception
     When A.End_Error => null;

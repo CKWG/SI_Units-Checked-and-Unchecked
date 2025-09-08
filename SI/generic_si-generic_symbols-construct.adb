@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2020, 2021, 2025 Christoph Karl Walter Grein
+-- Copyright (C) 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -27,40 +27,36 @@
 --   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-private generic
-
-package Generic_SI.Generic_Symbols is
+separate (Generic_SI.Generic_Symbols)
+procedure Construct (From_Unit_String: access procedure (C: out Character; EoT: out Boolean); Result: out Item; Length: out Natural) is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   2.1
-  -- Date      22 August 2025
+  -- Version   1.0
+  -- Date      21 August 2025
   --====================================================================
-  -- List of all unit symbols.
+  -- Unit_FSM: A finite state machine splitting the Unit_String in
+  -- factors.
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
-  --  C.G.    1.0  13.05.2020 Separated from Generic_Strings
-  --  C.G.    1.1  20.05.2020 Work-around for GNAT CE 2020 bug
-  --  C.G.    1.2  28.05.2021 Work-around for [T520-013 public] removed
-  --  C.G.    2.0  03.08.2025 Completely new implementation
-  --  C.G.    2.1  22.08.2025 New profile for Construct
+  --  C.G.    0.0  03.08.2025 Raw design
+  --  C.G.    0.1  11.08.2025 Works for unit strings
+  --  C.G.    0.2  16.08.2025 Last initialized to First - 1
+  --  C.G.    1.0  21.08.2025 New profile for Construct
   --====================================================================
 
-  -- Constructs From_Unit_String the item Result following the syntax
-  -- by splitting it in factor parts.
-  -- Returns in Length the number of the consumed characters.
-  --
-  procedure Construct (From_Unit_String: access procedure (C: out Character; EoT: out Boolean); Result: out Item; Length: out Natural);
+  package Unit_FSM is
+    procedure Run;
+  end Unit_FSM;
 
-  -- Returns the default representation of the dimension, a product of all
-  -- base units (m, kg, s, A, K, cd, mol in that sequence) with an exponent
-  -- different from 0.
-  -- Each base unit is given either as the pure unit (if the exponent is 1),
-  -- or as the unit with an integer exponent if the exponent is a whole number
-  -- (other than 1), or as the unit with a fractional exponent. The exponent
-  -- is included in parentheses as necessary according to normal Ada rules.
-  --
-  function Image (X: Dimension) return String;
+  package body Unit_FSM is separate;
 
-end Generic_SI.Generic_Symbols;
+begin
+
+  Result := One;  -- initialize
+  Length := 0;
+
+  Unit_FSM.Run;
+
+end Construct;

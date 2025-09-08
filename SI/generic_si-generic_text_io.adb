@@ -28,19 +28,14 @@
 --   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Ada.Strings.Fixed,
-     Ada.Strings.Maps.Constants;
-use  Ada.Strings.Maps,
-     Ada.Strings.Maps.Constants;
-
-with Rational_Arithmetics.Strings, Rational_Arithmetics.Text_IO;
+with Ada.Strings.Fixed;
 
 package body Generic_SI.Generic_Text_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   7.1
-  -- Date      5 July 2025
+  -- Version   8.2
+  -- Date      22 August 2025
   --====================================================================
   --
   --====================================================================
@@ -63,60 +58,88 @@ package body Generic_SI.Generic_Text_IO is
   --  C.G.    7.0  01.07.2025 generic param. as in Text_IO for Celsius
   --  C.G.    7.1  05.07.2025 Changed exception from Illegal_Unit to
   --                          Data_Error for Width > 0
+  --  C.G.    8.0  13.08.2025 New implementation of unit evaluation:
+  --                          Put to file reimplemented
+  --  C.G.    8.1  19.08.2025 Implementation Valid_Modifier changed;
+  --                          Put to and Get from string reimplemented;
+  --                          raised Illegal_Unit instead of Data_Error
+  --                          for Get with Width > 0
+  --  C.G.    8.2  22.08.2025 Ensure_Task_Safety is new; Get for Width=0
+  --                          new implementation
   --====================================================================
 
   use Real_Text_IO;
 
-  Operator_Set: constant Character_Set := To_Set ("*/");
-  Unit_Set    : constant Character_Set := Alphanumeric_Set or Operator_Set or To_Set ("+-()");
+  function Strip (Dim: String) return String with Inline is
+    use Ada.Strings, Ada.Strings.Fixed;
+  begin
+    return Trim (Dim, Both);
+  end Strip;
 
   function Valid_Modifier (X: Item; Dim: String) return Boolean is
+    sDim: constant String := Strip (Dim);
   begin
-    if Dim = "" then
+    if sDim = "" then
       return True;
     end if;
     declare  -- "rad" = 1, i.e. dimensionless
-      S: constant String := (if Is_In (Dim (Dim'First), Operator_Set) then "rad" else "") & Dim;
+      S: constant String := (if sDim (sDim'First) in '*' | '/' then "rad" else "") & sDim;
     begin
-      return Same_Dimension (X, 1.0 * S);
+      return has_Dimension (X, S);
     end;
   end Valid_Modifier;
+
+  generic
+    File: access constant File_Type;
+  package Ensure_Task_Safety is  -- see Generic_SI
+    procedure Get_and_Look_Ahead (C: out Character; EoF: out Boolean) with Inline;
+  end Ensure_Task_Safety;
+
+  package body Ensure_Task_Safety is
+    -- A look ahead is neede to avoid consuming characters not belonging
+    -- to the syntax. If a character belongs to the (correct or incorrect)
+    -- syntax, it is used directly and consumed with the next call of
+    -- Look_Ahead.
+    First_Call: Boolean := True;
+    procedure Get_and_Look_Ahead (C: out Character; EoF: out Boolean) is
+    begin
+      if First_Call then
+        First_Call := False;
+      else
+        Get (File.all, C);
+      end if;
+      Look_Ahead (File.all, C, EoF);
+      if EoF then
+        First_Call := True;  -- reset for call with next unit string
+      end if;
+    end Get_and_Look_Ahead;
+  end Ensure_Task_Safety;
 
   procedure Get (X: out Item; Width: in Field := 0) is
   begin
     Get (Current_Input, X, Width);
   end Get;
 
-  procedure Get_0 (File: in File_Type; X: out Item) is
-    -- Get characters as long as they are inside the Unit_Set.
-    Dim : String (1 .. 50) := (others => ' ');  -- should suffice for any imaginable input
-    Last: Natural := 0;
-    Char: Character;
-    Stop: Boolean;
-    Num : Real'Base;
-    use Ada.Strings.Fixed;
-  begin
-    Get (File, Num);
-    Look_Ahead (File, Char, Stop);
-    if Stop or else not Is_In (Char, Operator_Set) then
-      X := Num * One;
-      return;
-    end if;
-    Unit: loop
-      Look_Ahead (File, Char, Stop);
-      if Stop or else not Is_In (Char, Unit_Set) then
-        X := Num * ("rad" & Dim (1 .. Last));  -- rad = 1
-        return;
-      end if;
-      Last := Last + 1;
-      Get (File, Dim (Last));
-    end loop Unit;
-  end Get_0;
-
   procedure Get (File: in File_Type; X: out Item; Width: in Field := 0) is
   begin
     if Width = 0 then
-      Get_0 (File, X);
+      declare
+        package Get_Interface is new Ensure_Task_Safety (File'Access);
+        Num : Real'Base;
+        Unit: Item;
+        C   : Character;
+        EoF : Boolean;
+        Length: Natural := 0;  -- not needed
+      begin
+        Get (File, Num);
+        Look_Ahead (File, C, EoF);
+        if EoF or else C not in '*' | '/' | 'A' .. 'Z' | 'a' ..'z' then
+          X := Num * One;
+        else
+          Construct (Get_Interface.Get_and_Look_Ahead'Access, Unit, Length);
+          X := Num * Unit;
+        end if;
+      end;
     else
       declare
         Got  : String (1 .. Width);
@@ -134,7 +157,7 @@ package body Generic_SI.Generic_Text_IO is
         -- In any case, this is a syntax error in the input.
         -- Choose the simple way.
         if Last < Avail then
-          raise Data_Error;  -- seems better than Illegal_Unit
+          raise Illegal_Unit with "string not exhausted";
         end if;
       end;
     end if;
@@ -155,37 +178,50 @@ package body Generic_SI.Generic_Text_IO is
                  Aft : in Field  := Default_Aft;
                  Exp : in Field  := Default_Exp;
                  Dim : in String := "") is
-    Result: String (1 .. 255);  -- should suffice for any imaginable output
-    Dot, Start: Positive;
+    sDim: constant String := Strip (Dim);
   begin
-    Put (Result, X, Aft, Exp, Dim);
-    Start := Ada.Strings.Fixed.Index_Non_Blank (Result);       -- Start |    | Dot
-    Dot   := Ada.Strings.Fixed.Index           (Result, ".");  --       10000.
-    Start := Integer'Min (Start, Dot - Fore);
-    Put (File, Result (Start .. Result'Last));
+    if sDim = "" then
+      Put (File, X.Value, Fore, Aft, Exp);
+      Put (File, Image (X.Unit));
+    else
+      declare
+        eDim  : constant String := (if sDim (sDim'First) in '*' | '/' then "" else "*") & sDim;
+        Gauge : Item;
+        Length: Positive;
+        Gauged: Dimensionless;
+        package String_Interface is new Generic_SI.Ensure_Task_Safety (eDim);
+      begin
+        Construct (String_Interface.Get'Access, Gauge, Length);
+        -- If we arrive here, syntax is OK, but there might be wrong characters left.
+        if Length /= eDim'Length then
+          raise Illegal_Unit with "string not exhausted";
+        end if;
+        Gauged := X / Gauge;
+        Put (File, Gauged.Value, Fore, Aft, Exp);
+        Put (File, eDim);
+      end;
+    end if;
   end Put;
 
   procedure Get (From: in  String;
                  X   : out Item;
                  Last: out Positive) is
     Value: Real'Base;
-    use Ada.Strings, Ada.Strings.Fixed;
   begin
     Get (From, Value, Last);  -- get the numeric value
-    if Last = From'Last or else
-      (Last + 1 <= From'Last and then not Is_In (From (Last + 1), Operator_Set)) then
+    if Last = From'Last then
       X := Value * One;  -- no unit follows
-    else  -- a unit follows; get characters as long as they are inside the Unit_Set
+    elsif Last + 1 <= From'Last and then  -- any first unit character unexpected in syntax
+          From (Last + 1) in 'A' .. 'Z' | 'a' .. 'z' | '(' | '+' | '-' | ')' then
+      raise Illegal_Unit with "Spurious character after value";
+    else
       declare
-        First: constant Positive := Last + 1;
-        Stop : constant Natural := Index (Source => From, Set => Unit_Set, From => First, Test => Outside);
+        package String_Interface is new Generic_SI.Ensure_Task_Safety (From (Last + 1 .. From'Last));
+        Length: Positive;
       begin
-        if Stop = 0 then      -- no character outside the Unit_Set
-          Last := From'Last;  -- all characters will be consumed
-        else
-          Last := Stop - 1;
-        end if;
-        X := Value * ("rad" & From (First .. Last));
+        Construct (String_Interface.Get'Access, X, Length);
+        X := Value * X;
+        Last := Last + Length;
       end;
     end if;
   end Get;
@@ -195,27 +231,31 @@ package body Generic_SI.Generic_Text_IO is
                  Aft: in Field  := Default_Aft;
                  Exp: in Field  := Default_Exp;
                  Dim: in String := "") is
+    sDim: constant String := Strip (Dim);
   begin
-    if Dim = "" then
+    if sDim = "" then
       declare
-        Unit_Image : constant String  := Image (X.Unit);
+        eDim : constant String := Image (X.Unit);
       begin
-        if Unit_Image = "" then  -- X has dimension 1
-          Put (To, X.Value, Aft, Exp);
-        else
-          Put (To (To'First .. To'Last - Unit_Image'Length), X.Value, Aft, Exp);
-          To  (To'Last - Unit_Image'Length + 1 .. To'Last) := Unit_Image;
-        end if;
+        Put (To (To'First .. To'Last - eDim'Length), X.Value, Aft, Exp);
+        To  (To'Last - eDim'Length + 1 .. To'Last) := eDim;
       end;
-    elsif not Is_In (Dim (Dim'First), Operator_Set) then
-      Put (To, X, Aft, Exp, '*' & Dim);
-      return;
-    else  -- e.g. "1.0*m/s", "1.0/s"
+    else
       declare
-        Y: constant Item := X / (1.0 * ("rad" & Dim));  -- now dimension 1
+        eDim  : constant String := (if sDim (sDim'First) in '*' | '/' then "" else "*") & sDim;
+        Gauge : Item;
+        Length: Positive;
+        Gauged: Dimensionless;
+        package String_Interface is new Generic_SI.Ensure_Task_Safety (eDim);
       begin
-        Put (To (To'First .. To'last - Dim'Length), Y.Value, Aft, Exp);
-        To  (To'Last - Dim'Length + 1 .. To'Last) := Dim;
+        Construct (String_Interface.Get'Access, Gauge, Length);
+        -- If we arrive here, syntax is OK, but there might be wrong characters left.
+        if Length /= eDim'Length then
+          raise Illegal_Unit with "string not exhausted";
+        end if;
+        Gauged := X / Gauge;
+        Put (To (To'First .. To'Last - eDim'Length), Gauged.Value, Aft, Exp);
+        To  (To'Last - eDim'Length + 1 .. To'Last) := eDim;
       end;
     end if;
   exception

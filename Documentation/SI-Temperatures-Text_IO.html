@@ -9,6 +9,7 @@
 <!-- Version  Date
       1.0  08.12.2005
       2.0  03.07.2025  Redesign
+      3.0  29.08.2025  New syntax based on SI syntax
 //-->
 </head>
 
@@ -20,17 +21,24 @@
 
 <p>Get and Put read and write the numeric value like standard Text_IO.</p>
 
-<p><u>Get</u>: If no exception is raised, reading continues until the next
-space character or line end (resp. string end), whichever comes first, is
-reached, which stays in the input stream.
-If any other string than &quot;°C&quot; has been read, Illegal_Unit will
-be raised.
-Last is the index of the last character read (for string).
-(Instead, we could just check whether &quot;°C&quot; follows.
-In order to be compatible with Get for Item, this is not done.)</p>
+<p>The syntax of an external Celsius item is closely based on the one of
+SI items:</p>
 
-<p><u>Put</u>: If no exception is raised, writes the unit °C with no leading
-(nor trailing) space &ndash; this is different to the SI units.</p>
+<pre>   external_item ::= value unit_factor
+   unit_factor   ::= ° identifier
+   identifier    ::= letter {letter}</pre>
+
+<p><u>Get</u>: Reading procedes like reading for SI items according to the
+syntax above.
+The only allowed identifier is the single character C.
+Any others will raise Illegal_Unit (there is no discrimination between
+Unit_Error and Illegal_Unit).
+(Instead, we could just check whether &quot;°C&quot; follows.
+In order to be compatible with Get for Item, this is not done.)
+</p>
+
+<p><u>Put</u>: If no exception is raised when writing the value, writes
+the unit °C with no leading space.</p>
 
 <h3 align="left">Specification</h3>
 
@@ -74,8 +82,10 @@ package</b> Generic_<a href="SI.html">SI</a>.Generic_<a href="SI-Temperatures.ht
 
 <h4>Examples:</h4>
 
-<p><code>4.2*&quot;°C&quot;</code> is output as <code>4.2°C</code>;
-reading <code>4.2*°C</code> raises <code>Unit_Error</code>.</p>
+<p><code>4.2*&quot;°C&quot;</code> is output as <code>4.2°C</code> and
+can be read as such;
+reading <code>4.2*°C</code> raises <code>Illegal_Unit</code>, as
+does <code>4.2*K</code>.</p>
 
 <p><a href="Table_of_Contents.html">Table_of_Contents</a></p>
 

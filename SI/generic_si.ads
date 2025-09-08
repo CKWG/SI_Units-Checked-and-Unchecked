@@ -24,11 +24,6 @@
 -- however invalidate any other reasons why the executable file might be
 -- covered by the GNU Public License.
 --
--- Source:
--- https://www.adaic.org/ada-resources/tools-libraries/
---   (see Christoph Grein's Essentials)
--- http://archive.adaic.com/tools/CKWG/Dimension/Dimension.html
---
 -- Author's email address:
 --   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
@@ -52,8 +47,8 @@ package Generic_SI is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   6.0
-  -- Date      18 April 2025
+  -- Version   7.2
+  -- Date      22 August 2025
   --====================================================================
   -- Magnetic_Flux_Density is the classical name. Nowadays it's often
   -- just called Magnetic_Field.
@@ -109,6 +104,12 @@ package Generic_SI is
   --  C.G.    5.2  28.05.2021 Work-around for [T521-020 public] removed
   --  C.G.    5.3  14.10.2021 Predicate_Failure for subtypes
   --  C.G.    6.0  18.04.2025 Preconditions replace check in body
+  --  C.G.    7.0  13.08.2025 New implementation of unit evaluation:
+  --                          make Construct visible in private part
+  --  C.G.    7.1  16.08.2025 Precondition on unit string,
+  --                          postcondition on Arcsin/Arccos
+  --  C.G.    7.2  22.08.2025 Common interface for evaluating all kinds
+  --                          of unit indications
   --====================================================================
 
   type Item is private;
@@ -119,7 +120,7 @@ package Generic_SI is
   -- Check that the two items have the same dimension
   function Same_Dimension (X, Y: Item) return Boolean;
   -- Check that X has the dimension given by Symbol (ignoring all prefixes)
-  function has_Dimension (X: Item; Symbol: String) return Boolean;
+  function has_Dimension (X: Item; Symbol: String) return Boolean with Pre => Symbol'First = 1;
 
   function Value (X: Item) return Real'Base;
 
@@ -211,8 +212,8 @@ package Generic_SI is
 
   -- Unit strings
 
-  function "*" (Left: Real'Base; Right: String) return Item;  -- 1.0*"km"
-  function "/" (Left: Real'Base; Right: String) return Item;  -- 1.0/"s"
+  function "*" (Left: Real'Base; Right: String) return Item with Pre => Right'First = 1;  -- 1.0*"km"
+  function "/" (Left: Real'Base; Right: String) return Item with Pre => Right'First = 1;  -- 1.0/"s"
 
   Illegal_Unit: exception;
 
@@ -240,9 +241,9 @@ package Generic_SI is
   function Cot (X, Cycle: Item ) return Dimensionless with Pre => Same_Dimension (X, Cycle) or else raise Unit_Error;
 
   function Arcsin (X: Dimensionless             ) return Angle;
-  function Arcsin (X: Dimensionless; Cycle: Item) return Item;
+  function Arcsin (X: Dimensionless; Cycle: Item) return Item with Post => Same_Dimension (Arcsin'Result, Cycle);
   function Arccos (X: Dimensionless             ) return Angle;
-  function Arccos (X: Dimensionless; Cycle: Item) return Item;
+  function Arccos (X: Dimensionless; Cycle: Item) return Item with Post => Same_Dimension (Arccos'Result, Cycle);
   function Arctan (Y    : Item;
                    X    : Item := One) return Angle with Pre => Same_Dimension (Y, X) or else raise Unit_Error;
   function Arctan (Y    : Item;
@@ -276,6 +277,23 @@ private
                  Arcsinh, Arccosh, Arctanh, Arccoth);
 
   function Image (X: Dimension) return String;
+
+  -- For evaluating the unit strings 1.0*"km/h" in code, the dimension format modifier Dim
+  -- in Text_IO.Put and the dimension indication in Text_IO.Get, a common interface is
+  -- needed, since reading from strings or from files is different: for the latter, a
+  -- look ahead feature is necessary.
+  -- Reads the unit indication character by character. If the sequence read has correct syntax,
+  -- returns in Result the item and in Length the number of characters read; else raises
+  -- Illegal_Unit.
+  -- EoT: End of Text.
+  --
+  procedure Construct (From_Unit_String: access procedure (C: out Character; EoT: out Boolean); Result: out Item; Length: out Natural);
+
+  generic
+    Unit_String: String;
+  package Ensure_Task_Safety is
+    procedure Get (C: out Character; EoS: out Boolean) with Inline;
+  end Ensure_Task_Safety;
 
   type Item is record
     Unit : Dimension;

@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2006, 2018 Christoph Karl Walter Grein
+-- Copyright (C) 2006, 2018, 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -28,12 +28,12 @@
 --   Christ-Usch.Grein@T-Online.de
 ------------------------------------------------------------------------------
 
-package Rational_Arithmetics.Strings is
+package Rational_Arithmetics.Strings with Preelaborate is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   1.1
-  -- Date      29 July 2018
+  -- Version   1.2
+  -- Date      3 August 2025
   --====================================================================
   -- Image returns the argument as a string.
   -- If the denominator is 1, the string has the format "sn", else it
@@ -47,11 +47,9 @@ package Rational_Arithmetics.Strings is
   -- History
   -- Author Version   Date    Reason for change
   --  C.G.    1.0  27.02.2006
-  --  C.G.    1.0  29.07.2018 Preelaborate
+  --  C.G.    1.1  29.07.2018 pragma Preelaborate
+  --  C.G.    1.2  03.08.2025 aspect Preelaborate
   --====================================================================
-
-  pragma Preelaborate;
-  pragma Elaborate_Body;
 
   function Image (X: Rational) return String;
   function Value (X: String  ) return Rational;

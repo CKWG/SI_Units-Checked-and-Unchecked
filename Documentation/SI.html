@@ -34,6 +34,7 @@
                        notes on compiler bugs moved to separate file
       6.0  01.04.2025  ToC Subheaders
       6.1  18.04.2025  Preconditions replace check in body
+      6.2  16.08.2025  Precondition on unit string, postcondition on Arcsin/Arccos
 //-->
 </head>
 
@@ -88,7 +89,7 @@ variant, of course.</p>
   <i>-- Check that the two items have the same dimension</i>
   <b>function</b> Same_Dimension (X, Y: Item) <b>return</b> Boolean;
   <i>-- Check that X has the dimension given by Symbol (ignoring all prefixes)</i>
-  <b>function </b>has_Dimension <b>(</b>X: Item; Symbol: String<b>) return </b>Boolean;
+  <b>function </b>has_Dimension <b>(</b>X: Item; Symbol: String<b>) return </b>Boolean <b>with</b> Pre => Symbol'First = 1;
 
   <b>function </b>Value <b>(</b>X: Item<b>) return </b>Real'Base;
 
@@ -180,8 +181,8 @@ variant, of course.</p>
 
   <i>-- Unit strings</i>
 
-  <b>function </b>&quot;*&quot; <b>(</b>Left: Real'Base; Right: String<b>) return </b>Item;  <i>-- 1.0*&quot;km&quot;</i>
-  <b>function </b>&quot;/&quot; <b>(</b>Left: Real'Base; Right: String<b>) return </b>Item;  <i>-- 1.0/&quot;s&quot;</i>
+  <b>function </b>&quot;*&quot; <b>(</b>Left: Real'Base; Right: String<b>) return </b>Item <b>with</b> Pre => Right'First = 1;  <i>-- 1.0*&quot;km&quot;</i>
+  <b>function </b>&quot;/&quot; <b>(</b>Left: Real'Base; Right: String<b>) return </b>Item <b>with</b> Pre => Right'First = 1;  <i>-- 1.0/&quot;s&quot;</i>
 
   Illegal_Unit: <b>exception</b>;
 
@@ -209,9 +210,9 @@ variant, of course.</p>
   <b>function </b>Cot <b>(</b>X, Cycle: Item <b>) return </b>Dimensionless <b>with</b> Pre =&gt; Same_Dimension (X, Cycle) <b>or else raise</b> Unit_Error;
 
   <b>function </b>Arcsin <b>(</b>X: Dimensionless             <b>) return </b>Angle;
-  <b>function </b>Arcsin <b>(</b>X: Dimensionless; Cycle: Item<b>) return </b>Item;
+  <b>function </b>Arcsin <b>(</b>X: Dimensionless; Cycle: Item<b>) return </b>Item <b>with</b> Post => Same_Dimension (Arcsin'Result, Cycle);
   <b>function </b>Arccos <b>(</b>X: Dimensionless             <b>) return </b>Angle;
-  <b>function </b>Arccos <b>(</b>X: Dimensionless; Cycle: Item<b>) return </b>Item;
+  <b>function </b>Arccos <b>(</b>X: Dimensionless; Cycle: Item<b>) return </b>Item <b>with</b> Post => Same_Dimension (Arccos'Result, Cycle);
   <b>function </b>Arctan <b>(</b>Y    : Item;
                    X    : Item := One<b>) return </b>Angle <b>with</b> Pre =&gt; Same_Dimension (Y, X) <b>or else raise</b> Unit_Error;
   <b>function </b>Arctan <b>(</b>Y    : Item;

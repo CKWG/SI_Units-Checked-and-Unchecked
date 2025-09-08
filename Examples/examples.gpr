@@ -27,8 +27,8 @@ project Examples is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   6.1
-  -- Date      9 July 2025
+  -- Version   6.2
+  -- Date      17 August 2025
   --====================================================================
   --
   --====================================================================
@@ -45,7 +45,8 @@ project Examples is
   --  C.G.    5.0  15.05.2020 Dimensions generic parameter
   --  C.G.    6.0  19.04.2025 Preconditions; main measure
   --  C.G.    6.1  09.07.2025 Import Safety from SI
- --====================================================================
+  --  C.G.    6.2  17.08.2025 -gnat2022
+  --====================================================================
 
   for Object_Dir use "GnatLib";
 
@@ -73,7 +74,7 @@ project Examples is
   for Source_Dirs use (".", "../Instantiations/", "../Instantiations/" & SI.Safety);
 
   package Compiler is
-    for Default_Switches ("Ada") use ("-gnatn", "-O2", "-gnat12", "-gnatyOr",
+    for Default_Switches ("Ada") use ("-gnatn", "-O2", "-gnat2022", "-gnatyOr",
                                       "-gnato", "-fstack-check") &
                                       Assertion;
   end Compiler;

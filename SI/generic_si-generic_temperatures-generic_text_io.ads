@@ -38,19 +38,24 @@ package Generic_SI.Generic_Temperatures.Generic_Text_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   2.1
-  -- Date      3 July 2025
+  -- Version   3.0
+  -- Date      29 August 2025
   --====================================================================
   -- Get and Put read and write the numeric value like standard Text_IO.
   --
-  -- Get: If no exception is raised, reading continues until the next
-  -- space character or line end (resp. string end), whichever comes
-  -- first, is reached, which stays in the input stream. If any other
-  -- string than "°C" has been read, Illegal_Unit will be raised. Last
-  -- is the index of the last character read (for string).
+  -- The syntax of an external Celsius item is closely based on the one
+  -- of SI items:
   --
-  -- Put: If no exception is raised, writes the unit °C with no leading
-  -- (nor trailing) space - this is different to the SI units.
+  --    external_item ::= value unit_factor
+  --    unit_factor   ::= ° identifier
+  --    identifier    ::= letter {letter}
+  --
+  -- Get: Reading procedes like reading for SI items according to the
+  -- syntax above. The only allowed identifyer is the single character
+  -- C. Any others will raise Illegal_Unit.
+  --
+  -- Put: If no exception is raised when writing the value, writes the
+  -- unit °C with no leading space.
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
@@ -59,6 +64,7 @@ package Generic_SI.Generic_Temperatures.Generic_Text_IO is
   --                          generic_temperatures-generic_text_io and
   --                          rename; overhaul
   --  C.G.    2.1  03.07.2025 Get, Put for Strings
+  --  C.G.    3.0  29.08.2025 New syntax based on SI syntax
   --====================================================================
 
   pragma Elaborate_Body;

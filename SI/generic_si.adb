@@ -24,11 +24,6 @@
 -- however invalidate any other reasons why the executable file might be
 -- covered by the GNU Public License.
 --
--- Source:
--- https://www.adaic.org/ada-resources/tools-libraries/
---   (see Christoph Grein's Essentials)
--- http://archive.adaic.com/tools/CKWG/Dimension/Dimension.html
---
 -- Author's email address:
 --   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
@@ -39,8 +34,8 @@ package body Generic_SI is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   6.0
-  -- Date      14 April 2025
+  -- Version   7.4
+  -- Date      22 August 2025
   --====================================================================
   --
   --====================================================================
@@ -62,18 +57,29 @@ package body Generic_SI is
   --                          removed child package Generic_Strings
   --  C.G.    5.1  05.08.2020 Bug fix in has_Dimension
   --  C.G.    6.0  14.04.2025 Preconditions replace check in body
+  --  C.G.    6.1  31.07.2025 Bug fix in "/" (Left: Real; Right: String)
+  --  C.G.    7.0  03.08.2025 New implementation: Use FSM
+  --  C.G.    7.1  08.08.2025 Added exception message in function
+  --                          "*" (Left: Real'Base; Right: String)
+  --  C.G.    7.2  13.08.2025 Make Construct visible in private part
+  --  C.G.    7.3  16.08.2025 Implementation has_Dimension changed
+  --  C.G.    7.4  22.08.2025 Common interface for evaluating all kinds
+  --                          of unit indications
   --====================================================================
 
   function Same_Dimension (X, Y: Item) return Boolean is (X.Unit = Y.Unit);
 
   function has_Dimension (X: Item; Symbol: String) return Boolean is
-    S: constant String := (if    Symbol                = ""  then "rad"  -- "rad" = 1, i.e. dimensionless
-                           elsif Symbol (Symbol'First) = '*' or
-                                 Symbol (Symbol'First) = '/' then "rad" & Symbol
-                           else  Symbol);
-    Y: constant Item := 1.0 * S;
   begin
-    return Same_Dimension (X, Y);
+    if Symbol = "" then
+      return Same_Dimension (X, One);
+    else
+      declare
+        S: constant String := (if Symbol (1) in '*' | '/' then "rad" else "") & Symbol;
+      begin
+        return Same_Dimension (X, 1.0 * S);
+      end;
+    end if;
   end has_Dimension;
 
   function Value (X: Item) return Real'Base is (X.Value);
@@ -200,21 +206,53 @@ package body Generic_SI is
 
   package Symbols is new Generic_Symbols;
 
-  function Image (X  : Dimension) return String renames Symbols.Image;
-  function Value (Dim: String   ) return Item   is separate;  -- will raise Illegal_Unit if X not OK
+  function Image (X: Dimension) return String renames Symbols.Image;
+
+  procedure Construct (From_Unit_String: access procedure (C: out Character; EoT: out Boolean); Result: out Item; Length: out Natural) renames Symbols.Construct;
+
+  package body Ensure_Task_Safety is
+    -- Different tasks may concurrently evaluate unit strings. This
+    -- generic avoids conflicts: By instantiating the package locally
+    -- in functions, local variables become unique with each call.
+    Last: Natural := Unit_String'First - 1;
+    procedure Get (C: out Character; EoS: out Boolean) is
+    begin
+      EoS := Last = Unit_String'Last;
+      if EoS then
+        null;  -- don't consume
+      else
+        Last := Last + 1;
+        C    := Unit_String (Last);
+      end if;
+    end Get;
+  end Ensure_Task_Safety;
 
   function "*" (Left: Real'Base; Right: String) return Item is
   begin
-    return Left * Value (Right);
+    if Right = "" then  -- handle directly, FSM will fail
+      return Left * One;
+    end if;
+    declare
+      package String_Interface is new Ensure_Task_Safety ('*' & Right);  -- make task-safe
+      R: Item;
+      L: Positive;
+    begin
+      Construct (String_Interface.Get'Access, R, L);
+      -- If we arrive here, syntax is OK, but there might be wrong characters left.
+      if L - 1 /= Right'Length then  -- mind operator
+        raise Illegal_Unit with "string not exhausted";
+      end if;
+      return Left * R;
+    end;
   end "*";
 
   function "/" (Left: Real'Base; Right: String) return Item is
+    package String_Interface is new Ensure_Task_Safety ("/(" & Right & ')');  -- add parentheses (there might be a product)
+    R: Item;
+    L: Positive;
   begin
-    if Right (Right'First) = '(' then
-      return Left * Value ("rad/" & Right);
-    else
-      return Left * Value ("rad/(" & Right & ')');  -- add parentheses (there might be a product)
-    end if;
+    Symbols.Construct (String_Interface.Get'Access, R, L);
+    return Left * R;
   end "/";
 
   -- Mathematics

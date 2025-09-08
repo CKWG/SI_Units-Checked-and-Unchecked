@@ -41,8 +41,8 @@ procedure Test_SI_Text_IO_File is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   4.0
-  -- Date      5 July 2025
+  -- Version   5.0
+  -- Date      23 August 2025
   --====================================================================
   -- Test the IO package for a set of critical items by reading files
   -- Test_SI_Text_IO-10.in (Get with Width > 0) and Test_SI_Text_IO.in
@@ -58,6 +58,8 @@ procedure Test_SI_Text_IO_File is
   --  C.G.    2.0  02.08.2018 Unit strings
   --  C.G.    3.0  14.05.2020 Dimensions generic parameter
   --  C.G.    4.0  05.07.2025 Add test for Width > 0
+  --  C.G.    5.0  23.08.2025 New implementation of string evaluation:
+  --                          Test for Width = 0 adapted
   --====================================================================
 
   Physic, Result: File_Type;
@@ -67,7 +69,7 @@ procedure Test_SI_Text_IO_File is
   L: Natural;
 
   procedure Compare is
-    Line_P, Line_R: String (1 .. 30);
+    Line_P, Line_R: String (1 .. 50);
     Last_P, Last_R: Natural;
     P_End: Boolean := False;
   begin
@@ -130,7 +132,7 @@ begin
   -----------------------------------------------------------
 
   Test_Step (Title => "Test reading exactly Width characters",
-             Description => "Only the first ten characters are read.");
+             Description => "Only the first ten characters (or less) are read.");
 
   Open   (Physic, In_File , "Test_SI_Text_IO-10.in");
   Create (Result, Out_File, "Test_SI_Text_IO-10.out");
@@ -140,14 +142,17 @@ begin
   while not End_Of_File (Physic) loop
 
     begin
-      Get      (Physic, I, Width => 10);
-      Get_Line (Physic, D, L);
+      Get      (Physic, I, Width => 10);  -- might raise exception
+      Get_Line (Physic, D, L);  -- unit for output
       Put      (Result, I, Aft => 3, Exp => 0, Dim => D (16 .. L));
       New_Line (Result);
     exception
       when E: Data_Error | Illegal_Unit =>
-        Get_Line (Physic, D, L);
-        Put_Line (Result, Exception_Name (E));
+        Get_Line (Physic, D, L);  -- get unread part
+        Put_Line (Result, Exception_Name (E) &
+                  -- Exception message for Data_Error is compiler specific, so omit it.
+                  (if Exception_Name (E) = "ADA.IO_EXCEPTIONS.DATA_ERROR" then ""
+                   else " => " & Exception_Message (E)));
     end;
 
   end loop;
@@ -163,7 +168,7 @@ begin
 
   -------------------------------------------------------
 
-  Test_Step (Title => "Compare",
+  Test_Step (Title => "Read as much as the syntax prescribes",
              Description => "Compare the actual with the expected output.");
 
   Open   (Physic, In_File , "Test_SI_Text_IO.in");
@@ -177,11 +182,13 @@ begin
     exception
       when E: Data_Error | Illegal_Unit =>
         declare
-          Line: String (1 .. 20);
+          Line: String (1 .. 70);
           Last: Natural;
         begin
           Get_Line (Physic, Line, Last);
-          Put_Line (Result, Exception_Name (E) & " - rest of line: """ & Line (1 .. Last) & '"');
+          Put_Line (Result, Exception_Name (E) &
+                    (if Exception_Name (E) = "ADA.IO_EXCEPTIONS.DATA_ERROR" then "" else " => " & Exception_Message (E)) &
+                    " """ & Line (1 .. Last) & '"');
         end;
     end;
 

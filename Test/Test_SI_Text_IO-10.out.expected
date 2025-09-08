@@ -1,11 +1,17 @@
+1815.000
+1816.000
+SI.ILLEGAL_UNIT => wrong unit begin
+SI.ILLEGAL_UNIT => Spurious character after value
+SI.ILLEGAL_UNIT => Spurious character after value
+SI.ILLEGAL_UNIT => wrong unit begin
 1980.000
-SI.ILLEGAL_UNIT
+SI.ILLEGAL_UNIT => EoT no letter in symbol
 1995.000*m
 -2005000.000*m
  2.012*kHz
 2021999.875*mA
-SI.ILLEGAL_UNIT
+SI.ILLEGAL_UNIT => prefix illegal
  0.988/uS
 ADA.IO_EXCEPTIONS.DATA_ERROR
-ADA.IO_EXCEPTIONS.DATA_ERROR
  0.008*mol
+SI.ILLEGAL_UNIT => string not exhausted

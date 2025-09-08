@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<link rel="shortcut icon" type="image/x-icon" href="Ada.ico" />
+<title>Final Thoughts</title>
+<!-- Version  Date
+      1.0  08.09.2025
+//-->
+</head>
+
+<body>
+
+<h2 align="center">Final Thoughts</h2>
+
+<p>This library has been, from the very start on in 2002, a veritable
+challenge for GNAT, the only compiler I ever have worked with privately
+&ndash; there are still some work-arounds for Gnat bugs left in the code.
+I by now deem the library nearly perfect; it has been thoroughly tested.
+So further releases will most probably only be bug fixes of my code or
+work-around removals.</p>
+
+<p>I do not see important features missing.
+In the <i>Vector_Space</i> package, very few subtypes with predicate failures
+for vectors and matrices have been defined.
+If you miss some, you are kindly invited to send me a note with the
+missing definitions and perhaps a very simple example for the <i>Examples</i>
+directory.
+I will add them together with your name as author.</p>
+
+<p>I ponder the idea for two small additions:</p>
+
+<p><a href="#Celsius">Celsius Degrees</a><br/>
+<a href="#Input">Input from Files</a></p>
+
+<h3 align="center"><a name="Celsius">Celsius Degrees</a></h3>
+
+<p>Celsius temperatures have purposely been defined separately from SI items
+with different syntax.
+Of course transformations to and from Kelvin are provided.
+They also have to be read and written with a dedicated package of their
+own.</p>
+
+<p>A possible library enhancement could be the possibility to directly
+read (<b>nota bene: not to write</b>) Celsius degrees with the IO package
+for items, but to automatically return them converted in Kelvin.
+Admittedly, this would not save much work because when reading from files,
+you normally know what to read and can easily use the appropriate package
+and convert the result.</p>
+
+<p>Any thoughts?</p>
+
+<h3 align="center"><a name="Input">Input from Files</a></h3>
+
+<p>When you develop with the checked variant and have 100% test coverage,
+you can be certain that there is no dimension error lurking in your code
+so that you can safely switch to the unchecked variant for deployment.</p>
+
+<p>There is however one hole in this reasoning: <i>input from external
+devices</i>!
+When you read data with the wrong dimension, there is no way in the unchecked
+variant to prove that the input is correct.
+(This is like outputting a distance with a dimension format modifier for
+seconds &ndash; also this cannot be caught in the unchecked variant.)</p>
+
+<p>This input deficiency can be remedied by also adding a dimension format
+modifier for the Get operations:</p>
+
+<pre>  <b>procedure </b>Get (File : <b>in  </b>File_Type;
+                 X    : <b>out </b>Item;
+                 Width: <b>in  </b>Field  := 0;
+                 Dim  : <b>in</b>  String := &quot;&quot;);</pre>
+
+<p>The dimension format modifier, if given, will ignore any prefixes and
+verify the unit string input, raising <code>Unit_Error</code> in case of
+failure. For example, a modifier <code>&quot;m/s&quot;</code> will check
+that the input has dimension <i>Length/Time</i>.
+This is not a restriction since normally you have to know what to read and
+can select the proper dimension.
+If for some reason, you do not know the expected dimension (when for instance
+reading table data), you simply omit the parameter.
+(The modifier will of course be ignored in the checked variant.)</p>
+
+<p>Safety will cost execution time!</p>
+
+<p>For the implementation, a clone of the item's dimension component will
+be needed.</p>
+
+<p>Any thoughts?</p>
+
+<p><a href="Table_of_Contents.html">Table_of_Contents</a></p>
+
+<p align="center"><a href="http://validator.w3.org/check?uri=referer">
+<img src="valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a></p>
+
+</body>
+
+</html>
