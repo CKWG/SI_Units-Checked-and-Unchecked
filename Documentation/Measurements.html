@@ -8,7 +8,11 @@
 <title>SI Measurements</title>
 <style type="text/css">table td {text-align: right;}</style>
 <!-- Version  Date
-      1.0  16.06.2025
+      1.0  16.06.2025  GNAT CE 2021
+      1.1  18.07.2025  Measurements on new fast machine
+      1.2  16.08.2025  Link to Kazakov's work and AdaCore's language extension;
+                       colored important results
+      1.3  05.09.2025  Further coloring
 //-->
 </head>
 
@@ -16,16 +20,47 @@
 
 <h2 align="center">Execution Time Measurements</h2>
 
-<p> Measurements of relative speeds are performed with GNAT CE 2021
-on Windows 8.1.</p>
+<p>Checking units of measurement during runtime will inevitably slow down the
+execution time compared to the pure numerics, a waste (?) of execution time
+which 
+may be prohibitive for some applications.
+This library enables using strict unit checking during the development
+phase (until unit test phase), and switching off the checks when releasing
+the project into the wild.
+Nevertheless, there will be residues of the checking in the code which
+<b>slow down the execution time by a factor of around 10, see the relative
+timing below in the comparison of the <i>Nude</i> and the <i>Optimized</i>
+values in the <i>Unchecked</i> variant, which represent the truly important
+results</b>.</p>
+
+<p>So before you now delve into the measurement results because you are
+pondering the idea of unit checking, keep in mind that the results presented
+here are not representative.
+<b>Do measure your project yourself!</b></p>
+
+<p>If you feel this library inappropriate, think about trying Dmitry Kazakov's
+<a href="https://www.dmitry-kazakov.de/ada/units.htm">Units of Measurement for Ada</a>
+or <a href="https://gcc.gnu.org/onlinedocs/gnat_ugn.pdf">AdaCore's language extension</a>
+(see chapter 6.5) of which I gave a (meanwhile outdated) assessment here:
+<a href="http://archive.adaic.com/tools/CKWG/Dimension/Physical_units_with_GNAT_GPL_2013-AUJ35.1.pdf">
+Physical units with GNAT</a> (I do not know if there has been any progress,
+I have never used it myself &ndash; but note: <i>This is not Ada standard</i>
+and probably never will be).</p>
+
+<hr width="100%">
+
+<p>Measurements of relative speeds were performed with
+<b>GNAT CE 2021</b> on <b>Windows 8.1 with an old and slow
+machine</b> and on <b>Windows 11 with a brandnew fast
+machine</b>.</p>
 
 <p>The Schottky Langmuir equation is used for execution time
-measurements because it has a rational exponents.
+measurements because it has rational exponents.
 Quaternions may be used similarly to matrices for coordinate
 transformations but need much more time.</p>
 
-<p>For details, see the program <code>measure.adb</code> in directory
-<code>Examples</code>.</p>
+<p>For details, see the program <code>measure.adb</code> in
+directory <code>Examples</code>.</p>
 
 <p>Loops are used with one million repetitions.</p>
 
@@ -41,10 +76,10 @@ transformations but need much more time.</p>
 discussed.
 We are interested in the speed of the checked and unchecked versions
 in comparison with the pure mathematics, i. e. the time consumed for
-the <i>nude</i> Schottky Langmuir equation with only floating point
+the <b>nude</b> Schottky Langmuir equation with only floating point
 data.</p>
 
-<p>This nude equation is compiled twice, once with Assertion Policy
+<p>This <b>nude</b> equation is compiled twice, once with Assertion Policy
 set to <code>Ignore</code> and once set to <code>Check</code>.
 Although the code is identical and there are no assertions, the
 execution time different by an astonishing big factor.
@@ -54,6 +89,8 @@ depending on the switch <code>-gnata</code>, which corresponds to the
 
 <!-- ============= Assertion Effect ============ -->
 <table align="center">
+
+<caption><b>GNAT CE 2021 Windows 8.1</b><br/>&nbsp;</caption>
 
 <colgroup>
 <col width=" 70"/>
@@ -70,14 +107,47 @@ depending on the switch <code>-gnata</code>, which corresponds to the
 <tr>
 <th>Ignore</th>
 <td>0.015771666 s</td>
-<td>1.00</td>
+<td><font color="#0000F0">1.00</font></td>
 </tr>
 
 <tr>
 <th>Check</th>
 <td>0.109398771 s</td>
-<td>
-6.94</td>
+<td><font color="#0000F0">6.94</font></td>
+</tr>
+
+</table>
+<!-- =========== Assertion Effect End ========== -->
+
+<br/>
+
+<!-- ============= Assertion Effect ============ -->
+<table align="center">
+
+<caption><b>GNAT CE 2021 Windows 11</b><br/>&nbsp;</caption>
+
+<colgroup>
+<col width=" 70"/>
+<col width="110"/>
+<col width=" 50"/>
+</colgroup>
+
+<tr>
+<th>Assertion</th>
+<th>Absolute</th>
+<th>Relative</th>
+</tr>
+
+<tr>
+<th>Ignore</th>
+<td>0.002838900 s</td>
+<td><font color="#0000F0">1.00</font></td>
+</tr>
+
+<tr>
+<th>Check</th>
+<td>0.018112100 s</td>
+<td><font color="#0000F0">6.38</font></td>
 </tr>
 
 </table>
@@ -113,10 +183,14 @@ but cannot here because of the dimension components.</p>
 
 <p>These four versions are computed once with unit checking enabled
 and once disabled.
-The results are quite astonishing.</p>
+The results are quite astonishing.
+(Of course the absolute values depend on the speed of the machine
+in use; important are the relative speed values only.)</p>
 
 <!-- ============= Schottky Langmuir Unchecked ============ -->
 <table align="center">
+
+<caption><b>GNAT CE 2021 Windows 8.1</b><br/>&nbsp;</caption>
 
 <colgroup>
 <col width=" 70"/>
@@ -127,23 +201,23 @@ The results are quite astonishing.</p>
 </colgroup>
 
 <tr>
-<th>Unchecked</th>
+<th><font color="#00B050">Unchecked</font></th>
 <th>Absolute</th>
 <th colspan="3">Relative</th>
 </tr>
 
 <tr>
-<th>Nude</th>
+<th><font color="#00B050">Nude</font></th>
 <td>0.015771666 s</td>
-<td>1.0</td>
+<td><font color="#00B050">1.0</font></td>
 <td></td>
 <td></td>
 </tr>
 
 <tr>
-<th>Optimized</th>
+<th><font color="#00B050">Optimized</font></th>
 <td>0.167998892 s</td>
-<td>10.7</td>
+<td><font color="#00B050">10.7</font></td>
 <td>1.0</td>
 <td></td>
 </tr>
@@ -153,7 +227,7 @@ The results are quite astonishing.</p>
 <td>0.215526095 s</td>
 <td>13.7</td>
 <td>1.3</td>
-<td>1.0</td>
+<td><font color="#F00000">1.0</font></td>
 </tr>
 
 <tr>
@@ -161,7 +235,7 @@ The results are quite astonishing.</p>
 <td>0.668961375 s</td>
 <td>42.4</td>
 <td>4.0</td>
-<td>3.1</td>
+<td><font color="#F00000">3.1</font></td>
 </tr>
 
 </table>
@@ -207,7 +281,7 @@ The results are quite astonishing.</p>
 <td>6.994078595 s</td>
 <td>63.9</td>
 <td>1.2</td>
-<td>1.0</td>
+<td><font color="#F00000">1.0</font></td>
 </tr>
 
 <tr>
@@ -215,24 +289,138 @@ The results are quite astonishing.</p>
 <td>8.570521621 s</td>
 <td>78.3</td>
 <td>1.5</td>
-<td>1.2</td>
+<td><font color="#F00000">1.2</font></td>
 </tr>
 
 </table>
 <!-- =========== Schottky Langmuir Checked End ========== -->
 
-<p>Comparing the <i>nude</i> and the <i>omptimized</i> versions in
-the <i>checked</i> variant, you can see that the dimension
-calculation makes the execution time explode.
-This melts down when checking is off.
+<br/>
+
+<!-- ============= Schottky Langmuir Unchecked ============ -->
+<table align="center">
+
+<caption><b>GNAT CE 2021 Windows 11</b><br/>&nbsp;</caption>
+
+<colgroup>
+<col width=" 70"/>
+<col width="110"/>
+<col width=" 60"/>
+<col width=" 50"/>
+<col width=" 50"/>
+</colgroup>
+
+<tr>
+<th><font color="#00B050">Unchecked</font></th>
+<th>Absolute</th>
+<th colspan="3">Relative</th>
+</tr>
+
+<tr>
+<th><font color="#00B050">Nude</font></th>
+<td>0.002838900 s</td>
+<td><font color="#00B050">1.0</font></td>
+<td></td>
+<td></td>
+</tr>
+
+<tr>
+<th><font color="#00B050">Optimized</font></th>
+<td>0.035072600 s</td>
+<td><font color="#00B050">12.4</font></td>
+<td>1.0</td>
+<td></td>
+</tr>
+
+<tr>
+<th>Stringless</th>
+<td>0.043505100 s</td>
+<td>15.3</td>
+<td>1.2</td>
+<td><font color="#F00000">1.0</font></td>
+</tr>
+
+<tr>
+<th>Dressed</th>
+<td>0.141652300 s</td>
+<td>49.9</td>
+<td>4.0</td>
+<td><font color="#F00000">3.3</font></td>
+</tr>
+
+</table>
+<!-- =========== Schottky Langmuir Unchecked End ========== -->
+
+<br/>
+
+<!-- ============= Schottky Langmuir Checked ============ -->
+<table align="center">
+
+<colgroup>
+<col width=" 70"/>
+<col width="110"/>
+<col width=" 60"/>
+<col width=" 50"/>
+<col width=" 50"/>
+</colgroup>
+
+<tr>
+<th>Checked</th>
+<th>Absolute</th>
+<th colspan="3">Relative</th>
+</tr>
+
+<tr>
+<th>Nude</th>
+<td>0.018112100 s</td>
+<td>1.0</td>
+<td></td>
+<td></td>
+</tr>
+
+<tr>
+<th>Optimized</th>
+<td>0.869659000 s</td>
+<td>48.0</td>
+<td>1.0</td>
+<td></td>
+</tr>
+
+<tr>
+<th>Stringless</th>
+<td>1.017735200 s</td>
+<td>56.2</td>
+<td>1.2</td>
+<td><font color="#F00000">1.0</font></td>
+</tr>
+
+<tr>
+<th>Dressed</th>
+<td>1.251099400 s</td>
+<td>69.1</td>
+<td>1.4</td>
+<td><font color="#F00000">1.2</font></td>
+</tr>
+
+</table>
+<!-- =========== Schottky Langmuir Checked End ========== -->
+
+<p><font color="#00B050">Comparing the <i>nude</i> and the
+<i>optimized</i> versions</font> in the <i>checked</i> variant,
+you can see that the dimension calculation makes the execution
+time explode.
+This melts down when <font color="#00B050">checking is off</font>.
+<font color="#00B050">These figures are in effect the most
+interesting ones</font>.
 The rest must be attributed to the compiler ignoring the
 <code>Inline</code> pragma for the operations in the dimension
 signature package.</p>
 
-<p>Comparing the <i>stringless</i> and the <i>dressed</i> execution
-times, you can see that the dimension string evaluation is extremely
-expensive in the <i>unchecked</i> version, thus be careful to only
-use them for data initilization and avoid them in calculations.
+<p>Comparing <font color="#F00000">the <i>stringless</i> and the
+<i>dressed</i></font> execution times, you can see that the
+dimension string evaluation is extremely expensive in the
+<i>unchecked</i> version, thus be careful to only use them for
+data initilization and avoid them in calculations.
 In the <i>checked</i> version, this effect is smaller since the
 computation of the dimension components consumes most of the time,
 whereas in the unchecked version, only the dimension string
@@ -240,6 +428,8 @@ evaluation is left.</p>
 
 <!-- ============= Unchecked v. Checked ============ -->
 <table align="center">
+
+<caption><b>GNAT CE 2021 Windows 8.1</b><br/>&nbsp;</caption>
 
 <colgroup>
 <col width=" 70"/>
@@ -264,7 +454,7 @@ evaluation is left.</p>
 <tr>
 <th>Unchecked</th>
 <td>0.015771666 s</td>
-<td>1.00</td>
+<td><font color="#0000F0">1.00</font></td>
 <td>0.167998892 s</td>
 <td>1.00</td>
 <td>0.215526095 s</td>
@@ -276,13 +466,67 @@ evaluation is left.</p>
 <tr>
 <th>  Checked</th>
 <td>0.109398771 s</td>
-<td>6.94</td>
+<td><font color="#0000F0">6.94</font></td>
 <td>5.908864053 s</td>
 <td>35.17</td>
 <td>6.994078595 s</td>
 <td>32.45</td>
 <td>8.570521621 s</td>
 <td>12.81</td>
+</tr>
+
+</table>
+<!-- =========== Unchecked v. Checked End ========== -->
+
+<br/>
+
+<!-- ============= Unchecked v. Checked ============ -->
+<table align="center">
+
+<caption><b>GNAT CE 2021 Windows 11</b><br/>&nbsp;</caption>
+
+<colgroup>
+<col width=" 70"/>
+<col width="110"/>
+<col width=" 40"/>
+<col width="120"/>
+<col width=" 45"/>
+<col width="120"/>
+<col width=" 45"/>
+<col width="120"/>
+<col width=" 45"/>
+</colgroup>
+
+<tr>
+<th></th>
+<th colspan="2">Nude</th>
+<th colspan="2">Optimized</th>
+<th colspan="2">Stringless</th>
+<th colspan="2">Dressed</th>
+</tr>
+
+<tr>
+<th>Unchecked</th>
+<td>0.002838900 s</td>
+<td><font color="#0000F0">1.00</font></td>
+<td>0.035072600 s</td>
+<td>1.00</td>
+<td>0.043505100 s</td>
+<td>1.00</td>
+<td>0.141652300 s</td>
+<td>1.00</td>
+</tr>
+
+<tr>
+<th>  Checked</th>
+<td>0.018112100 s</td>
+<td><font color="#0000F0">6.38</font></td>
+<td>0.869659000 s</td>
+<td>24.80</td>
+<td>1.017735200 s</td>
+<td>23.39</td>
+<td>1.251099400 s</td>
+<td>8.83</td>
 </tr>
 
 </table>
@@ -302,6 +546,8 @@ and even more so in the checked version.</p>
 
 <!-- ============= Matrix vs. Quaternion ============ -->
 <table align="center">
+
+<caption><b>GNAT CE 2021 Windows 8.1</b><br/>&nbsp;</caption>
 
 <colgroup>
 <col width=" 70"/>
@@ -367,6 +613,82 @@ and even more so in the checked version.</p>
 <td>5.4</td>
 <td>2.576114086 s</td>
 <td>9.4</td>
+</tr>
+
+</table>
+<!-- =========== Matrix vs. Quaternion End ========== -->
+
+<br/>
+
+<!-- ============= Matrix vs. Quaternion ============ -->
+<table align="center">
+
+<caption><b>GNAT CE 2021 Windows 11</b><br/>&nbsp;</caption>
+
+<colgroup>
+<col width=" 70"/>
+<col width="120"/>
+<col width=" 40"/>
+<col width="120"/>
+<col width=" 40"/>
+</colgroup>
+
+<tr>
+<th></th>
+<th colspan="2">Matrix</th>
+<th colspan="2">Quaternion</th>
+</tr>
+
+<tr>
+<th>Unchecked</th>
+<td>0.023591300 s</td>
+<td>1.0</td>
+<td>0.135526300 s</td>
+<td>1.0</td>
+</tr>
+
+<tr>
+<th>Checked</th>
+<td>0.054099800 s</td>
+<td>2.3</td>
+<td>0.489615400 s</td>
+<td>3.6</td>
+</tr>
+
+</table>
+
+<br/>
+
+<table align="center">
+
+<colgroup>
+<col width=" 70"/>
+<col width="120"/>
+<col width=" 40"/>
+<col width="120"/>
+<col width=" 40"/>
+</colgroup>
+
+<tr>
+<th></th>
+<th colspan="2">Unchecked</th>
+<th colspan="2">Checked</th>
+</tr>
+
+<tr>
+<th>Matrix</th>
+<td>0.023591300 s</td>  <!-- mu -->
+<td>1.0</td>
+<td>0.054099800 s</td>  <!-- mc -->
+<td>1.0</td>
+</tr>
+
+<tr>
+<th>Quaternion</th>
+<td>0.135526300 s</td>
+<td>5.7</td>
+<td>0.489615400 s</td>
+<td>9.1</td>
 </tr>
 
 </table>
