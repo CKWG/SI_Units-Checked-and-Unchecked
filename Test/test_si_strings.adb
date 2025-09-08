@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2018, 2019, 2020 Christoph Karl Walter Grein
+-- Copyright (C) 2018, 2019, 2020, 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -23,18 +23,13 @@
 -- however invalidate any other reasons why the executable file might be
 -- covered by the GNU Public License.
 --
--- Source:
--- https://www.adaic.org/ada-resources/tools-libraries/
---   (see Christoph Grein's Essentials)
--- http://archive.adaic.com/tools/CKWG/Dimension/Dimension.html
---
 -- Author's email address:
 --   christ-usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Ada.Assertions,
-     Ada.Strings.Fixed;
-with Ada.Strings.Maps;
+with Ada.Assertions;
+with Ada.Exceptions;
+with Ada.Strings.Fixed;
 
 with Test_Support;
 use  Test_Support;
@@ -46,12 +41,12 @@ procedure Test_SI_Strings is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   2.0
-  -- Date      13 May 2020
+  -- Version   3.0
+  -- Date      15 August 2025
   --====================================================================
   -- Test the Image and Value functions.
-  -- (Only a few simple tests. More extensive tests are performed on
-  -- Text_IO.)
+  -- (Only a few simple tests. More extensive tests are performed in
+  -- Test_SI_Units.)
   -- Note: Since reversity of Image and Value is tested, the test cannot
   --       run correctly on the unchecked version.
   --====================================================================
@@ -61,6 +56,7 @@ procedure Test_SI_Strings is
   --  C.G.    1.1  28.09.2018 Unit syntax changed
   --  C.G.    1.2  13.02.2019 Test slightly improved
   --  C.G.    2.0  13.05.2020 Dimensions generic parameter
+  --  C.G.    3.0  15.08.2025 New test: Value reimplemented
   --====================================================================
 
   procedure Test_Image_Value (Legal_Image: String; Expected: Item) is
@@ -78,16 +74,21 @@ procedure Test_SI_Strings is
 
   procedure Test_KO (Illegal_Image: String; Text: String) is
     X: Item;
+    use Ada.Exceptions, Ada.Strings.Fixed;
   begin
     X := Value (Illegal_Image);
     Assert (Condition => False,
             Message   => '"' & Illegal_Image & """ should have raised exception",
             Only_Report_Error => False);
   exception
-    when Illegal_Unit =>
-      Assert (Condition => True,
-              Message   => '"' & Illegal_Image & """: " & Text & " Illegal_Unit",
-              Only_Report_Error => False);
+    when Ex: Illegal_Unit =>
+      declare
+        Reason: constant String := '"' & Illegal_Image & """: " & Text;
+      begin
+        Assert (Condition => True,
+                Message   => Reason & (65 - Reason'Length) * ' ' & " => Illegal_Unit " & Exception_Message (Ex),
+                Only_Report_Error => False);
+      end;
   end Test_KO;
 
 begin

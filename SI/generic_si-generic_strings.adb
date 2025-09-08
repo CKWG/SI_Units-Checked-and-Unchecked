@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2018, 2020 Christoph Karl Walter Grein
+-- Copyright (C) 2018, 2020, 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -23,11 +23,6 @@
 -- however invalidate any other reasons why the executable file might be
 -- covered by the GNU Public License.
 --
--- Source:
--- https://www.adaic.org/ada-resources/tools-libraries/
---   (see Christoph Grein's Essentials)
--- http://archive.adaic.com/tools/CKWG/Dimension/Dimension.html
---
 -- Author's email address:
 --   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
@@ -39,8 +34,8 @@ package body Generic_SI.Generic_Strings is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   2.0
-  -- Date      13 May 2020
+  -- Version   3.1
+  -- Date      22 August 2025
   --====================================================================
   --
   --====================================================================
@@ -48,6 +43,8 @@ package body Generic_SI.Generic_Strings is
   -- Author Version   Date    Reason for change
   --  C.G.    1.0  29.07.2018
   --  C.G.    2.0  13.05.2020 Parent renamed to Generic_SI
+  --  C.G.    3.0  15.08.2025 Value reimplemented
+  --  C.G.    3.1  22.08.2025 Ensure_Task_Safety is new
   --====================================================================
 
   function Image (X: Item) return String is
@@ -62,11 +59,21 @@ package body Generic_SI.Generic_Strings is
     if Unit_Start = 0 then
       return Real'Base'Value (X) * One;  -- will raise Constraint_Error if X is not OK
     elsif X (Unit_Start - 1) = ' ' then
-      raise Illegal_Unit;
-    elsif X (Unit_Start) = '*' then
-      return Real'Base'Value (X (X'First .. Unit_Start - 1)) * Trim (X (Unit_Start + 1 .. X'Last), Right);
+      raise Illegal_Unit with "illegal space";
     else
-      return Real'Base'Value (X (X'First .. Unit_Start - 1)) / Trim (X (Unit_Start + 1 .. X'Last), Right);
+      declare
+        Value : constant Real'Base := Real'Base'Value (X (X'First .. Unit_Start - 1));
+        Trim_X: constant String    := Trim (X (Unit_Start .. X'Last), Right);
+        Result: Item;
+        Length: Positive;
+        package String_Interface is new Ensure_Task_Safety (Trim_X);  -- make task-safe
+      begin
+        Construct (String_Interface.Get'Access, Result, Length);
+        if Length /= Trim_X'Length then
+          raise Illegal_Unit with "string not exhausted";
+        end if;
+        return Value * Result;
+      end;
     end if;
   end Value;
 

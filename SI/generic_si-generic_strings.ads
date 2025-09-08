@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2018, 2020 Christoph Karl Walter Grein
+-- Copyright (C) 2018, 2020, 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -23,11 +23,6 @@
 -- however invalidate any other reasons why the executable file might be
 -- covered by the GNU Public License.
 --
--- Source:
--- https://www.adaic.org/ada-resources/tools-libraries/
---   (see Christoph Grein's Essentials)
--- http://archive.adaic.com/tools/CKWG/Dimension/Dimension.html
---
 -- Author's email address:
 --   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
@@ -38,8 +33,8 @@ package Generic_SI.Generic_Strings is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   2.0
-  -- Date      11 May 2020
+  -- Version   2.1
+  -- Date      15 August 2025
   --====================================================================
   -- For the numeric part, Image and Value behave like the corresponding
   -- attributes.
@@ -54,11 +49,12 @@ package Generic_SI.Generic_Strings is
   -- Author Version   Date    Reason for change
   --  C.G.    1.0  29.07.2018
   --  C.G.    2.0  11.05.2020 Parent renamed to Generic_SI
+  --  C.G.    2.1  15.08.2025 Postcondition added
   --====================================================================
 
   pragma Elaborate_Body;
 
-  function Image (X: Item  ) return String;
+  function Image (X: Item  ) return String with Post => Image'Result'First = 1;
   function Value (X: String) return Item;
 
 end Generic_SI.Generic_Strings;

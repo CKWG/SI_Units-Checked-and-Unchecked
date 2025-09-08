@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2008, 2018, 2020 Christoph Karl Walter Grein
+-- Copyright (C) 2008, 2018, 2020, 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -23,17 +23,12 @@
 -- however invalidate any other reasons why the executable file might be
 -- covered by the GNU Public License.
 --
--- Source:
--- https://www.adaic.org/ada-resources/tools-libraries/
---   (see Christoph Grein's Essentials)
--- http://archive.adaic.com/tools/CKWG/Dimension/Dimension.html
---
 -- Author's email address:
 --   christ-usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Ada.Assertions, Ada.IO_Exceptions;
-use  Ada.Assertions, Ada.IO_Exceptions;
+with Ada.Assertions, Ada.IO_Exceptions, Ada.Exceptions;
+use  Ada.Assertions, Ada.IO_Exceptions, Ada.Exceptions;
 
 with SI.IO;
 use  SI.IO, SI;
@@ -45,8 +40,8 @@ procedure Test_SI_Text_IO_Strings is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   3.0
-  -- Date      13 May 2020
+  -- Version   4.0
+  -- Date      21 August 2025
   --====================================================================
   -- Test the Text_IO to and from string procedure.
   -- Note: Since output with default Dim parameter is tested, the test
@@ -58,6 +53,7 @@ procedure Test_SI_Text_IO_Strings is
   --  C.G.    2.0  01.08.2018 Unit strings; test completely reworked
   --  C.G.    2.1  29.09.2018 Unit syntax changed
   --  C.G.    3.0  13.05.2020 Dimensions generic parameter
+  --  C.G.    4.0  21.08.2025 Test adapted to new impl. of Gen_Text_IO
   --====================================================================
 
   procedure Test_Aft_Exp (Value: Item; Expected_D, Expected_F: String) is
@@ -94,7 +90,7 @@ procedure Test_SI_Text_IO_Strings is
             Message   => '"' & Result & '"',
             Only_Report_Error => False);
     Get (From => Result, X => Got, Last => Last);
-    Assert (Condition => abs (Value - Got) <= 1.0E-6 * abs Value,
+    Assert (Condition => abs (Value - Got) <= 1.0E-3 * abs Value,
             Message   => "Get",
             Only_Report_Error => False);
   end Test_Prefix;
@@ -125,7 +121,7 @@ begin
   -----------------------------------------------------------
 
   Test_Step (Title => "Test that the string is correctly filled",
-             Description => "Aft and Ex modify Fore.");
+             Description => "Aft and Exp modify Fore.");
   --                                     2345678901234567890123456789012345678901
   Test_Aft_Exp (One     , Expected_D => "                             1.00000E+00",
                           Expected_F => "                                    1.00");
@@ -138,37 +134,55 @@ begin
   Test_Step (Title => "Test prefixes",
              Description => "Prefix modifies exponent.");
   --                                                        234567890123456789012345"
-  Test_Prefix (10_000.0*"m", "km"            , Expected => "             1.00E+01*km");
-  Test_Prefix ( 1.0*"A"    , "mA"            , Expected => "             1.00E+03*mA");
-  Test_Prefix ( 2.0/"s"    , "/Ms"           , Expected => "             2.00E+06/Ms");
-  Test_Prefix ( 2.0/"s*Em" , "/(Ms*km**(+1))", Expected => "  2.00E-09/(Ms*km**(+1))");
-  Test_Prefix (-3.0*"kV/mm", "V/m"           , Expected => "           -3.00E+06*V/m");
+  Test_Prefix (10_000.0*"m"   , "km"            , Expected => "             1.00E+01*km");
+  Test_Prefix ( 1.0*"A"       , "mA"            , Expected => "             1.00E+03*mA");
+  Test_Prefix ( 2.0/"s**(1/3)", "/hs**(1/3)"    , Expected => "      9.28E+00/hs**(1/3)");
+  Test_Prefix ( 2.0/"s*Em"    , "/(Ms*km**(+1))", Expected => "  2.00E-09/(Ms*km**(+1))");
+  Test_Prefix (-3.0*"kV/mm"   , "V/m"           , Expected => "           -3.00E+06*V/m");
 
   ------------------------------------------------------------------------------
   Test_Step (Title => "Further Get tests",
-             Description => ".");
+             Description => "Charakters foreign to syntax stop reading; others raise Illegal_Unit.");
 
   declare
     Value: Item;
     Last : Positive;
   begin
-    Get ("1.0K", Value, Last);
-    Assert (Condition => Value = One and Last = 3,
-            Message   => "K unconsumed",
-            Only_Report_Error => False);
+    for C in Character when C in 'A' .. 'Z' | 'a' .. 'z' | '(' | '+' | '-' | ')' loop
+      begin
+        Get ("1.0" & C, Value, Last);
+        Assert (Condition => False,
+                Message   => C & "Illegal_Unit raised",
+                Only_Report_Error => False);
+      exception
+        when Ex: Data_Error | Illegal_Unit =>
+          Assert (Condition => True,
+                  Message   => C & " consumed => " & Exception_Name (Ex) &
+                  -- Exception message for Data_Error is compiler specific, so omit it.
+                  (if Exception_Name (Ex) = "ADA.IO_EXCEPTIONS.DATA_ERROR" then ""
+                   else ' ' & Exception_Message (Ex)),
+                  Only_Report_Error => False);
+      end;
+    end loop;
+  end;
+
+  declare
+    Value: Item;
+    Last : Positive;
+  begin --12345   rest not read
     Get ("1.0*m k", Value, Last);
     Assert (Condition => Value = 1.0*"m" and Last = 5,
-            Message   => "space stops reading",
+            Message   => "space stops reading and is not read (Last =" & Last'Image & ')',
             Only_Report_Error => False);
-    Get ("1.0*S;", Value, Last);
-    Assert (Condition => Value = 1.0/"Ohm" and Last = 5,
-            Message   => "semicolon stops reading",
+    Get ("2.02*S;", Value, Last);
+    Assert (Condition => Value = 2.02/"Ohm" and Last = 6,
+            Message   => "semicolon stops reading and is not read (Last =" & Last'Image & ')',
             Only_Report_Error => False);
   end;
 
   ------------------------------------------------------------------------------
   Test_Step (Title => "Test exceptions",
-             Description => ".");
+             Description => "String too short: Layout_Error; wrong unit: Unit_Error.");
 
   declare
     Result: String (1 .. 5);
@@ -182,7 +196,7 @@ begin
   end;
 
   declare
-    Result: String (1 .. 5);
+    Result: String (1 .. 5);  -- doesn't matter that string too short
   begin
     Put (Result, 1.0*"A", Dim => "m");
   exception

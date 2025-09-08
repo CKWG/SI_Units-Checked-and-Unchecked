@@ -23,11 +23,6 @@
 -- however invalidate any other reasons why the executable file might be
 -- covered by the GNU Public License.
 --
--- Source:
--- https://www.adaic.org/ada-resources/tools-libraries/
---   (see Christoph Grein's Essentials)
--- http://archive.adaic.com/tools/CKWG/Dimension/Dimension.html
---
 -- Author's email address:
 --   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
@@ -37,8 +32,8 @@ function Evaluate (Symbol: String) return Item is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   4.4
-  -- Date      11 April 2025
+  -- Version   4.5
+  -- Date      11 August 2025
   --====================================================================
   -- Symbol index starts always with 1.
   -- This is the time killer, so try to be efficient.
@@ -53,6 +48,7 @@ function Evaluate (Symbol: String) return Item is
   --  C.G.    4.2  06.12.2022 prefixes QqRr added
   --  C.G.    4.3  27.02.2025 deka -> deca
   --  C.G.    4.4  11.04.2025 ha added
+  --  C.G.    4.5  11.08.2025 Added reason string to raise
   --====================================================================
 
   pragma Optimize (Time);
@@ -64,7 +60,7 @@ function Evaluate (Symbol: String) return Item is
     -- so second recursive call with Prefixed = True.
   begin
     if Symbol = "" then
-      raise Illegal_Unit;
+      raise Illegal_Unit with "illegal symbol";
     end if;
     case Symbol (Symbol'First) is
       when 'A' => if Symbol = Symbol_List (A  ).Symbol then return Symbol_List (A  ).Value; end if;
@@ -102,8 +98,8 @@ function Evaluate (Symbol: String) return Item is
       when 'e' => if Symbol = Symbol_List (eV ).Symbol then return Symbol_List (eV ).Value; end if;
       when 'f' => Prefix := femto;
       when 'g' => if Symbol = Symbol_List (g  ).Symbol then return Symbol_List (g  ).Value; end if;
-      when 'h' => if Prefixed then raise Illegal_Unit; end if;  -- no prefix on hour or hectare
-                  if Symbol = Symbol_List (ha ).Symbol then return Symbol_List (ha ).Value;
+      when 'h' => if Prefixed then null;  -- no prefix on hour or hectare
+               elsif Symbol = Symbol_List (ha ).Symbol then return Symbol_List (ha ).Value;
                elsif Symbol = Symbol_List (hor).Symbol then return Symbol_List (hor).Value; end if;
                   Prefix := hecto;
       when 'k' => if Symbol = Symbol_List (kat).Symbol then return Symbol_List (kat).Value; end if;
@@ -112,8 +108,9 @@ function Evaluate (Symbol: String) return Item is
                elsif Symbol = Symbol_List (lm ).Symbol then return Symbol_List (lm ).Value;
                elsif Symbol = Symbol_List (lx ).Symbol then return Symbol_List (lx ).Value; end if;
       when 'm' => if Symbol = Symbol_List (m  ).Symbol then return Symbol_List (m  ).Value;
-               elsif Symbol = Symbol_List (min).Symbol then if Prefixed then raise Illegal_Unit; end if;  -- no prefix on minute
-                                                            return Symbol_List (min).Value;
+               elsif Symbol = Symbol_List (min).Symbol then
+                                                       if Prefixed then null;  -- no prefix on minute
+                                                       else return Symbol_List (min).Value; end if;
                elsif Symbol = Symbol_List (mol).Symbol then return Symbol_List (mol).Value; end if;
                   Prefix := milli;
       when 'n' => Prefix := nano;
@@ -131,7 +128,7 @@ function Evaluate (Symbol: String) return Item is
     if Prefix /= 1.0 and not Prefixed then
       return Eval (Symbol ((if Prefix = deca then 3 else 2) .. Symbol'Last), Prefixed => True);
     end if;
-    raise Illegal_Unit;
+    raise Illegal_Unit with "prefix illegal";
   end Eval;
 
 begin

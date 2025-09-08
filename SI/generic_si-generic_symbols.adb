@@ -23,14 +23,10 @@
 -- however invalidate any other reasons why the executable file might be
 -- covered by the GNU Public License.
 --
--- Source:
--- https://www.adaic.org/ada-resources/tools-libraries/
---   (see Christoph Grein's Essentials)
--- http://archive.adaic.com/tools/CKWG/Dimension/Dimension.html
---
 -- Author's email address:
 --   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
+
 with Ada.Strings.Fixed;
 with Rational_Arithmetics.Strings;
 
@@ -38,10 +34,17 @@ package body Generic_SI.Generic_Symbols is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   2.5
-  -- Date      11 April 2025
+  -- Version   3.1
+  -- Date      22 August 2025
   --====================================================================
   -- List of all unit symbols.
+  --
+  -- Construct splits the long Unit_String (e.g. "mA*s") in factors
+  -- ("mA" and "s"), calls Evaluate to split each factor in prefixed
+  -- symbol and exponent, then composes the result.
+  --
+  -- Image creates the default string respresentation of the Dimension
+  -- component.
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
@@ -54,6 +57,8 @@ package body Generic_SI.Generic_Symbols is
   --                          Work-around for [T520-013 public] removed
   --  C.G.    2.4  27.02.2025 deka -> deca (change not visible outside)
   --  C.G.    2.5  11.04.2025 ha added
+  --  C.G.    3.0  02.08.2025 Completely new implementation started
+  --  C.G.    3.1  22.08.2025 New profile for Construct
   --====================================================================
 
   subtype Symbol_Length is Positive range 1 .. 3;
@@ -134,31 +139,10 @@ package body Generic_SI.Generic_Symbols is
   ronna : constant := 1.0E+27;  -- R
   quetta: constant := 1.0E+30;  -- Q
 
-  Symbol_Characters: Ada.Strings.Maps.Character_Set :=     -- in fact a constant, completed below
-    Ada.Strings.Maps.To_Set ("qryzafpnumcdahkMGTPEZYRQ");  -- the prefixes
-
-  function Legal_Characters return Ada.Strings.Maps.Character_Set is
-    use Ada.Strings.Maps;
-  begin
-    return Symbol_Characters;
-  end Legal_Characters;
-
-  function Evaluate (Symbol: String) return Item  is separate;
+  function Evaluate (Symbol: String) return Item is separate  -- a single symbol (without exponent)
+    with Pre => Symbol'First = 1;
+  procedure Construct (From_Unit_String: access procedure (C: out Character; EoT: out Boolean); Result: out Item; Length: out Natural) is separate;
 
   function Image (X: Dimension) return String is separate;
-
-begin
-
-  declare
-    procedure Collect_Symbol_Characters is
-      use Ada.Strings.Maps;
-    begin
-      for S of Symbol_List loop
-        Symbol_Characters := Symbol_Characters or To_Set (S.Symbol (1 .. S.Length));
-      end loop;
-    end Collect_Symbol_Characters;
-  begin
-    Collect_Symbol_Characters;
-  end;
 
 end Generic_SI.Generic_Symbols;

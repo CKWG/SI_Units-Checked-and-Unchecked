@@ -16,17 +16,16 @@
 -- along with this program; if not, write to the Free Software
 -- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 --
--- Author's homepage and email address:
---   http://www.christ-usch-grein.homepage.t-online.de/
---   Christ-Usch.Grein@T-Online.de
+-- Author's email address:
+--   christ-usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
 project SI is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   7.0
-  -- Date      16 April 2025
+  -- Version   7.1
+  -- Date      17 August 2025
   --====================================================================
   --
   --====================================================================
@@ -48,6 +47,7 @@ project SI is
   --  C.G.    5.1  02.07.2020 -O3
   --  C.G.    6.0  20.04.2024 GNAT CE 2021
   --  C.G.    7.0  16.04.2025 Safety_Choice added
+  --  C.G.    7.1  17.08.2025 -gnat2022
   --====================================================================
 
   for Source_Dirs use (".", "Rational_Arithmetics", "Dimensions");
@@ -66,7 +66,7 @@ project SI is
   package Compiler is
     for Default_Switches ("ada") use ("-gnatn",  -- inlining
                                       "-gnato",  -- overflow
-                                      "-O3", "-gnat12", "-fstack-check") &
+                                      "-O3", "-gnat2022", "-fstack-check") &
                                       Assertion;
   end Compiler;
 

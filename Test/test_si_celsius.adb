@@ -27,7 +27,7 @@
 --   christ-usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Ada.Assertions;
+with Ada.Assertions, Ada.Exceptions;
 with Ada.Text_IO;
 
 with Test_Support;
@@ -40,8 +40,8 @@ procedure Test_SI_Celsius is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   1.0
-  -- Date      3 July 2025
+  -- Version   1.1
+  -- Date      30 August 2025
   --====================================================================
   -- Test SI.Temperature and children, i.e. the Celsius operations.
   -- The program reads the file Test_SI_Celsius_IO.in and writes the
@@ -52,6 +52,7 @@ procedure Test_SI_Celsius is
   -- History
   -- Author Version   Date    Reason for change
   --  C.G.    1.0  03.07.2025
+  --  C.G.    1.1  30.08.2025 Better test structure
   --====================================================================
 
   Physic, Result: Ada.Text_IO.File_Type;
@@ -185,7 +186,7 @@ begin
 
   -----------------------------------------------------------
 
-  Test_Step (Title => "Compare",
+  Test_Step (Title => "Read from file and Compare",
              Description => "Compare the actual with the expected output.");
 
   declare
@@ -201,12 +202,20 @@ begin
 
       declare
         T: Celsius;
+        D: String (1 .. 30);
+        L: Natural;
+        use Ada.Exceptions;
       begin
         Get (Physic, T);
+        --Ada.Text_IO.Put_Line ("Where art though?");
         Put (Result, T, Aft => 1, Exp => 0);  New_Line (Result);
       exception
-        when Unit_Error => Put_Line (Result, "Unit_Error");
-        when Data_Error => Put_Line (Result, "Data_Error");  Skip_Line (Physic);
+        when E: Illegal_Unit | Data_Error =>
+          Get_Line (Physic, D, L);  -- get unread part
+          Put_Line (Result, Exception_Name (E) &
+                    (if Exception_Name (E) = "ADA.IO_EXCEPTIONS.DATA_ERROR" then ""
+                     else " => " & Exception_Message (E)) &
+                     ", Rest of line """ & D (1 .. L) & '"');
         when End_Error  => exit;
       end;
 
@@ -296,9 +305,9 @@ begin
     Get (S, C, L);
 
   exception
-    when Unit_Error =>
+    when Illegal_Unit =>
       Assert (Condition => True,
-              Message   => "Unit_Error raised",
+              Message   => "Illegal_Unit raised",
               Only_Report_Error => False);
       Put_Line ("Last" & L'Image & " is invalid.");
 
