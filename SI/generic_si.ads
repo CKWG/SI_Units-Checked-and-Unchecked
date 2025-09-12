@@ -47,8 +47,8 @@ package Generic_SI is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   7.2
-  -- Date      22 August 2025
+  -- Version   7.3
+  -- Date      12 September 2025
   --====================================================================
   -- Magnetic_Flux_Density is the classical name. Nowadays it's often
   -- just called Magnetic_Field.
@@ -110,6 +110,7 @@ package Generic_SI is
   --                          postcondition on Arcsin/Arccos
   --  C.G.    7.2  22.08.2025 Common interface for evaluating all kinds
   --                          of unit indications
+  --  C.G.    7.3  12.09.2025 function SI_is_Unchecked is new
   --====================================================================
 
   type Item is private;
@@ -264,6 +265,10 @@ package Generic_SI is
   function Arctanh (X: Dimensionless) return Dimensionless;
   function Arccoth (X: Dimensionless) return Dimensionless;
 
+  -- Compilation choice
+
+  function SI_is_Unchecked return Boolean with Inline;
+
 private
 
   pragma Inline (Same_Dimension, has_Dimension, Value,
@@ -349,5 +354,7 @@ private
 
   package Elementary_Functions is new Ada.Numerics.Generic_Elementary_Functions (Real'Base);
   use     Elementary_Functions;
+
+  function SI_is_Unchecked return Boolean is (Meter = Mole);  -- any pair will do
 
 end Generic_SI;
