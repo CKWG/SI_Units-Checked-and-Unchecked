@@ -41,8 +41,8 @@ procedure Test_SI_Units is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   5.1
-  -- Date      12 August 2025
+  -- Version   5.2
+  -- Date      10 September 2025
   --====================================================================
   -- Test that all derived symbols are correctly defined.
   -- Test that various incorrect symbols are deteced.
@@ -68,19 +68,8 @@ procedure Test_SI_Units is
   --  C.G.    5.0  11.08.2025 Better systematic tests for new implemen-
   --                          tation of unit string evaluation
   --  C.G.    5.1  12.08.2025 Make test succeed in Unchecked variant
+  --  C.G.    5.2  10.09.2025 Use new function SI_is_Unchecked
   --====================================================================
-
-  function Test_Checked return Boolean is
-    T: Time;
-  begin
-    T := 1.0*"S";
-    return False;
-  exception
-    when others =>
-      return True;
-  end Test_Checked;
-
-  is_Checked: Boolean renames Test_Checked;
 
   procedure Test_Prefix is
     subtype Index is Natural range 0 .. 5;
@@ -169,7 +158,7 @@ procedure Test_SI_Units is
       with Inline, Pre => X'First = 1 is        -- of the expected result
       Pos: constant Natural := Index (X, "*");  -- in the Unchecked variant
     begin                                       -- because it doesn't exist
-      if is_Checked or Pos = 0 then             -- in the resulting image.
+      if not SI_is_Unchecked or Pos = 0 then    -- in the resulting image.
         return X;
       else
         return X (1 .. Pos - 1);
@@ -199,7 +188,7 @@ begin
   Test_Header (Title => "Test SI_Units",
                Description => "Test syntax of unit strings and definitions for correctness.");
 
-  Put_Line ("This is the " & (if is_Checked then "C" else "Unc") & "hecked variant." );
+  Put_Line ("This is the " & (if SI_is_Unchecked then "Unc" else "C") & "hecked variant." );
 
   Test_Step (Title => "Prefixes",
              Description => "Test all combinations of prefixes and symbols.");
