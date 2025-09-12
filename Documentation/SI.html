@@ -35,6 +35,7 @@
       6.0  01.04.2025  ToC Subheaders
       6.1  18.04.2025  Preconditions replace check in body
       6.2  16.08.2025  Precondition on unit string, postcondition on Arcsin/Arccos
+      6.3  11.09.2025  function SI_is_Unchecked is new
 //-->
 </head>
 
@@ -233,6 +234,10 @@ variant, of course.</p>
   <b>function </b>Arctanh <b>(</b>X: Dimensionless<b>) return </b>Dimensionless;
   <b>function </b>Arccoth <b>(</b>X: Dimensionless<b>) return </b>Dimensionless;
 
+  <i>-- Compilation choice</i>
+
+  <b>function</b> SI_is_Unchecked <b>return</b> Boolean <b>with</b> Inline;
+
 <b>private
 
   </b><i>Not shown</i>
@@ -273,6 +278,16 @@ the case, <code>pragma&nbsp;Assertion_Policy&nbsp;(Ignore);</code>
 should be set.</font>
 Variables with subtype Item may assume any dimension.</p>
 
+<p>The library knows how it was compiled:</p>
+
+<pre>  <b>function</b> SI_is_Unchecked <b>return</b> Boolean <b>with</b> Inline;</pre>
+
+<p>SI_is_Unchecked returns <font color="#FF0000"><code>True</code></font> when the
+library has been compiled with
+<font color="#FF0000"><code>Assertion_Policy (Ignore)</code></font>,
+<font color="#008000"><code>False</code></font> when compiled with
+<font color="#008000"><code>Assertion_Policy (Check)</code></font>.</p>
+
 <p>Note: Magnetic_Flux_Density is the classical name.
 Nowadays it's often just called Magnetic_Field because this is the
 fundamental one.
@@ -281,15 +296,16 @@ If you find the name annoying, just remove it.</p>
 
 <pre>  <b>function</b> Same_Dimension (X, Y: Item) <b>return</b> Boolean;</pre>
 
-<p>returns True if both items have the same dimension, else False.</p>
+<p>returns <code>True</code> if both items have the same dimension,
+else <code>False</code>.</p>
 
 <pre>  <b>function </b>has_Dimension <b>(</b>X: Item; Symbol: String<b>) return </b>Boolean;</pre>
 
-<p><font color="#008000">returns True if the Symbol parameter is compatible with the dimension
-of X, else False.</font>
-It raises Illegal_Unit if Symbol does not have the syntax of a <i>dimension
-format modifier</i> (see package <a href="SI-Text_IO.html">SI.Text_IO</a>).
-<font color="#FF0000">In the unchecked variant, it returns always True.</font></p>
+<p><font color="#008000">returns <code>True</code> if the Symbol parameter is
+compatible with the dimension of X, else <code>False</code>.</font>
+It raises <code>Illegal_Unit</code> if Symbol does not have the syntax of a
+<i>dimension format modifier</i> (see package <a href="SI-Text_IO.html">SI.Text_IO</a>).
+<font color="#FF0000">In the unchecked variant, it returns always <code>True</code>.</font></p>
 
 <h3><a name="Value">Value Construction</a></h3>
 
