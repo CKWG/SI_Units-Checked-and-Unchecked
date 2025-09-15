@@ -41,8 +41,8 @@ procedure Test_SI_Units is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   5.2
-  -- Date      10 September 2025
+  -- Version   5.3
+  -- Date      15 September 2025
   --====================================================================
   -- Test that all derived symbols are correctly defined.
   -- Test that various incorrect symbols are deteced.
@@ -69,6 +69,7 @@ procedure Test_SI_Units is
   --                          tation of unit string evaluation
   --  C.G.    5.1  12.08.2025 Make test succeed in Unchecked variant
   --  C.G.    5.2  10.09.2025 Use new function SI_is_Unchecked
+  --  C.G.    5.3  15.09.2025 Allow µ
   --====================================================================
 
   procedure Test_Prefix is
@@ -210,6 +211,8 @@ begin
   Put_Line ("-------");
   New_Line;
   Test_Case ('*', "*"              , "no letter"                 , Expect => False);
+  Test_Case ('*', "µs"             , "Microsecond"               , Expect => True , Expected_Result => " 1.00000E-06*s");
+  Test_Case ('*', "um"             , "Micrometer"                , Expect => True , Expected_Result => " 1.00000E-06*m");
   Test_Case ('*', "L"              , "Liter"                     , Expect => True , Expected_Result => " 1.00000E-03*m**3");
   Test_Case ('*', "ml"             , "Milliliter"                , Expect => True , Expected_Result => " 1.00000E-06*m**3");
   Test_Case ('*', " ml"            , "leading space"             , Expect => False);
