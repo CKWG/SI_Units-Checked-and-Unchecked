@@ -28,6 +28,7 @@
       6.2  18.04.2025  Preconditions
       6.3  18.08.2025  Bug fix and more precision in syntax; link to Bureau International des Poids et Mesures
       6.4  04.09.2025  Generic parameter is new; improved examples
+      6.5  15.09.2025  Allow µ; corrected typos in description
 //-->
 </head>
 
@@ -102,10 +103,10 @@ correct dimension format modifier it would be evaluated at least twice on each c
 
 <h3 align="left"><a name="Unit">Unit Syntax</a></h3>
 
-<p>An item is a value of generic type <code>Real'Base</code> multiplied by its dimension.
+<p>An item is a value of generic type <code>Real'Base</code> multiplied by its unit.
 There are two forms of items: an internal one as written in programs
-(e.g. 1.0*&quot;m&quot;) and an external one as output to or read from files
-or strings (e.g. 1.0*m).</p>
+(e.g. 1.0*&quot;m&quot;) and an external one as output to or read from files or
+strings (e.g. 1.0*m).</p>
 
 <p>This is the syntax of an external item:</p>
 
@@ -117,7 +118,7 @@ or strings (e.g. 1.0*m).</p>
                    | ( product )
    product       ::= unit_factor {* unit_factor}
    unit_factor   ::= identifier [** exponent]
-   identifier    ::= letter {letter}
+   identifier    ::= si_letter {si_letter}
    exponent      ::= ( [sign] rational )
                    | numeral
    sign          ::= + | -
@@ -136,12 +137,13 @@ or strings (e.g. 1.0*m).</p>
 
 <p>There may be no spaces between the string quotes.</p>
 
-<p>A <code>letter</code> is a character that is in one of the ranges <code>'A'..'Z'</code>
-or <code>'a'..'z'</code>.
+<p>An <code>si_letter</code> is a character that is in one of the ranges
+<code>'A'..'Z'</code> or <code>'a'..'z'</code> or is '&micro;'.
 The <code>identifier</code> must be interpretable as <code>[prefix] symbol</code>.</p>
 
 <p><code>prefix</code> and <code>symbol</code> are as defined in SI
-(case sensitive); <code>'u'</code> is used for micro instead of <code>'&micro;'</code>;
+(case sensitive); <code>'u'</code> may be used for micro instead of
+<code>'&micro;'</code>;
 <code>&quot;Ohm&quot;</code> is used for <code>'&Omega;'</code>.</p>
 
 <p>Any prefixed SI unit may be used as defined in
@@ -152,11 +154,11 @@ Of the non-SI units listed in this document, only hectare (ha), minute (min),
 hour (h), liter (l, L), and electronvolt (eV) are currently allowed; of these,
 only the last three may take prefixes.</p>
 
-<p>Note: &quot;ha&quot; (10,000 m<sup>2</sup>) is a special case; it is composed
-of the prefix hecto and the unit &quot;are&quot; ((10 m)<sup>2</sup>),
-but &quot;are&quot; is not allowed with SI, thus no prefixes are allowed and
-neither e.g. &quot;ka&quot; nor &quot;hha&quot; (allegedly 1 km<sup>2</sup>)
-are legal units.</p>
+<p>Note: &quot;ha&quot; (100*(10*m)<sup>2</sup> = (100*m)<sup>2</sup> = 10_000*m<sup>2</sup>)
+is a special case; it is composed of the prefix &quot;hecto&quot; and the unit &quot;are&quot;
+((10*m)<sup>2</sup> = 100*m<sup>2</sup>), but &quot;are&quot; is not allowed with SI, thus no
+prefixes are allowed and neither e.g. &quot;ka&quot; nor the alleged 1*km<sup>2</sup>
+&quot;hha&quot; are legal units.</p>
 
 <p>The <b>complete list of symbols</b> can be found in package body
 Generic_SI.Generic_Symbols.</p>
