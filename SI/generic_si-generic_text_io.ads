@@ -39,8 +39,8 @@ package Generic_SI.Generic_Text_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   8.2
-  -- Date      29 August 2025
+  -- Version   8.3
+  -- Date      15 September 2025
   --====================================================================
   -- For the numeric part, Put and Get work like the conventional
   -- operations in Ada.Text_IO, the formatting parameters apply to
@@ -59,7 +59,7 @@ package Generic_SI.Generic_Text_IO is
   --    divisor       ::= unit_factor | ( product )
   --    product       ::= unit_factor {* unit_factor}
   --    unit_factor   ::= identifier [** exponent]
-  --    identifier    ::= letter {letter}
+  --    identifier    ::= si_letter {si_letter}
   --    exponent      ::= ( [sign] rational ) | numeral
   --    sign          ::= + | -
   --    rational      ::= numeral [ / numeral]
@@ -77,12 +77,12 @@ package Generic_SI.Generic_Text_IO is
   --
   -- There may be no space between the string quotes.
   --
-  -- A letter is a character that is in one of the ranges 'A'..'Z' or
-  -- 'a'..'z'. The identifier must be interpretable as [prefix] symbol.
+  -- An si_letter is a character that is in one of the ranges 'A'..'Z'
+  -- or 'a'..'z' or is 'µ'. The identifier must be interpretable as
   -- [prefix] symbol.
   --
   -- prefix and symbol are as defined in SI (case sensitive);
-  -- 'u' is used for micro instead of ' '; "Ohm" is used for the
+  -- 'u' may be used for micro instead of 'µ'; "Ohm" is used for the
   -- capital Omega.
   --
   -- Any prefixed SI unit may be used as defined in The International
@@ -92,10 +92,11 @@ package Generic_SI.Generic_Text_IO is
   -- electronvolt (eV) are currently allowed; of these, only the last
   -- three may take prefixes.
   --
-  -- Note: "ha" (10,000 m2) is a special case; it is composed of the
-  -- prefix hecto and the unit "are" ((10 m**2), but "are" is not
-  -- allowed with SI, thus no prefixes are allowed and neither e.g.
-  -- "ka" nor "hha" (allegedly 1 km**2) are legal units.
+  -- Note: "ha" (100*(10*m)**2 = (100*m)**2 = 10_000*m**2) is a special
+  -- case; it is composed of the prefix "hecto" and the unit "are"
+  -- ((10*m)**2 = 100*m**2), but "are" is not allowed with SI, thus no
+  -- prefixes are allowed and neither e.g. "ka" nor the alleged 1*km**2
+  -- "hha" are legal units.
   --
   -- The complete list of symbols can be found in package body
   -- Generic_SI.Generic_Symbols.
@@ -178,6 +179,7 @@ package Generic_SI.Generic_Text_IO is
   --  C.G.    8.0  01.07.2025 generic param. as in Text_IO for Celsius
   --  C.G.    8.1  12.08.2025 Improved description
   --  C.G.    8.2  29.08.2025 Preconditions commented out
+  --  C.G.    8.3  15.09.2025 Allow µ; corrected typos in description
   --====================================================================
 
   pragma Elaborate_Body;

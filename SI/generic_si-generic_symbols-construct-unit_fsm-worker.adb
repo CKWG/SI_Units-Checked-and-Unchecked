@@ -32,8 +32,8 @@ package body Worker is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   1.00
-  -- Date      21 August 2025
+  -- Version   1.1
+  -- Date      15 September 2025
   --====================================================================
   -- Unit, the prefix and symbol, is created character per character;
   -- it might be correct if Read (the number of characters read from the
@@ -49,6 +49,7 @@ package body Worker is
   --                          works without exponents
   --  C.G.    0.3  11.08.2025 Works for unit strings
   --  C.G.    1.0  21.08.2025 Final touch
+  --  C.G.    1.1  15.09.2025 Allow µ
   --====================================================================
 
   Ident: Item := One;  -- the identifier in the syntax
@@ -79,7 +80,7 @@ package body Worker is
            '-' => return Sign;
       when ')' => return ')';
       when '0' .. '9' => return Digit;
-      when 'A' .. 'Z' | 'a' .. 'z' => return Letter;
+      when 'A' .. 'Z' | 'a' .. 'z' | 'µ' => return Letter;
       when others => Length := Length - 1;  -- must not be consumed
                      return EoT;
     end Case;

@@ -32,8 +32,8 @@ package body Unit_FSM is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   1.0
-  -- Date      22 August 2025
+  -- Version   1.1
+  -- Date      15 September 2025
   --====================================================================
   -- Syntax:
   --
@@ -59,7 +59,7 @@ package body Unit_FSM is
   -- product_string  ::= "product"
   --
   -- A letter is a character that is in one of the ranges 'A'..'Z' or
-  -- 'a'..'z'.
+  -- 'a'..'z' or 'µ'.
   -- The identifier must be interpretable as [prefix] symbol.
   --
   -- Note: The very first production has obligatory dimension in this
@@ -78,6 +78,7 @@ package body Unit_FSM is
   --  C.G.    0.4  18.08.2025 Replaced Program_Error with "wrong unit
   --                          begin" by Illegal_Unit
   --  C.G.    1.0  22.08.2025 No further changes
+  --  C.G.    1.1  15.09.2025 Allow µ
   --====================================================================
 
   pragma Optimize (Time);
