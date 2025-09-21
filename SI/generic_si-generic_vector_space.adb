@@ -32,8 +32,8 @@ package body Generic_SI.Generic_Vector_Space is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   8.0
-  -- Date      15 April 2025
+  -- Version   8.1
+  -- Date      21 September 2025
   --====================================================================
   --
   --====================================================================
@@ -53,6 +53,8 @@ package body Generic_SI.Generic_Vector_Space is
   --  C.G.    6.2  23.01.2020 Added a few vector and matrix subtypes
   --  C.G.    7.0  14.05.2020 Dimensions generic parameter
   --  C.G.    8.0  15.04.2025 Preconditions replace check in body
+  --  C.G.    8.1  21.09.2025 [T520-013 public] has long been fixed in
+  --                          GNAT CE 2021
   --====================================================================
 
   function has_Dimension (X: Vector; Symbol: String) return Boolean is
@@ -72,8 +74,7 @@ package body Generic_SI.Generic_Vector_Space is
 
   function "/" (Left: Proto_Vector; Right: Item) return Vector is
   begin
-  --return (uno / Right.Unit, Left / Right.Value);
-    return (Dimensions."/" (Dimensions.uno, Right.Unit), Left / Right.Value);  -- Why is this needed? [T520-013 public]
+    return (uno / Right.Unit, Left / Right.Value);
   end "/";
 
   function "*" (Left: Proto_Vector; Right: String) return Vector is
@@ -217,8 +218,7 @@ package body Generic_SI.Generic_Vector_Space is
 
   function "*" (Left: Item; Right: Vector) return Vector is
   begin
-  --return (Left.Unit * Right.Unit, Left.Value * Right.Value);
-    return (Dimensions."*" (Left.Unit, Right.Unit), Left.Value * Right.Value);  -- [T520-013 public]
+    return (Left.Unit * Right.Unit, Left.Value * Right.Value);
   end "*";
 
   function "*" (Left: Vector; Right: Real'Base) return Vector is
@@ -238,20 +238,17 @@ package body Generic_SI.Generic_Vector_Space is
 
   function "/" (Left: Vector; Right: Item) return Vector is
   begin
-  --return (Left.Unit / Right.Unit, Left.Value / Right.Value);
-    return (Dimensions."/" (Left.Unit, Right.Unit), Left.Value / Right.Value);  -- [T520-013 public]
+    return (Left.Unit / Right.Unit, Left.Value / Right.Value);
   end "/";
 
   function Inner (Left, Right: Vector) return Item is
   begin
-  --return (Left.Unit * Right.Unit, Left.Value * Right.Value);
-    return (Dimensions."*" (Left.Unit, Right.Unit), Left.Value * Right.Value);  -- [T520-013 public]
+    return (Left.Unit * Right.Unit, Left.Value * Right.Value);
   end Inner;
 
   function Cross (Left, Right: Vector) return Vector is
   begin
-    return (Unit  => --Left.Unit * Right.Unit,
-                     Dimensions."*" (Left.Unit, Right.Unit),  -- [T520-013 public]
+    return (Unit  => Left.Unit * Right.Unit,
             Value => (Left.Value (2) * Right.Value (3) - Left.Value (3) * Right.Value (2),
                       Left.Value (3) * Right.Value (1) - Left.Value (1) * Right.Value (3),
                       Left.Value (1) * Right.Value (2) - Left.Value (2) * Right.Value (1)));
@@ -274,8 +271,7 @@ package body Generic_SI.Generic_Vector_Space is
 
   function "/" (Left: Proto_Matrix; Right: Item) return Matrix is
   begin
-  --return (uno / Right.Unit, Left / Right.Value);
-    return (Dimensions."/" (Dimensions.uno, Right.Unit), Left / Right.Value);  -- [T520-013 public]
+    return (uno / Right.Unit, Left / Right.Value);
   end "/";
 
   function "*" (Left: Proto_Matrix; Right: String) return Matrix is
@@ -345,8 +341,7 @@ package body Generic_SI.Generic_Vector_Space is
 
   function "*" (Left: Item; Right: Matrix) return Matrix is
   begin
-  --return (Left.Unit * Right.Unit, Left.Value * Right.Value);
-    return (Dimensions."*" (Left.Unit, Right.Unit), Left.Value * Right.Value);  -- [T520-013 public]
+    return (Left.Unit * Right.Unit, Left.Value * Right.Value);
   end "*";
 
   function "*" (Left: Matrix; Right: Item) return Matrix is
@@ -356,26 +351,22 @@ package body Generic_SI.Generic_Vector_Space is
 
   function "/" (Left: Matrix; Right: Item) return Matrix is
   begin
-  --return (Left.Unit / Right.Unit, Left.Value / Right.Value);
-    return (Dimensions."/" (Left.Unit, Right.Unit), Left.Value / Right.Value);  -- [T520-013 public]
+    return (Left.Unit / Right.Unit, Left.Value / Right.Value);
   end "/";
 
   function "*" (Left, Right: Matrix) return Matrix is
   begin
-  --return (Left.Unit * Right.Unit, Left.Value * Right.Value);
-    return (Dimensions."*" (Left.Unit, Right.Unit), Left.Value * Right.Value);  -- [T520-013 public]
+    return (Left.Unit * Right.Unit, Left.Value * Right.Value);
   end "*";
 
   function Det (M: Matrix) return Item is
   begin
-  --return (M.Unit**3, Determinant (M.Value));
-    return (Dimensions."**" (M.Unit, 3), Determinant (M.Value));  -- [T520-013 public]
+    return (M.Unit**3, Determinant (M.Value));
   end Det;
 
   function Inv (M: Matrix) return Matrix is
   begin
-  --return (uno / M.Unit, Inverse (M.Value));
-    return (Dimensions."/" (Dimensions.uno, M.Unit), Inverse (M.Value));  -- [T520-013 public]
+    return (uno / M.Unit, Inverse (M.Value));
   end Inv;
 
   function Tran (M: Matrix) return Matrix is
@@ -385,14 +376,12 @@ package body Generic_SI.Generic_Vector_Space is
 
   function "*" (Left: Matrix; Right: Vector) return Vector is
   begin
-  --return (Left.Unit * Right.Unit, Left.Value * Right.Value);
-    return (Dimensions."*" (Left.Unit, Right.Unit), Left.Value * Right.Value);  -- [T520-013 public]
+    return (Left.Unit * Right.Unit, Left.Value * Right.Value);
   end "*";
 
   function "*" (Left: Vector; Right: Matrix) return Vector is
   begin
-  --return (Left.Unit * Right.Unit, Left.Value * Right.Value);
-    return (Dimensions."*" (Left.Unit, Right.Unit), Left.Value * Right.Value);  -- [T520-013 public]
+    return (Left.Unit * Right.Unit, Left.Value * Right.Value);
   end "*";
 
   function to_Proto (V: Vector) return Proto_Vector is

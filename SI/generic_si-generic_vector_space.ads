@@ -39,8 +39,8 @@ package Generic_SI.Generic_Vector_Space is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   8.0
-  -- Date      16 April 2025
+  -- Version   8.1
+  -- Date      21 September 2025
   --====================================================================
   -- This is not a linear algebraics package. All elements of a vector
   -- and a matrix must have the same dimension lest Unit_Error be
@@ -88,6 +88,7 @@ package Generic_SI.Generic_Vector_Space is
   --  C.G.    7.2  28.05.2021 Work-around for [T521-020 public] removed
   --  C.G.    7.3  14.10.2021 Predicate_Failure for subtypes
   --  C.G.    8.0  18.04.2025 Preconditions replace check in body
+  --  C.G.    8.1  21.09.2025 Work-around removed [T520-013 public ?]
  --====================================================================
 
   subtype Axis is Integer range 1 .. 3;
@@ -264,10 +265,10 @@ private
     Value: Proto_Vector;
   end record;
 
-  U1: constant Vector := (Dimensions.uno, P1);  -- don't know why uno is not directly visible
-  U2: constant Vector := (Dimensions.uno, P2);
-  U3: constant Vector := (Dimensions.uno, P3);
-  Null_Vector: constant Vector  := (Dimensions.uno, Null_Proto_Vector);
+  U1: constant Vector := (uno, P1);
+  U2: constant Vector := (uno, P2);
+  U3: constant Vector := (uno, P3);
+  Null_Vector: constant Vector  := (uno, Null_Proto_Vector);
   Unit_Vector: constant Vectors := (U1, U2, U3);
 
   type Polar is record
@@ -281,7 +282,7 @@ private
     Value: Proto_Matrix;
   end record;
 
-  Null_Matrix: constant Matrix := (Dimensions.uno, Null_Proto_Matrix);  -- don't know why uno is not directly visible
-  Unity      : constant Matrix := (Dimensions.uno, Proto_Unity);
+  Null_Matrix: constant Matrix := (uno, Null_Proto_Matrix);
+  Unity      : constant Matrix := (uno, Proto_Unity);
 
 end Generic_SI.Generic_Vector_Space;
