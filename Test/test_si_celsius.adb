@@ -40,8 +40,8 @@ procedure Test_SI_Celsius is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   1.1
-  -- Date      30 August 2025
+  -- Version   1.2
+  -- Date      22 September 2025
   --====================================================================
   -- Test SI.Temperature and children, i.e. the Celsius operations.
   -- The program reads the file Test_SI_Celsius_IO.in and writes the
@@ -53,6 +53,9 @@ procedure Test_SI_Celsius is
   -- Author Version   Date    Reason for change
   --  C.G.    1.0  03.07.2025
   --  C.G.    1.1  30.08.2025 Better test structure
+  --  C.G.    1.2  22.09.2025 [UA09-009 public] fixed  in alr 2.1.0
+  --                          gnat_native=15.2.1; instead use new
+  --                          function SI_is_Unchecked
   --====================================================================
 
   Physic, Result: Ada.Text_IO.File_Type;
@@ -65,21 +68,16 @@ begin
   Test_Step (Title => "Assertions",
              Description => "Test that Assertion_Policy is Check.");
 
-  declare
-    T: Time;
-  begin
-    T := 1.0*"S";
-    Assert (Condition => False,
-            Message   => "Switch on Assertion_Policy and use checked instantiation",
-            Only_Report_Error => False);
+
+  Assert (Condition => not SI_is_Unchecked,
+          Message   => "Assertion_Policy is Check",
+          Only_Report_Error => False);
+
+  if SI_is_Unchecked then
+    Put_Line ("Switch on Assertion_Policy and use checked instantiation");
     Test_Result;
     return;
-  exception
-    when Ada.Assertions.Assertion_Error =>
-      Assert (Condition => True,
-              Message   => "Exception Assertion_Error as expected",
-              Only_Report_Error => True);
-  end;
+  end if;
 
   -----------------------------------------------------------
 

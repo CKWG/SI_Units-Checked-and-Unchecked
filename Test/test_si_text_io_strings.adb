@@ -40,8 +40,8 @@ procedure Test_SI_Text_IO_Strings is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   4.0
-  -- Date      21 August 2025
+  -- Version   4.1
+  -- Date      22 September 2025
   --====================================================================
   -- Test the Text_IO to and from string procedure.
   -- Note: Since output with default Dim parameter is tested, the test
@@ -54,6 +54,9 @@ procedure Test_SI_Text_IO_Strings is
   --  C.G.    2.1  29.09.2018 Unit syntax changed
   --  C.G.    3.0  13.05.2020 Dimensions generic parameter
   --  C.G.    4.0  21.08.2025 Test adapted to new impl. of Gen_Text_IO
+  --  C.G.    4.1  22.09.2025 [UA09-009 public] fixed  in alr 2.1.0
+  --                          gnat_native=15.2.1; instead use new
+  --                          function SI_is_Unchecked
   --====================================================================
 
   procedure Test_Aft_Exp (Value: Item; Expected_D, Expected_F: String) is
@@ -102,21 +105,15 @@ begin
   Test_Step (Title => "Assertions",
              Description => "Test that Assertion_Policy is Check.");
 
-  declare
-    T: Time;
-  begin
-    T := 1.0*"S";
-    Assert (Condition => False,
-            Message   => "Switch on Assertion_Policy and use checked instantiation",
-            Only_Report_Error => False);
+  Assert (Condition => not SI_is_Unchecked,
+          Message   => "Assertion_Policy is Check",
+          Only_Report_Error => False);
+
+  if SI_is_Unchecked then
+    Put_Line ("Switch on Assertion_Policy and use checked instantiation");
     Test_Result;
     return;
-  exception
-    when Ada.Assertions.Assertion_Error =>
-      Assert (Condition => True,
-              Message   => "Exception Assertion_Error as expected",
-              Only_Report_Error => False);
-  end;
+  end if;
 
   -----------------------------------------------------------
 

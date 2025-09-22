@@ -41,8 +41,8 @@ procedure Test_SI_Text_IO_File is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   5.0
-  -- Date      23 August 2025
+  -- Version   5.1
+  -- Date      22 September 2025
   --====================================================================
   -- Test the IO package for a set of critical items by reading files
   -- Test_SI_Text_IO-10.in (Get with Width > 0) and Test_SI_Text_IO.in
@@ -60,6 +60,9 @@ procedure Test_SI_Text_IO_File is
   --  C.G.    4.0  05.07.2025 Add test for Width > 0
   --  C.G.    5.0  23.08.2025 New implementation of string evaluation:
   --                          Test for Width = 0 adapted
+  --  C.G.    5.1  22.09.2025 [UA09-009 public] fixed  in alr 2.1.0
+  --                          gnat_native=15.2.1; instead use new
+  --                          function SI_is_Unchecked
   --====================================================================
 
   Physic, Result: File_Type;
@@ -113,21 +116,15 @@ begin
   Test_Step (Title => "Assertions",
              Description => "Test that Assertion_Policy is Check.");
 
-  declare
-    T: Time;
-  begin
-    T := 1.0*"S";
-    Assert (Condition => False,
-            Message   => "Switch on Assertion_Policy and use checked instantiation",
-            Only_Report_Error => False);
+  Assert (Condition => not SI_is_Unchecked,
+          Message   => "Assertion_Policy is Check",
+          Only_Report_Error => False);
+
+  if SI_is_Unchecked then
+    Test_Support.Put_Line ("Switch on Assertion_Policy and use checked instantiation");
     Test_Result;
     return;
-  exception
-    when Ada.Assertions.Assertion_Error =>
-      Assert (Condition => True,
-              Message   => "Exception Assertion_Error as expected",
-              Only_Report_Error => True);
-  end;
+  end if;
 
   -----------------------------------------------------------
 
