@@ -103,7 +103,8 @@
                       GitHub (release 1.0.0)
      11.1  31.07.2025 Link to The International System of Units (SI)
      11.2  08.09.2025 New implementation of unit evaluation: GitHub release 1.0.1
-     11.3  12.09.2025 Added picture of Lady Ada; sign typo corrected in prefixes r and q
+     11.3  26.09.2025 Added pictures of Lady Ada, mascot; darker green;
+                      sign typo corrected in prefixes r and q; added link to FFF system
 //-->
 </head>
 
@@ -123,7 +124,6 @@
 <table width="80%">
 
 <tr>
-
 <td>
 <ul>
   <li><a href="#Prelude">Prelude</a></li>
@@ -137,10 +137,14 @@
   <li><a href="#History">History</a></li>
 </ul>
 </td>
+<td><img src="Ada_1838.jpg" height="194" width="156" alt="1838 Picture of Lady Ada"></td>
+<td><img src="Ada_9X.png"   height="175" width="101" alt="9X Picture of Lady Ada"><br/>
+    Image created by<br/>Christine Anderson</td>
+</tr>
 
-<td align="right"><img src="Bildnis.gif" height="224" width="152"
-    alt="Picture of Lady Ada"></td>
-
+<tr>
+<td colspan="3">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <img src="Ada Mascot.jpg" height="183" width="161" alt="Ada Mascot"></td>
 </tr>
 
 </table>
@@ -277,7 +281,8 @@ most general physical equations.</p>
   <b>type</b> Item <b>is record</b>
     Unit : Dimension;
     Value: Real;
-  <b>end record</b>;</pre></td>
+  <b>end record</b>;</pre>
+</td>
 <td width="50%"><i>As a side note: With a package like this, I guess a
 compiler could evaluate the dimension strings in statements like
 <code>v:=5.0*"m/s";</code> at compile-time and also check the correct
@@ -315,14 +320,14 @@ Real above is the generic parameter name.</p>
 
 <p>Item T, since defined to be of subtype Time, now is constrained to any
 time unit like Second or Millisecond (initial values are optional).
-<font color="#00ff00">For this to be true, of course you have to make sure
+<font color="#22b14c">For this to be true, of course you have to make sure
 that <code>pragma Assertion_Policy (Check);</code> is set.</font>
 Item X is unconstrained and may assume any dimension.
 This kind of declaration is recommended only for intermediate results.</p>
 
 <p>Thus, provided that all items are dimensioned appropriately in their
 declarations, expressions like free fall or force on a charged particle in
-an electromagnetic field are checked for dimensional correctness - failures
+an electromagnetic field are checked for dimensional correctness &ndash; failures
 will raise exceptions:</p>
 
 <pre>  D := 0.5 * G * T**2;
@@ -411,23 +416,31 @@ any others are inside the string: 1.0*"m/s", 1.0*"A/m**2"; this is incorrect:
       2.33395*10<sup>-6</sup> m<sup>-3</sup>kg<sup>-3/2</sup>s<sup>9/2</sup>A<sup>5/2</sup>.</td>
 </tr>
 </table>
+
 <br/>
-<table align="center" border="1" width="560" bgcolor="#FEFED2">
+
+<table align="center" border="1" width="560" bgcolor="#FEFED2"><!--===========================-->
 <tr>
 <td><i>&nbsp;Just for the fun of it, here are two unconventional units
-(not included):</i><br/><br/>
+(not included):</i></td>
+</tr>
+<tr>
+<td><a href="https://en.wikipedia.org/wiki/FFF_system">The FFF system</a> using <i>Furlong</i>
+for length, <i>Firkin</i> for mass, <i>Fortnight</i> for time:<br/>
 &nbsp;1 furlong / fortnight = 0.99785714285714 cm/min<br/>
 &nbsp;1 inch = 2.54 cm<br/>
 &nbsp;1 foot = 12 in<br/>
 &nbsp;1 furlong = 660 ft = 201.168 m<br/>
 &nbsp;1 fortnight = 1_209_600 s (14 days)<br/>
 &nbsp;If 1 inch were (2+54/99) cm, 1 furlong / fortnight would be exactly 1 cm/min.<br/>
-&nbsp;1 km/h = 6 Mega furlong / fortnight<br/><br/>
-&nbsp;<i>In particle physics, the unit barn (which is allowed in mix with SI) is used for<br/>
+&nbsp;1 km/h = 6 Mega furlong / fortnight</td>
+</tr>
+<tr>
+<td>&nbsp;<i>In particle physics, the unit barn (which is allowed in mix with SI) is used for<br/>
 &nbsp;particle cross sections:</i><br/>
 &nbsp;1 barn = 1.0E-28 m<sup>2</sup> = (1.0E-14 m)<sup>2</sup> = 100 fm<sup>2</sup></td>
 </tr>
-</table>
+</table><!--==================================================================================-->
 
 <p>Now a word in favour of the use clause is due.
 All examples you'll find in the download have been built with the
@@ -481,12 +494,12 @@ signature package.</p>
 
 <p>By selecting the appropriate
 <font color="#0000ff"><code>Dimensions</code></font> package
-(<font color="#00ff00"><code>True_Dimensions</code></font>,
+(<font color="#22b14c"><code>True_Dimensions</code></font>,
 <font color="ff#0000"><code>Fake_Dimensions</code></font>),
 you obtain the checked or the unchecked version.
 Do not forget to set
 <font color="#0000ff"><code>pragma Assertion_Policy (...);</code></font>
-to the appropriate value <font color="#00ff00">Check</font> or
+to the appropriate value <font color="#22b14c">Check</font> or
 <font color="#ff0000">Ignore</font>.</p>
 
 <p>Since the  type <code>Dimension</code> declared in
