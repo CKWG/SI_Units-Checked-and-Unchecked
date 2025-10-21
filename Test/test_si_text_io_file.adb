@@ -41,8 +41,8 @@ procedure Test_SI_Text_IO_File is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   5.1
-  -- Date      22 September 2025
+  -- Version   5.2
+  -- Date      9 October 2025
   --====================================================================
   -- Test the IO package for a set of critical items by reading files
   -- Test_SI_Text_IO-10.in (Get with Width > 0) and Test_SI_Text_IO.in
@@ -63,6 +63,7 @@ procedure Test_SI_Text_IO_File is
   --  C.G.    5.1  22.09.2025 [UA09-009 public] fixed  in alr 2.1.0
   --                          gnat_native=15.2.1; instead use new
   --                          function SI_is_Unchecked
+  --  C.G.    5.2  09.10.2025 Minor output bux fix
   --====================================================================
 
   Physic, Result: File_Type;
@@ -98,7 +99,7 @@ procedure Test_SI_Text_IO_File is
         when End_Error =>  -- both at end?
           Assert (Condition => P_End,
                   Message   => "Files have same length" &
-                  (if not P_End then " (Result too short))" else "."),
+                  (if not P_End then " (Result too short)" else "."),
                   Only_Report_Error => False);
           exit;
       end;

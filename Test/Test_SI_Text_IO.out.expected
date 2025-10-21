@@ -16,3 +16,8 @@ SI.ILLEGAL_UNIT => syntax error after symbol "2 stays in input stream"
 SI.ILLEGAL_UNIT => unexpected character in number "kg stays in input stream"
 SI.ILLEGAL_UNIT => syntax error in symbol "-3/kg stays in input stream"
 SI.ILLEGAL_UNIT => prefix illegal ""
+ 0.00000E+00*K
+ 0.00000E+00
+ADA.IO_EXCEPTIONS.DATA_ERROR "°C stays in input stream (no Celsius)"
+ 4.20000E+01*s*A
+SI.ILLEGAL_UNIT => EoT no letter in symbol "°C stays in input stream"

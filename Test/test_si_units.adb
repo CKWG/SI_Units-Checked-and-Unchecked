@@ -31,8 +31,8 @@
 with Test_Support;
 use  Test_Support;
 
-with SI.Strings;
-use  SI.Strings, SI;
+with SI;
+use  SI;
 
 with Ada.Exceptions;
 with Ada.Strings.Fixed;
@@ -41,8 +41,8 @@ procedure Test_SI_Units is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   5.3
-  -- Date      15 September 2025
+  -- Version   6.0
+  -- Date      16 October 2025
   --====================================================================
   -- Test that all derived symbols are correctly defined.
   -- Test that various incorrect symbols are deteced.
@@ -70,6 +70,7 @@ procedure Test_SI_Units is
   --  C.G.    5.1  12.08.2025 Make test succeed in Unchecked variant
   --  C.G.    5.2  10.09.2025 Use new function SI_is_Unchecked
   --  C.G.    5.3  15.09.2025 Allow µ
+  --  C.G.    6.0  16.10.2025 'Image redefined
   --====================================================================
 
   procedure Test_Prefix is
@@ -173,8 +174,8 @@ procedure Test_SI_Units is
     Assert (Condition => Expect,
             Message   => Op'Image & '"' & Unit_String & '"' & (20 - Unit_String'Length) * ' ' & Text,
             Only_Report_Error => False);
-    Assert (Condition => Image (X) = -Expected_Result,
-            Message   => Image (X),
+    Assert (Condition => X'Image = -Expected_Result,
+            Message   => X'Image,
             Only_Report_Error => True);
   exception
     when E: Illegal_Unit =>
@@ -336,8 +337,8 @@ begin
           Message   => "Values are nearly equal",
           Only_Report_Error => False);
 
-  Assert (Condition => Image (2.33395*10.0**(-6)*"m**(-3)*kg**(-3/2)*s**(9/2)*A**(5/2)") =
-                       Image (7.38060E-08*"dam**(-3)*hs**(9/2)*dag**(-3/2)*mA**(5/2)" ),
+  Assert (Condition => Item'(2.33395*10.0**(-6)*"m**(-3)*kg**(-3/2)*s**(9/2)*A**(5/2)")'Image =
+                       Item'(7.38060E-08*"dam**(-3)*hs**(9/2)*dag**(-3/2)*mA**(5/2)")'Image,
           Message   => "Images are equal",
           Only_Report_Error => False);
 

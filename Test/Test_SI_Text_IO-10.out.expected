@@ -11,7 +11,9 @@ SI.ILLEGAL_UNIT => EoT no letter in symbol
  2.012*kHz
 2021999.875*mA
 SI.ILLEGAL_UNIT => prefix illegal
- 0.988/uS
+ 0.988/µS
 ADA.IO_EXCEPTIONS.DATA_ERROR
  0.008*mol
 SI.ILLEGAL_UNIT => string not exhausted
+SI.ILLEGAL_UNIT => wrong unit begin
+SI.ILLEGAL_UNIT => EoT no letter in symbol

@@ -33,8 +33,8 @@ with Test_Rational_Arithmetics,
 with Test_SI_Units;
 with Test_SI_Math,
      Test_SI_Poly;
-with Test_SI_Strings;
 with Test_SI_Celsius;
+with Test_SI_Unformatted_IO;
 with Test_SI_Text_IO_Strings,
      Test_SI_Text_IO_File,
      Test_SI_Text_IO_Put;
@@ -46,8 +46,8 @@ procedure Run_All is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   1.1
-  -- Date      1 July 2025
+  -- Version   2.0
+  -- Date      16 October 2025
   --====================================================================
   -- Run all tests and display the global result.
   --====================================================================
@@ -55,6 +55,7 @@ procedure Run_All is
   -- Author Version   Date    Reason for change
   --  C.G.    1.0  14.05.2020
   --  C.G.    1.1  01.07.2025 new Test_SI_Celsius
+  --  C.G.    2.0  16.10.2025 'Image redefined
   --====================================================================
 
 begin
@@ -69,7 +70,7 @@ begin
   Test_SI_Poly;
   Test_SI_Celsius;
 
-  Test_SI_Strings;
+  Test_SI_Unformatted_IO;
 
   Test_SI_Text_IO_Strings;
   Test_SI_Text_IO_File;
