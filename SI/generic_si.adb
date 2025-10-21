@@ -28,14 +28,15 @@
 --   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Generic_SI.Generic_Symbols;
+with Generic_SI.Generic_Unformatted_IO,
+     Generic_SI.Generic_Symbols;
 
 package body Generic_SI is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   7.4
-  -- Date      22 August 2025
+  -- Version   8.0
+  -- Date      15 October 2025
   --====================================================================
   --
   --====================================================================
@@ -65,7 +66,19 @@ package body Generic_SI is
   --  C.G.    7.3  16.08.2025 Implementation has_Dimension changed
   --  C.G.    7.4  22.08.2025 Common interface for evaluating all kinds
   --                          of unit indications
+  --  C.G.    8.0  15.10.2025 Ada 2022: Redefine 'Image attribute;
+  --                          Generic_Strings renamed to
+  --                          Generic_Unformatted_IO
   --====================================================================
+
+  package Unformatted_IO is new Generic_Unformatted_IO;
+
+  function Value (X: String) return Item renames Unformatted_IO.Value;
+
+  procedure Image (B: in out Ada.Strings.Text_Buffers.Root_Buffer_Type'Class; X: Item) is
+  begin
+    B.Put (Unformatted_IO.Image (X));
+  end Image;
 
   function Same_Dimension (X, Y: Item) return Boolean is (X.Unit = Y.Unit);
 

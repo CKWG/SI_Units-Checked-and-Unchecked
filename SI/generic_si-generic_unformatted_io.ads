@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Checked and Unchecked ComImageation with SI Units
+-- Checked and Unchecked Computation with SI Units
 -- Copyright (C) 2018, 2020, 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
@@ -27,51 +27,36 @@
 --   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Ada.Strings.Fixed;
+private generic
 
-separate (Generic_SI.Generic_Symbols)
-function Image (X: Dimensions.Dimension) return String is
+package Generic_SI.Generic_Unformatted_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   2.1
-  -- Date      20 October 2025
+  -- Version   3.0
+  -- Date      15 October 2025
   --====================================================================
-  --
+  -- For the numeric part, Image and Value behave like the corresponding
+  -- attributes.
+  -- Image returns the argument as a string, the unit in default
+  -- representation; first index 1.
+  -- Value returns the argument as an item ignoring any leading or
+  -- trailing blanks. Constraint_Error is raised if the numeric string
+  -- does not have the correct format, Illegal_Unit is raised if the
+  -- unit string does not have the correct format.
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
-  --  C.G.    1.0  29.07.2018 Extracted from Text_IO
-  --  C.G.    2.0  13.05.2020 Parent renamed to Generic_Symbols
-  --  C.G.    2.1  20.10.2025 Use new Rational 'Image attribute
+  --  C.G.    1.0  29.07.2018
+  --  C.G.    2.0  11.05.2020 Parent renamed to Generic_SI
+  --  C.G.    2.1  15.08.2025 Postcondition added
+  --  C.G.    3.0  15.10.2025 Made private for redefining 'Image;
+  --                          renamed from Generic_Strings
   --====================================================================
 
-  function Image (Symbol: String; Value: in Rational) return String is
-  begin
-    if Value = 0 then
-      return "";
-    else
-      declare
-        use Ada.Strings, Ada.Strings.Fixed;
-        Exp  : constant String := (if Value = 1 then "" else "**");
-        Open : constant String := (if Value < 0 or Denominator (Value) /= 1 then "(" else "");
-        Close: constant String := (if Value < 0 or Denominator (Value) /= 1 then ")" else "");
-        Image: constant String := (if Value = 1 then "" else Trim (Value'Image, Left));
-      begin
-        return
-          '*' & Symbol & Exp & Open & Image & Close;
-      end;
-    end if;
-  end Image;
+  pragma Elaborate_Body;
 
-begin
+  function Image (X: Item  ) return String with Post => Image'Result'First = 1;
+  function Value (X: String) return Item;
 
-  return Image ("m"  , Dimensions.m   (X)) &
-         Image ("kg" , Dimensions.kg  (X)) &
-         Image ("s"  , Dimensions.s   (X)) &
-         Image ("A"  , Dimensions.A   (X)) &
-         Image ("K"  , Dimensions.K   (X)) &
-         Image ("cd" , Dimensions.cd  (X)) &
-         Image ("mol", Dimensions.mol (X));
-
-end Image;
+end Generic_SI.Generic_Unformatted_IO;

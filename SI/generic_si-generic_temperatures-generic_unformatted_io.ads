@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
--- Checked and Unchecked ComImageation with SI Units
--- Copyright (C) 2018, 2020, 2025 Christoph Karl Walter Grein
+-- Checked and Unchecked Computation with SI Units
+-- Copyright (C) 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -27,51 +27,31 @@
 --   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Ada.Strings.Fixed;
+private generic
 
-separate (Generic_SI.Generic_Symbols)
-function Image (X: Dimensions.Dimension) return String is
+package Generic_SI.Generic_Temperatures.Generic_Unformatted_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   2.1
-  -- Date      20 October 2025
+  -- Version   2.0
+  -- Date      17 October 2025
   --====================================================================
-  --
+  -- For the numeric part, Image and Value behave like the corresponding
+  -- attributes and may raise the appropriate exceptions.
+  -- If no exception is raised, then:
+  -- Image appends the unit "°C".
+  -- Value checks if the numeric part is followed by the correct unit,
+  -- else Unit_Error is raised. Trailing blanks are ignored.
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
-  --  C.G.    1.0  29.07.2018 Extracted from Text_IO
-  --  C.G.    2.0  13.05.2020 Parent renamed to Generic_Symbols
-  --  C.G.    2.1  20.10.2025 Use new Rational 'Image attribute
+  --  C.G.    1.0  02.07.2025
+  --  C.G.    2.0  17.10.2025 Renamed from Generic_Strings, private
   --====================================================================
 
-  function Image (Symbol: String; Value: in Rational) return String is
-  begin
-    if Value = 0 then
-      return "";
-    else
-      declare
-        use Ada.Strings, Ada.Strings.Fixed;
-        Exp  : constant String := (if Value = 1 then "" else "**");
-        Open : constant String := (if Value < 0 or Denominator (Value) /= 1 then "(" else "");
-        Close: constant String := (if Value < 0 or Denominator (Value) /= 1 then ")" else "");
-        Image: constant String := (if Value = 1 then "" else Trim (Value'Image, Left));
-      begin
-        return
-          '*' & Symbol & Exp & Open & Image & Close;
-      end;
-    end if;
-  end Image;
+  pragma Elaborate_Body;
 
-begin
+  function Image (X: Celsius) return String;
+  function Value (X: String ) return Celsius;
 
-  return Image ("m"  , Dimensions.m   (X)) &
-         Image ("kg" , Dimensions.kg  (X)) &
-         Image ("s"  , Dimensions.s   (X)) &
-         Image ("A"  , Dimensions.A   (X)) &
-         Image ("K"  , Dimensions.K   (X)) &
-         Image ("cd" , Dimensions.cd  (X)) &
-         Image ("mol", Dimensions.mol (X));
-
-end Image;
+end Generic_SI.Generic_Temperatures.Generic_Unformatted_IO;

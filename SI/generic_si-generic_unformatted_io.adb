@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Checked and Unchecked ComImageation with SI Units
+-- Checked and Unchecked Computation with SI Units
 -- Copyright (C) 2018, 2020, 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
@@ -27,51 +27,55 @@
 --   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Ada.Strings.Fixed;
+with Ada.Strings.Fixed,
+     Ada.Strings.Maps;
 
-separate (Generic_SI.Generic_Symbols)
-function Image (X: Dimensions.Dimension) return String is
+package body Generic_SI.Generic_Unformatted_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   2.1
-  -- Date      20 October 2025
+  -- Version   4.0
+  -- Date      15 October 2025
   --====================================================================
   --
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
-  --  C.G.    1.0  29.07.2018 Extracted from Text_IO
-  --  C.G.    2.0  13.05.2020 Parent renamed to Generic_Symbols
-  --  C.G.    2.1  20.10.2025 Use new Rational 'Image attribute
+  --  C.G.    1.0  29.07.2018
+  --  C.G.    2.0  13.05.2020 Parent renamed to Generic_SI
+  --  C.G.    3.0  15.08.2025 Value reimplemented
+  --  C.G.    3.1  22.08.2025 Ensure_Task_Safety is new
+  --  C.G.    4.0  15.10.2025 Renamed from Generic_Strings
   --====================================================================
 
-  function Image (Symbol: String; Value: in Rational) return String is
+  function Image (X: Item) return String is
   begin
-    if Value = 0 then
-      return "";
-    else
-      declare
-        use Ada.Strings, Ada.Strings.Fixed;
-        Exp  : constant String := (if Value = 1 then "" else "**");
-        Open : constant String := (if Value < 0 or Denominator (Value) /= 1 then "(" else "");
-        Close: constant String := (if Value < 0 or Denominator (Value) /= 1 then ")" else "");
-        Image: constant String := (if Value = 1 then "" else Trim (Value'Image, Left));
-      begin
-        return
-          '*' & Symbol & Exp & Open & Image & Close;
-      end;
-    end if;
+    return X.Value'Image & Image (X.Unit);
   end Image;
 
-begin
+  function Value (X: String) return Item is
+    Unit_Start: constant Natural := Ada.Strings.Fixed.Index (X, Ada.Strings.Maps.To_Set ("*/"));
+    use Ada.Strings, Ada.Strings.Fixed;
+  begin
+    if Unit_Start = 0 then
+      return Real'Base'Value (X) * One;  -- will raise Constraint_Error if X is not OK
+    elsif X (Unit_Start - 1) = ' ' then
+      raise Illegal_Unit with "illegal space";
+    else
+      declare
+        Value : constant Real'Base := Real'Base'Value (X (X'First .. Unit_Start - 1));
+        Trim_X: constant String    := Trim (X (Unit_Start .. X'Last), Right);
+        Result: Item;
+        Length: Positive;
+        package String_Interface is new Ensure_Task_Safety (Trim_X);  -- make task-safe
+      begin
+        Construct (String_Interface.Get'Access, Result, Length);
+        if Length /= Trim_X'Length then
+          raise Illegal_Unit with "string not exhausted";
+        end if;
+        return Value * Result;
+      end;
+    end if;
+  end Value;
 
-  return Image ("m"  , Dimensions.m   (X)) &
-         Image ("kg" , Dimensions.kg  (X)) &
-         Image ("s"  , Dimensions.s   (X)) &
-         Image ("A"  , Dimensions.A   (X)) &
-         Image ("K"  , Dimensions.K   (X)) &
-         Image ("cd" , Dimensions.cd  (X)) &
-         Image ("mol", Dimensions.mol (X));
-
-end Image;
+end Generic_SI.Generic_Unformatted_IO;

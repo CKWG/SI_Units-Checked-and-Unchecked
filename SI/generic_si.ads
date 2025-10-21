@@ -31,6 +31,8 @@
 with Ada.Numerics;
 private with Ada.Numerics.Generic_Elementary_Functions;
 
+with Ada.Strings.Text_Buffers;  -- 'Image redefinition
+
 with Rational_Arithmetics;
 use  Rational_Arithmetics;
 
@@ -47,8 +49,8 @@ package Generic_SI is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   7.3
-  -- Date      12 September 2025
+  -- Version   8.0
+  -- Date      14 October 2025
   --====================================================================
   -- Magnetic_Flux_Density is the classical name. Nowadays it's often
   -- just called Magnetic_Field.
@@ -111,19 +113,24 @@ package Generic_SI is
   --  C.G.    7.2  22.08.2025 Common interface for evaluating all kinds
   --                          of unit indications
   --  C.G.    7.3  12.09.2025 function SI_is_Unchecked is new
+  --  C.G.    8.0  14.10.2025 Ada 2022: Redefine 'Image attribute
   --====================================================================
 
-  type Item is private;
+  type Item is private with Put_Image => Image;
 
   Zero: constant Item;  -- 0.0*""
   One : constant Item;  -- 1.0*""
+
+  -- Redefine attribute and add its inverse
+  procedure Image (B: in out Ada.Strings.Text_Buffers.Root_Buffer_Type'Class; X: Item);
+  function  Value (X: String) return Item;
+
+  function  Value (X: Item) return Real'Base;
 
   -- Check that the two items have the same dimension
   function Same_Dimension (X, Y: Item) return Boolean;
   -- Check that X has the dimension given by Symbol (ignoring all prefixes)
   function has_Dimension (X: Item; Symbol: String) return Boolean with Pre => Symbol'First = 1;
-
-  function Value (X: Item) return Real'Base;
 
   Unit_Error: exception;
 
@@ -271,7 +278,8 @@ package Generic_SI is
 
 private
 
-  pragma Inline (Same_Dimension, has_Dimension, Value,
+  pragma Inline (Same_Dimension, has_Dimension,
+                 Image, Value,
                  "abs", "+", "-", "*", "/", "**",
                  "<", "<=", ">=", ">",
                  Sqrt, Cbrt,
