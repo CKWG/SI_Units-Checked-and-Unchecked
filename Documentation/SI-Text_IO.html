@@ -29,6 +29,7 @@
       6.3  18.08.2025  Bug fix and more precision in syntax; link to Bureau International des Poids et Mesures
       6.4  04.09.2025  Generic parameter is new; improved examples
       6.5  15.09.2025  Allow µ; corrected typos in description
+      6.6  11.10.2025  Presentation improved
 //-->
 </head>
 
@@ -118,7 +119,7 @@ strings (e.g. 1.0*m).</p>
                    | ( product )
    product       ::= unit_factor {* unit_factor}
    unit_factor   ::= identifier [** exponent]
-   identifier    ::= si_letter {si_letter}
+   identifier    ::= letter {letter}
    exponent      ::= ( [sign] rational )
                    | numeral
    sign          ::= + | -
@@ -137,8 +138,8 @@ strings (e.g. 1.0*m).</p>
 
 <p>There may be no spaces between the string quotes.</p>
 
-<p>An <code>si_letter</code> is a character that is in one of the ranges
-<code>'A'..'Z'</code> or <code>'a'..'z'</code> or is '&micro;'.
+<p>An <code>letter</code> is a character that is in one of the ranges
+<code>'A'..'Z'</code> or <code>'a'..'z'</code> or is <code>'&micro;'</code>.
 The <code>identifier</code> must be interpretable as <code>[prefix] symbol</code>.</p>
 
 <p><code>prefix</code> and <code>symbol</code> are as defined in SI
@@ -248,7 +249,9 @@ would be evaluated at least twice.</p>
   Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;/s&quot;);&nbsp;   -- output as 0.001/s in both variants
   Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;/s*2&quot;);&nbsp; -- exception Illegal_Unit
   Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;m&quot;);&nbsp;    -- <font color="#008000">exception Unit_Error for the checked variant</font>, 
-                                  -- <font color="#FF0000">output as 0.001*m for the unchecked variant</font></span></pre>
+                                  -- <font color="#FF0000">output as 0.001*m for the unchecked variant</font>
+  Put (1.0*&quot;°C&quot;);  -- impossible, you have to use the operation in Temperatures.Text_IO
+</span></pre>
 
 <h4>Input from Files or Strings:</h4>
 
@@ -274,45 +277,56 @@ Illegal_Unit is raised if the sequence input does not have the required syntax.
 
 <h4>Examples of Input for Width=0:</h4>
 
+<p>The following will all be sucessfully read:</p>
+
+<pre>  100.0*km/h
+  273.15*K
+  10.0*N/m**2</pre>
+
 <p>The following will be read as the pure number; reading stops after the number
 (there is no operator nor a letter after it), the characters after the number,
-i.e. ;m/s in the first example and m/s together with the leading space in the
-second sample will stay in the input stream.
+i.e. <code>;m/s</code> in the first example and <code> m/s</code> together with
+the leading space in the second sample will stay in the input stream.
 <i>Pure number</i> means a dimensionless item (or better an item with dimension 1),
-not a floating point value (numbers are read as with Ada.Text_IO.Float_IO, but this
-is SI.Text_IO, not Ada.Text_IO)!
-
-The internal representation would thus be 42.0*"".</p>
+not a floating point value (numbers are read as with <code>Ada.Text_IO.Float_IO</code>,
+but this is <code>SI.Text_IO</code>, not <code>Ada.Text_IO</code>)!
+The internal representation would thus be <code>42.0*&quot;&quot;</code>.</p>
 
 <pre>  42.0;m/s
   42.0 m/s</pre>
 
 <p>It is debatable whether the next input should better return the pure number as
-above but this looks too much like an oversight so that Illegal_Unit will be raised
-leaving m/s in the input stream.
+above but this looks too much like an oversight so that <code>Illegal_Unit</code>
+will be raised leaving <code>m/s</code> in the input stream.
 (Treating the examples above also like an oversight would mean to consume a
 character that is not part of the syntax.)</p>
 
 <pre>  42.0m/s</pre>
 
 <p>Both will be read the same; in the second sample, reading will stop at
-'[', leaving &quot;[-1]&quot; in the input stream.</p>
+<code>[</code>, leaving <code>[-1]</code> in the input stream.</p>
 
 <pre>  42.0*m*s
   42.0*m*s[-1]</pre>
 
-<p>All the following items show syntax errors and will raise Illegal_Unit upon
-evaluation at different places, the offending character will stay in the input
+<p>All the following items show syntax errors and will raise <code>Illegal_Unit</code>
+upon evaluation at different places, the offending character will stay in the input
 stream.</p>
 
 <pre>  42.0*m/s*2
   42.0*m**(3/kg
   42.0*m-3/kg</pre>
 
-<p>The following item will be completely read and raise Illegal_Unit upon evaluation
-because A is an unknown prefix (Ampere-second would need an operator).</p>
+<p>The following item will be completely read and raise <code>Illegal_Unit</code>
+upon evaluation because <code>A</code> is an unknown prefix (Ampere-second would
+need an operator).</p>
 
 <pre>  42.0*As</pre>
+
+<p>Celsius data will raise <code>Illegal_Unit</code> because it is alien to an
+<code>si_item</code> and has to be read with <code>Temperatures.Text_IO</code>.</p>
+
+<pre>  0.0°C</pre>
 
 <p><a href="Table_of_Contents.html">Table_of_Contents</a></p>
 

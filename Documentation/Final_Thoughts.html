@@ -8,6 +8,7 @@
 <title>Final Thoughts</title>
 <!-- Version  Date
       1.0  08.09.2025
+      1.1  11.10.2025  Celsius degrees read as Kelvin no good idea
 //-->
 </head>
 
@@ -30,27 +31,7 @@ missing definitions and perhaps a very simple example for the <i>Examples</i>
 directory.
 I will add them together with your name as author.</p>
 
-<p>I ponder the idea for two small additions:</p>
-
-<p><a href="#Celsius">Celsius Degrees</a><br/>
-<a href="#Input">Input from Files</a></p>
-
-<h3 align="center"><a name="Celsius">Celsius Degrees</a></h3>
-
-<p>Celsius temperatures have purposely been defined separately from SI items
-with different syntax.
-Of course transformations to and from Kelvin are provided.
-They also have to be read and written with a dedicated package of their
-own.</p>
-
-<p>A possible library enhancement could be the possibility to directly
-read (<b>nota bene: not to write</b>) Celsius degrees with the IO package
-for items, but to automatically return them converted in Kelvin.
-Admittedly, this would not save much work because when reading from files,
-you normally know what to read and can easily use the appropriate package
-and convert the result.</p>
-
-<p>Any thoughts?</p>
+<p>I ponder the idea of one perhaps important addition:</p>
 
 <h3 align="center"><a name="Input">Input from Files</a></h3>
 

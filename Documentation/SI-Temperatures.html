@@ -10,6 +10,7 @@
       1.0  03.02.2006
       1.1  27.02.2006  pragma Pure
       2.0  02.07.2025  Redesign
+      3.0  17.10.2025  Redefine 'Image
 //-->
 </head>
 
@@ -23,6 +24,11 @@ scales:
 <i>Réaumur</i>.
 Only Celsius and Fahrenheit are in use nowadays.
 Of these, only the former is allowed parallel to SI units.</p>
+
+<p><a href="#Spec">Specification</a><br/>
+<a href="#Constr">Constructor</a><br/>
+<a href="#Oper">Operators</a><br/>
+<a href="#Unfor">Unformatted_IO</a></p>
 
 <p>Kelvin and Celsius use the same unit interval.
 So do Rankine and Fahrenheit.
@@ -143,12 +149,18 @@ a value in Kelvin.</p>
 
 <p>Only the operations defined here seem to make sense to me:</p>
 
-<h3 align="left"><a name="Specification">Specification</a></h3>
+<h3 align="left"><a name="Spec">Specification</a></h3>
 
-<pre><b>generic
+<pre><b>with</b> Ada.Strings.Text_Buffers;  -- <i>'Image redefinition</i>
+
+<b>generic
 package </b>Generic_<a href="SI.html">SI</a>.Generic_Temperatures <b>is
 
   type </b>Celsius <b>is private</b>;
+
+  -- <i>Redefine attribute and add its inverse</i>
+  <b>procedure</b> Image (B: <b>in out</b> Ada.Strings.Text_Buffers.Root_Buffer_Type'Class; X: Celsius);
+  <b>function</b>  Value (X: String) <b>return</b> Celsius;
 
   <b>function </b>&quot;*&quot; <b>(</b>Left: Real'Base; Right: String<b>) return </b>Celsius <b>with </b>Pre =&gt; Right = &quot;°C&quot; <b>or else raise</b> Unit_Error;
 
@@ -174,13 +186,13 @@ package </b>Generic_<a href="SI.html">SI</a>.Generic_Temperatures <b>is
 
 <b>end </b>Generic_SI.Generic_Temperatures;</pre>
 
-<h3>Constructor</h3>
+<h3><a name="Constr">Constructor</a></h3>
 
-<p>The cnstructor is formed in accordance with the one of the parent package.
+<p>The constructor is formed in accordance with the one of the parent package.
 Of course, only this unit string is allowed.</p>
 
 <pre>  <b>function </b>&quot;*&quot; <b>(</b>Left: Real'Base; Right: String<b>) return </b>Celsius <b>with </b>Pre =&gt; Right = &quot;°C&quot;;
-  <b>function </b>&quot;*&quot; <b>(</b>Left: Real'Base; Right: String<b>) return </b>Item;  -- <i>SI</i>
+--<i>function &quot;*&quot; (Left: Real'Base; Right: String) return Item;  -- from SI for comparison</i>
 
   TC: Celsius :=  30.40*&quot;°C&quot;;  -- <i>Celsius</i>
   TK: Item    := 203.55*&quot;K&quot;;   -- <i>Kelvin</i>
@@ -188,16 +200,34 @@ Of course, only this unit string is allowed.</p>
   TC: Celsius :=  30.40*&quot;K&quot;;   -- <i>raises Unit_Error</i>
   TK: Item    := 203.55*&quot;°C&quot;;  -- <i>raises Unit_Error</i></pre>
 
-<h3>Operators</h3>
+<h3><a name="Oper"></a>Operators</h3>
 
 <p>No preconditions are needed for the operators.</p>
 
+<h3><a name="Unfor">Unformatted_IO</a></h3>
+
+<p>For the numeric part, 'Image and Value behave like the corresponding
+numeric attributes and may raise the appropriate exceptions.</p>
+
+<p>If no exception is raised, then:</p>
+
+<p>Image appends the unit &quot;°C&quot;.</p>
+
+<p>Value checks if the numeric part is followed by the correct unit,
+else Unit_Error is raised. Trailing blanks are ignored.</p>
+
+<h4>Examples:</h4>
+
+<pre>Image (0.1*&quot;°C&quot;) = &quot; 1.00000E-01°C&quot;  -- <i>note that the external string has no '*' operator</i>
+
+Value (&quot; 1.00E-01°C   &quot;) = 0.1*&quot;°C&quot;  -- <i>trailing blanks are ignored</i>
+Value (&quot; 1.00E-01°C x &quot;)             -- <i>raises Unit_Error</i></pre>
+
 <p><a href="Table_of_Contents.html">Table_of_Contents</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="SI-Temperatures-Strings.html">SI.Temperatures.Strings</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <a href="SI-Temperatures-Text_IO.html">SI.Temperatures.Text_IO</a></p>
 
 <p align="center"><a href="http://validator.w3.org/check?uri=referer">
-   <img src="valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a></p>
+<img src="valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a></p>
 
 </body>
 </html>
