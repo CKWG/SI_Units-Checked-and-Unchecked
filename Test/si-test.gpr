@@ -27,8 +27,8 @@ project SI.Test is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   7.0
-  -- Date      17 October 2025
+  -- Version   7.1
+  -- Date      23 October 2025
   --====================================================================
   --
   --====================================================================
@@ -56,6 +56,7 @@ project SI.Test is
   --  C.G.    6.0  09.07.2025 Make it a child project
   --  C.G.    6.1  16.08.2025 -gnat2022
   --  C.G.    7.0  17.10.2025 Rework because of new 'Image attribute
+  --  C.G.    7.1  23.10.2025 Add test_si_vectors
   --====================================================================
 
   for Object_Dir use "GnatLib";
@@ -69,6 +70,7 @@ project SI.Test is
                 "test_si_units",
                 "test_si_math",
                 "test_si_poly",
+                "test_si_vectors",
                 "test_si_celsius",
                 "test_si_unformatted_io",
                 "test_si_text_io_strings",
