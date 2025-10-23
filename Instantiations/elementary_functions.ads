@@ -1,10 +1,10 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2006, 2018, 2020, 2025 Christoph Karl Walter Grein
+-- Copyright (C) 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
--- as published by the Free Software Foundation; either version 3
+-- as published by the Free Software Foundation; either version 2
 -- of the License, or any later version.
 --
 -- This program is distributed in the hope that it will be useful,
@@ -24,25 +24,21 @@
 -- covered by the GNU Public License.
 --
 -- Author's email address:
---   christ-Usch.grein@t-online.de
+--   Christ-Usch.Grein@T-Online.de
 ------------------------------------------------------------------------------
 
-with Generic_SI;
-with Elementary_Functions, Actual_Dimensions;
+with Ada.Numerics.Generic_Elementary_Functions;
 
-package SI is new Generic_SI (Float, Elementary_Functions, Actual_Dimensions);
+package Elementary_Functions is new Ada.Numerics.Generic_Elementary_Functions (Float);
 
 --====================================================================
 -- Author    Christoph Grein
--- Version   4.0
+-- Version   1.0
 -- Date      23 October 2025
 --====================================================================
 --
 --====================================================================
 -- History
 -- Author Version   Date    Reason for change
---  C.G.    1.0  22.02.2006
---  C.G.    2.0  05.08.2018 Unit strings
---  C.G.    3.0  11.05.2020 Dimensions generic parameter
---  C.G.    4.0  23.10.2025 Elementary_Functions generic parameter
+--  C.G.    1.0  23.10.2025
 --====================================================================
