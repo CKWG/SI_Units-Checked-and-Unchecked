@@ -28,8 +28,7 @@
 --   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Ada.Numerics;
-private with Ada.Numerics.Generic_Elementary_Functions;
+with Ada.Numerics.Generic_Elementary_Functions;
 
 with Ada.Strings.Text_Buffers;  -- 'Image redefinition
 
@@ -42,6 +41,9 @@ generic
 
   type Real is digits <>;
 
+  with package Elementary_Functions is new Ada.Numerics.Generic_Elementary_Functions (Real'Base);
+  use Elementary_Functions;
+
   with package Dimensions is new Dimension_Signature (<>);
   use Dimensions;
 
@@ -49,8 +51,8 @@ package Generic_SI is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   8.0
-  -- Date      14 October 2025
+  -- Version   8.1
+  -- Date      23 October 2025
   --====================================================================
   -- Magnetic_Flux_Density is the classical name. Nowadays it's often
   -- just called Magnetic_Field.
@@ -114,6 +116,7 @@ package Generic_SI is
   --                          of unit indications
   --  C.G.    7.3  12.09.2025 function SI_is_Unchecked is new
   --  C.G.    8.0  14.10.2025 Ada 2022: Redefine 'Image attribute
+  --  C.G.    8.1  23.10.2025 Elementary_Functions generic parameter
   --====================================================================
 
   type Item is private with Put_Image => Image;
@@ -359,9 +362,6 @@ private
   Lux      : constant Item := (cd/m**2            , 1.0);  -- lx = lm/m**2
 
   Katal    : constant Item := (mol/s              , 1.0);  -- kat = mol/s
-
-  package Elementary_Functions is new Ada.Numerics.Generic_Elementary_Functions (Real'Base);
-  use     Elementary_Functions;
 
   function SI_is_Unchecked return Boolean is (Meter = Mole);  -- any pair will do
 
