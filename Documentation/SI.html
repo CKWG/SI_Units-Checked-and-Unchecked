@@ -36,7 +36,7 @@
       6.1  18.04.2025  Preconditions replace check in body
       6.2  16.08.2025  Precondition on unit string, postcondition on Arcsin/Arccos
       6.3  11.09.2025  function SI_is_Unchecked is new
-      7.0  16.10.2025  Image and Value moved from Generic_Strings, 'Image redefined
+      7.0  23.10.2025  Image and Value moved from Generic_Strings, 'Image redefined
 //-->
 </head>
 
@@ -67,8 +67,7 @@ variant, of course.</p>
 
 <h3 align="left"><a name="Specification">Specification</a></h3>
 
-<pre><b>with </b>Ada.Numerics;
-<b>private with </b>Ada.Numerics.Generic_Elementary_Functions;
+<pre><b>with </b>Ada.Numerics.Generic_Elementary_Functions;
 
 <b>with </b>Ada.Strings.Text_Buffers;  <i>-- 'Image redefinition
 
@@ -80,6 +79,9 @@ variant, of course.</p>
 <b>generic
 
   type </b>Real <b>is digits </b>&lt;&gt;;
+
+  <b>with</b> package Elementary_Functions <b>is new</b> Ada.Numerics.Generic_Elementary_Functions (Real'Base);
+  <b>use</b> Elementary_Functions;
 
   <b>with package </b>Dimensions <b>is new </b>Dimension_Signature <b>(</b>&lt;&gt;<b>)</b>;
   <b>use </b>Dimensions;
@@ -378,8 +380,12 @@ Unit_Error is raised in case of wrong dimensions.</p>
 <p>In older versions of this library, the attributes 'Image and 'Value
 (which then did not exist for private types) were emulated by homonymous
 functions in the child package Generic_Strings (a rather unfortunate name).
-In Ada 2022, 'Image has been defined for any type and is user-definable;
-'Value is still not available.
+In Ada 2022, 'Image has been defined for any type and is now user-definable;
+the replacement must be done here and hence Generic_Strings, now osolete,
+has been removed.
+Also Value, the partner of 'Image, has therefore been moved here.</p>
+
+<p>'Value is still not available.
 The idea to redefine also this attribute as the inverse has been dropped
 by the ARG for the time being, it might be resumed eventually.</p>
 
