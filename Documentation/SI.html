@@ -36,7 +36,8 @@
       6.1  18.04.2025  Preconditions replace check in body
       6.2  16.08.2025  Precondition on unit string, postcondition on Arcsin/Arccos
       6.3  11.09.2025  function SI_is_Unchecked is new
-      7.0  23.10.2025  Image and Value moved from Generic_Strings, 'Image redefined
+      7.0  23.10.2025  Image and Value moved from Generic_Strings, 'Image redefined;
+                       Elementary_Functions generic parameter
 //-->
 </head>
 
@@ -80,7 +81,7 @@ variant, of course.</p>
 
   type </b>Real <b>is digits </b>&lt;&gt;;
 
-  <b>with</b> package Elementary_Functions <b>is new</b> Ada.Numerics.Generic_Elementary_Functions (Real'Base);
+  <b>with package</b> Elementary_Functions <b>is new</b> Ada.Numerics.Generic_Elementary_Functions (Real'Base);
   <b>use</b> Elementary_Functions;
 
   <b>with package </b>Dimensions <b>is new </b>Dimension_Signature <b>(</b>&lt;&gt;<b>)</b>;
