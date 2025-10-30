@@ -9,6 +9,7 @@
 <!-- Version  Date
       1.0  08.09.2025
       1.1  11.10.2025  Celsius degrees read as Kelvin no good idea
+      1.2  30.10.2025  Work-arounds for GNAT Bugs
 //-->
 </head>
 
@@ -33,7 +34,7 @@ I will add them together with your name as author.</p>
 
 <p>I ponder the idea of one perhaps important addition:</p>
 
-<h3 align="center"><a name="Input">Input from Files</a></h3>
+<h3 align="center">Input from Files</h3>
 
 <p>When you develop with the checked variant and have 100% test coverage,
 you can be certain that there is no dimension error lurking in your code
@@ -70,6 +71,16 @@ reading table data), you simply omit the parameter.
 be needed.</p>
 
 <p>Any thoughts?</p>
+
+<h3 align="center">Work-arounds for GNAT Bugs</h3>
+
+<p>These are work-arounds for GNAT bugs currently left in the code.</p>
+
+<ul>
+<li>generic_si.generic_vector_space.adb: [T526-002], reported 26.05.2020: fixed in GNAT 15.2.1;<br/>
+[T520-013 public] did not fix it</li>
+<li>generic_si.generic_vector_space.ads: Bugzilla 122161, reported 04.10.2025: being fixed</li>
+</ul>
 
 <p><a href="Table_of_Contents.html">Table_of_Contents</a></p>
 
