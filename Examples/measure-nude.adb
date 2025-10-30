@@ -23,34 +23,30 @@
 -- however invalidate any other reasons why the executable file might be
 -- covered by the GNU Public License.
 --
--- Source:
--- http://???.html
---
 -- Author's email address:
 --   christ-usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Ada.Numerics.Generic_Elementary_Functions;
+with Ada.Numerics;
+with Elementary_Functions;
+use  Ada.Numerics, Elementary_Functions;
 
 separate (Measure)
 package body Nude is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   1.0
-  -- Date      9 April 2025
+  -- Version   1.1
+  -- Date      30 October 2025
   --====================================================================
   -- Just the nude data.
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
   --  C.G.    1.0  09.04.2025 New
+  --  C.G.    1.1  30.10.2025 Replace Ada.Numerics.Generic_Elementary_
+  --                          Functions by Elementary_Functions
   --====================================================================
-
-  use Ada.Numerics;
-
-  package Math is new Generic_Elementary_Functions (Float);
-  use Math;
 
   Elementary_Charge: constant Float := 1.602_176_634E-19;
   Electron_Mass    : constant Float := 9.109_382_6E-31;
