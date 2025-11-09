@@ -7,9 +7,12 @@ Checked: Physical items carry with them their current dimension, so that all ass
 
 Unchecked: This variant has the exact same specification, but physical items only carry their numerical values, dimensions are stripped.
 
-This is release 1.0.1.
-Evaluation of unit strings has been reimplemented, tests adapted accordingly (no effect on execution time). There is no change in the user interface. Only behaviour in case of wrong unit strings is different.
-There is a bug fix in the unit string syntax.
+This is release 2.0.0.
+Incompatible User Interface change: 'Image attribute redefined.
+Some improvements of documentation and tests.
 Tested with GNAT CE 2021.
+Use of GNAT 15.2.1 is not recommended because of Bugzilla 122574.
+
+License GPL 3 with GNAT modification.
 
 For more information, see file SI.html.
