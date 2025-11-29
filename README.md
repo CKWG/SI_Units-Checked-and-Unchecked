@@ -1,5 +1,9 @@
 # SI_Units Checked and Unchecked
-Ada packages for handling SI units of measure
+Ada packages for handling SI units of measure:
+  V: Speed  := 5.0*"km/h";  -- unit indication is
+  T: Time   := 30.0*"s";    -- case sensitive: "S" is Siemens
+  D: Length := V * T;       -- dimension "m"
+  Put (V, Dim => "dam");    -- output with any prefix, here decameter
 
 The method comes in two variants, checked and unchecked, selected with a generic parameter:
 
