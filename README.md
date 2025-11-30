@@ -4,7 +4,8 @@ Ada packages for handling SI units of measure:
 `  V: Speed  := 5.0*"km/h";  -- unit indication is ...`<br>
 `  T: Time   := 30.0*"s";    -- ... case sensitive: "S" is Siemens`<br>
 `  D: Length := V * T;       -- dimension "m"`<br>
-`  Put (V, Dim => "dam");    -- output with any prefix, here decameter`
+`  Put (D, Dim => "dam");    -- output with any prefix, here decameter`<br>
+`  Put (V, Dim => "dam");    -- raises Unit_Error`
 
 The method comes in two variants, checked and unchecked, selected with a generic parameter:
 
