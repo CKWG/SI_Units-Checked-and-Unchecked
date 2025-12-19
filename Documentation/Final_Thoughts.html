@@ -11,6 +11,7 @@
       1.1  11.10.2025  Celsius degrees read as Kelvin no good idea
       1.2  30.10.2025  Work-arounds for GNAT Bugs
       1.3  07.11.2025  Bugzilla 122574
+      1.4  24.11.2025  Added km/h example to proposed input check
 //-->
 </head>
 
@@ -58,13 +59,16 @@ modifier for the Get operations:</p>
 
 <p>The dimension format modifier, if given, will ignore any prefixes and
 verify the unit string input, raising <code>Unit_Error</code> in case of
-failure. For example, a modifier <code>&quot;m/s&quot;</code> will check
-that the input has dimension <i>Length/Time</i>.
+failure.
 This is not a restriction since normally you have to know what to read and
 can select the proper dimension.
 If for some reason, you do not know the expected dimension (when for instance
 reading table data), you simply omit the parameter.
 (The modifier will of course be ignored in the checked variant.)</p>
+
+<p>For example, a modifier <code>&quot;m/s&quot;</code> as well as
+<code>&quot;km/h&quot;</code> will check that the input has dimension
+<i>Length/Time</i>.</p>
 
 <p>Safety will cost execution time!</p>
 
