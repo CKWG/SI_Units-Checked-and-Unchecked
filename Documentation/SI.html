@@ -37,7 +37,7 @@
       6.2  16.08.2025  Precondition on unit string, postcondition on Arcsin/Arccos
       6.3  11.09.2025  function SI_is_Unchecked is new
       7.0  23.10.2025  Image and Value moved from Generic_Strings, 'Image redefined;
-                       Elementary_Functions generic parameter
+      7.1  14.12.2025  Unit Nit mentioned
 //-->
 </head>
 
@@ -299,12 +299,6 @@ library has been compiled with
 <font color="#008000"><code>False</code></font> when compiled with
 <font color="#008000"><code>Assertion_Policy (Check)</code></font>.</p>
 
-<p>Note: Magnetic_Flux_Density is the classical name.
-Nowadays it's often just called Magnetic_Field because this is the
-fundamental one.
-The subtype name reflects this.
-If you find the name annoying, just remove it.</p>
-
 <pre>  <b>function</b> Same_Dimension (X, Y: Item) <b>return</b> Boolean;</pre>
 
 <p>returns <code>True</code> if both items have the same dimension,
@@ -318,6 +312,14 @@ It raises <code>Illegal_Unit</code> if Symbol does not have the syntax of a
 <i>dimension format modifier</i> (see package <a href="SI-Text_IO.html">SI.Text_IO</a>).
 <font color="#FF0000">In the unchecked variant, it returns always <code>True</code>.</font></p>
 
+<p><u>Notes:</u><br>Magnetic_Flux_Density is the classical name.
+Nowadays it's often just called Magnetic_Field because this is the
+fundamental one.
+The subtype name reflects this.
+If you find the name annoying, just remove it.<br>
+Computer screen luminance is measured in Nit (nt), from Latin <i>nitere</i> glitter,
+which is exactly cd/m<sup>2</sup>, but this is not an SI unit and thus not included.</p>
+
 <h3><a name="Value">Value Construction</a></h3>
 
 <p>Dimensioned values are constructed with a numeric value of type Real'Base,
@@ -327,11 +329,11 @@ multplied or divided by the unit indication in a string:</p>
 
 <p>Any unit names and prefixes may be used as given for the SI unit system
 in <a href="https://www.bipm.org/en/measurement-units/">BIPM</a>.
-There are two exceptions: 'u' is used for micro instead of '&micro;';
+There are two exceptions: 'u' can be used for micro instead of '&micro;';
 &quot;Ohm&quot; is used for &quot;&Omega;&quot;.
-Additionally allowed symbols are &quot;min&quot;, &quot;h&quot; for minute
-and hour (no prefixes allowed) and &quot;l&quot;, &quot;L&quot; for liter
-(prefixes allowed), &quot;eV&quot; for particle mass (prefixes allowed).
+Additionally allowed symbols by this document are &quot;min&quot;, &quot;h&quot;
+for minute and hour (no prefixes allowed) and &quot;l&quot;, &quot;L&quot; for
+liter (prefixes allowed), &quot;eV&quot; for particle mass (prefixes allowed).
 Unit and prefix are case sensitive and written together like &quot;Ms&quot;,
 megasecond, or &quot;mS&quot;, millisiemens.
 The exact syntax for a unit indication is given in package
