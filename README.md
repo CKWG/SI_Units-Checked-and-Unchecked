@@ -20,4 +20,5 @@ Use of GNAT 15.2.1 is not recommended because of Bugzilla 122574.
 
 License GPL 3 with GNAT modification.
 
-For more information, see file SI.html.
+For a more detailed introduction, see file SI.html.
+There is a complete user interface documentation included in a separate directory about which units are supported, what is the unit string syntax etc.
