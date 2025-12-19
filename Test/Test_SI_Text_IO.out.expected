@@ -2,6 +2,8 @@
  2.00000E+03*m
  8.33333E-04*s**(-1)
  1.11111E+00*m*s**(-1)
+ 1.11111E-03*m*s**(-1)
+ADA.IO_EXCEPTIONS.DATA_ERROR "just for fun"
  5.00000E+00
 ADA.IO_EXCEPTIONS.DATA_ERROR "; stays in input stream"
  1.00000E-01*s**(-1)

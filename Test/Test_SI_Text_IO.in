@@ -1,5 +1,6 @@
 1.0 2.0*km 3.0/h
 4.0*km/h
+4.0*km/(h*dm**(-1)*hm) just for fun
 5.0; stays in input stream
 6.0/min; stays in input stream
 7.0m/s stays in input stream
