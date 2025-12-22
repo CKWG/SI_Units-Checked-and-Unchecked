@@ -22,3 +22,18 @@ License GPL 3 with GNAT modification.
 
 For a more detailed introduction, see file SI.html.
 There is a complete user interface documentation included in a separate directory about which units are supported, what is the unit string syntax etc.
+
+**Release 1.0.1**<br>
+Evaluation of unit strings has been reimplemented, tests adapted accordingly (no effect on execution time).
+There is no change in the user interface.
+Only behaviour in case of wrong unit strings is different.
+There is a bug fix in the unit string syntax.<br>
+Tested with GNAT CE 2021.
+
+**Release 1.0.0**<br>
+First GitHub release.<br>
+Updated edition of 5 Aug 2020 published at http://archive.adaic.com/tools/CKWG/Dimension/SI.html.
+The source at this URL is no longer updated.<br>
+Uses Predicates and (new) pragma Assertion_Policy.<br>
+Code: Celsius temperature scale added; instantiation of Text_IO package changed.<br>
+Test: Improved IO tests.
