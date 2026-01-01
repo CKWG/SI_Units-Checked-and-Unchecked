@@ -1,6 +1,8 @@
 # SI_Units Checked and Unchecked
 Ada packages for handling SI units of measure:
 
+Physical items have a private type; a subtype is defined for any dimension that has a unique SI unit like Newton and a lot more like speed.
+
 `  V: Speed  := 5.0*"km/h";  -- unit indication is ...`<br>
 `  T: Time   := 30.0*"s";    -- ... case sensitive: "S" is Siemens`<br>
 `  D: Length := V * T;       -- dimension "m"`<br>
@@ -13,7 +15,10 @@ The method comes in two variants, checked and unchecked, selected with a generic
 - *Unchecked*: This variant has the exact same specification, but physical items only carry their numerical values, dimensions are stripped.
 
 **This is release 2.0.0.**<br>
-Incompatible User Interface change: 'Image attribute redefined.<br>
+Incompatible User Interface change: Ada 2022 defines the 'Image attribute for any type and allows its redefinition &ndash;
+since its default is impractical, the 'Image attribute has been redefined to deliver the same result as its previous homonymous
+replacement function, which does no longer exist; its partner, the Value function, has been moved to the base package where
+'Image is now defined.<br>
 Some improvements of documentation and tests.<br>
 Tested with GNAT CE 2021.<br>
 Use of GNAT 15.2.1 is not recommended because of Bugzilla 122574.
@@ -36,4 +41,6 @@ Updated edition of 5 Aug 2020 published at http://archive.adaic.com/tools/CKWG/D
 The source at this URL is no longer updated.<br>
 Uses Predicates and (new) pragma Assertion_Policy.<br>
 Code: Celsius temperature scale added; instantiation of Text_IO package changed.<br>
-Test: Improved IO tests.
+Test: Improved IO tests.<br>
+Since a physical item is of a private type, the attributes 'Image and 'Value do not exist.
+Two homonymous functions are used as a replacement.
