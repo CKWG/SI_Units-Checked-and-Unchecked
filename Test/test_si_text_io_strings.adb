@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2008, 2018, 2020, 2025 Christoph Karl Walter Grein
+-- Copyright (C) 2008, 2018, 2020, 2025, 2026 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -40,8 +40,8 @@ procedure Test_SI_Text_IO_Strings is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   4.2
-  -- Date      12 October 2025
+  -- Version   4.3
+  -- Date      20 January 2026
   --====================================================================
   -- Test the Text_IO to and from string procedure.
   -- Note: Since output with default Dim parameter is tested, the test
@@ -58,6 +58,7 @@ procedure Test_SI_Text_IO_Strings is
   --                          gnat_native=15.2.1; instead use new
   --                          function SI_is_Unchecked
   --  C.G.    4.2  12.10.2025 Allow µ
+  --  C.G.    4.3  20.01.2026 Test case added "  -1.0 *km/h"
   --====================================================================
 
   procedure Test_Aft_Exp (Value: Item; Expected_D, Expected_F: String) is
@@ -146,7 +147,12 @@ begin
   declare
     Value: Item;
     Last : Positive;
-  begin --12345   rest not read
+  begin --123456  rest not read
+    Get ("  -1.0 *km/h", Value, Last);
+    Assert (Condition => Value = -1.0*"" and Last = 6,
+            Message   => "space stops reading and is not read (Last =" & Last'Image & ')',
+            Only_Report_Error => False);
+        --12345   rest not read
     Get ("1.0*m k", Value, Last);
     Assert (Condition => Value = 1.0*"m" and Last = 5,
             Message   => "space stops reading and is not read (Last =" & Last'Image & ')',
