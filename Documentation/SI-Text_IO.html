@@ -28,8 +28,9 @@
       6.2  18.04.2025  Preconditions
       6.3  18.08.2025  Bug fix and more precision in syntax; link to Bureau International des Poids et Mesures
       6.4  04.09.2025  Generic parameter is new; improved examples
-      6.5  15.09.2025  Allow µ; corrected typos in description
+      6.5  15.09.2025  Allow  ; corrected typos in description
       6.6  11.10.2025  Presentation improved
+      6.7  20.01.2026  More precision in theresentation
 //-->
 </head>
 
@@ -204,12 +205,16 @@ prefixes and symbols in any sequence and with any exponents.</p>
 
 <h3><a name="InOut">Input and Output</a></h3>
 
+<p>Additionally to the standard numeric format modifiers <code>Fore</code>,
+<code>Aft</code>, <code>Exp</code>, there is a dimension format modifier
+<code>Dim</code>.</p>
+
 <h4>Dimension format modifiers:</h4>
 
 <p>Other than the unit strings, which have to begin with index 1, a format modifier
 may occupy any range.
 This is the syntax of a dimension format modifier after stripping any leading or
-trailing spaces (there may of course  be no spaces in the inside of the string):</p>
+trailing spaces (there may of course  be no spaces inside the string):</p>
 
 <pre>   modifier ::= &quot;&quot; | &quot;[*]quotient&quot; | &quot;/divisor&quot;</pre>
 
@@ -244,12 +249,12 @@ would be evaluated at least twice.</p>
 <pre><span>  Put (1.0/&quot;ks&quot;);&nbsp; -- output <font color="#008000">in the default representation as 0.001*s**(-1) for the
                    -- checked variant</font>, <font color="#FF0000">as 0.001 for the unchecked variant</font>
                    -- (for appropriately chosen numeric format modifiers)
-  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;mBq&quot;);&nbsp;  -- output as 1.0*mBq in both variants
-  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;*mBq&quot;);&nbsp; -- the same
-  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;/s&quot;);&nbsp;   -- output as 0.001/s in both variants
-  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;/s*2&quot;);&nbsp; -- exception Illegal_Unit
-  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;m&quot;);&nbsp;    -- <font color="#008000">exception Unit_Error for the checked variant</font>, 
-                                  -- <font color="#FF0000">output as 0.001*m for the unchecked variant</font>
+  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;mBq&quot;);&nbsp;    -- output as 1.0*mBq in both variants
+  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot; *mBq &quot;);&nbsp; -- the same; note the stripped blanks
+  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;/s&quot;);&nbsp;     -- output as 0.001/s in both variants
+  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;/s*2&quot;);&nbsp;   -- exception Illegal_Unit
+  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;m&quot;);&nbsp;      -- <font color="#008000">exception Unit_Error for the checked variant</font>, 
+                                    -- <font color="#FF0000">output as 0.001*m for the unchecked variant</font>
   Put (1.0*&quot;°C&quot;);  -- impossible, you have to use the operation in Temperatures.Text_IO
 </span></pre>
 
@@ -262,8 +267,10 @@ as with Get of standard Text_IO.Float_IO (i.e. skipping any leading blanks,
 line terminators, or page terminators; see RM A.10.9(13)); Data_Error may
 be raised in this step.
 In case Data_Error is not raised, then reads the longest possible sequence
-of characters matching the syntax given above.
-[This sentence is an exact copy of RM A.10.9(13), applied to the unit string.]</p>
+of characters matching the syntax of an external item given above, or a
+prefix of such syntax.
+[This last sentence is an exact copy of RM A.10.9(13/7), applied to the unit
+string.]</p>
 
 <p>If a nonzero value of Width is supplied, then exactly Width characters are
 input, or the characters (possibly none) up to a line terminator, whichever
@@ -303,8 +310,8 @@ character that is not part of the syntax.)</p>
 
 <pre>  42.0m/s</pre>
 
-<p>Both will be read the same; in the second sample, reading will stop at
-<code>[</code>, leaving <code>[-1]</code> in the input stream.</p>
+<p>The following two lines will be read the same; in the second exsample, reading
+will stop at <code>[</code>, leaving <code>[-1]</code> in the input stream.</p>
 
 <pre>  42.0*m*s
   42.0*m*s[-1]</pre>
@@ -317,11 +324,15 @@ stream.</p>
   42.0*m**(3/kg
   42.0*m-3/kg</pre>
 
-<p>The following item will be completely read and raise <code>Illegal_Unit</code>
-upon evaluation because <code>A</code> is an unknown prefix (Ampere-second would
-need an operator).</p>
-
-<pre>  42.0*As</pre>
+<p>The string <code>abcd</code> will be completely read because it is an
+<code>identifier</code> and thus legal syntax (leaving the exponent operator in
+the input stream), but will raise <code>Illegal_Unit</code> because there is no
+such unit.
+The same holds for the second example because <code>A</code> is an unknown prefix
+(Ampere-second would need an operator).</p>
+  
+<pre>  42.0*abcd**2
+  42.0*As</pre>
 
 <p>Celsius data will raise <code>Illegal_Unit</code> because it is alien to an
 <code>si_item</code> and has to be read with <code>Temperatures.Text_IO</code>.</p>
