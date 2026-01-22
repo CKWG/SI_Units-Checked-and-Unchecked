@@ -7,6 +7,7 @@ Physical items have a private type; a subtype is defined for any dimension that 
 `  T: Time   := 30.0*"s";    -- ... case sensitive: "S" is Siemens`<br>
 `  D: Length := V * T;       -- dimension "m"`<br>
 `  Put (D, Dim => "dam");    -- output with any prefix, here decameter`<br>
+`  Put (D, Dim => "Km");     -- raises Illegal_Unit`<br>
 `  Put (V, Dim => "dam");    -- raises Unit_Error`
 
 The method comes in two variants, checked and unchecked, selected with a generic parameter:
