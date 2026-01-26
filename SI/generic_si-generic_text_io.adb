@@ -34,8 +34,8 @@ package body Generic_SI.Generic_Text_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   8.3
-  -- Date      20 January 2026
+  -- Version   8.4
+  -- Date      26 January 2026
   --====================================================================
   --
   --====================================================================
@@ -68,6 +68,7 @@ package body Generic_SI.Generic_Text_IO is
   --                          new implementation
   --  C.G.    8.3  20.01.2026 Add µ in Get from file;
   --                          simplified code in Get from string
+  --  C.G.    8.4  26.01.2026 Remove outdated and irritating comment
   --====================================================================
 
   use Real_Text_IO;
@@ -153,11 +154,7 @@ package body Generic_SI.Generic_Text_IO is
           Avail := Avail + 1;
           Get (File, Got (C));
         end loop;
-        Get (Got (1 .. Avail), X, Last);  -- may raise Data_Error
-        -- Gnat: 5_ does not raise Data_Error here.
-        -- Discriminating between Data_Error and Illegal_Unit is difficult.
-        -- In any case, this is a syntax error in the input.
-        -- Choose the simple way.
+        Get (Got (1 .. Avail), X, Last);
         if Last < Avail then
           raise Illegal_Unit with "string not exhausted";
         end if;
