@@ -28,9 +28,10 @@
       6.2  18.04.2025  Preconditions
       6.3  18.08.2025  Bug fix and more precision in syntax; link to Bureau International des Poids et Mesures
       6.4  04.09.2025  Generic parameter is new; improved examples
-      6.5  15.09.2025  Allow  ; corrected typos in description
+      6.5  15.09.2025  Allow µ; corrected typos in description
       6.6  11.10.2025  Presentation improved
-      6.7  20.01.2026  More precision in theresentation
+      6.7  20.01.2026  More precision in the presentation
+      6.8  27.01.2026  correct typos
 //-->
 </head>
 
@@ -174,8 +175,8 @@ Generic_SI.Generic_Symbols.</p>
     1.0 * &quot;km/h&quot;                     1.0*km/h
     1.0 /&quot;ks&quot;                        1.0/ks
     1.0*&quot;N/cm**2&quot;                    1.0*N/cm**2
-    1.0/&quot;mol*s&quot;                      1.0/(mol*s)  -- <i>note the difference in parentheses</i>
-    1.0/&quot;(mol*s)&quot;                                 -- <i>illegal</i>
+    1.0/&quot;mol*s&quot;                      1.0/(mol*s)      -- <i>note the difference in parentheses</i>
+    1.0/&quot;(mol*s)&quot;                                     -- <i>illegal</i>
     6.674_2E-11*&quot;m**3/(kg*s**2)&quot;     6.674_2E-11*m**3/(kg*s**2)  -- <i>gravitational constant</i>
     1.0 * &quot;W&quot;                        1.0*W s          -- <i>legal (reading will stop after W, see syntax above)</i>
     1.0*&quot;&quot;                           1.0              -- <i>dimension 1</i>
@@ -214,7 +215,7 @@ prefixes and symbols in any sequence and with any exponents.</p>
 <p>Other than the unit strings, which have to begin with index 1, a format modifier
 may occupy any range.
 This is the syntax of a dimension format modifier after stripping any leading or
-trailing spaces (there may of course  be no spaces inside the string):</p>
+trailing spaces (there may of course be no spaces inside the string):</p>
 
 <pre>   modifier ::= &quot;&quot; | &quot;[*]quotient&quot; | &quot;/divisor&quot;</pre>
 
@@ -325,9 +326,8 @@ stream.</p>
   42.0*m-3/kg</pre>
 
 <p>The string <code>abcd</code> will be completely read because it is an
-<code>identifier</code> and thus legal syntax (leaving the exponent operator in
-the input stream), but will raise <code>Illegal_Unit</code> because there is no
-such unit.
+<code>identifier</code> and thus legal syntax, but will raise <code>Illegal_Unit</code>
+because there is no such unit (leaving the exponent operator in the input stream).
 The same holds for the second example because <code>A</code> is an unknown prefix
 (Ampere-second would need an operator).</p>
   
