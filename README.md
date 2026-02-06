@@ -1,7 +1,7 @@
 # SI_Units Checked and Unchecked
 Ada packages for handling SI units of measure:
 
-Physical items have a private type; a subtype is defined for any dimension that has a unique SI unit like Newton and a lot more like speed.
+Physical items have a private type; a subtype is defined for any dimension that has a unique SI unit like Newton and a lot more like speed. Units (meter `"m"`, second `"s"`, Newton `"N"`, etc. together wirh optional prefixes) are given as strings because they are case sensitive.
 
 `  V: Speed  := 5.0*"km/h";  -- unit indication is ...`<br>
 `  T: Time   := 30.0*"s";    -- ... case sensitive: "S" is Siemens`<br>
