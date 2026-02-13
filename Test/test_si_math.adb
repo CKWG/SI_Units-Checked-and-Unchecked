@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2018, 2020, 2021, 2025 Christoph Karl Walter Grein
+-- Copyright (C) 2018, 2020, 2021, 2025, 2026 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -27,8 +27,6 @@
 --   christ-usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Ada.Assertions;
-
 with Test_Support;
 use  Test_Support;
 
@@ -42,8 +40,8 @@ procedure Test_SI_Math is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   2.3
-  -- Date      22 September 2025
+  -- Version   2.4
+  -- Date      13 February 2026
   --====================================================================
   -- Test correct dimenioning of the mathematical functions.
   -- Note: The test cannot be run with the unchecked version since
@@ -60,6 +58,7 @@ procedure Test_SI_Math is
   --  C.G.    2.3  22.09.2025 [UA09-009 public] fixed  in alr 2.1.0
   --                          gnat_native=15.2.1; instead use new
   --                          function SI_is_Unchecked
+  --  C.G.    2.4  13.02.2026 Added test for Tan and Arctan
   --====================================================================
 
 begin
@@ -234,7 +233,7 @@ begin
   ----------------------------------------------------------
 
   Test_Step (Title => "Test Sin and Arcsin",
-             Description => "Arguments must be dimensioned correctly.");
+             Description => "Arguments and results must be dimensioned correctly.");
 
   Assert (Condition => Sin ((Pi/2.0)*"rad") = One,
           Message   => "Sin rad",
@@ -257,15 +256,15 @@ begin
               Only_Report_Error => False);
   end;
 
-  Assert (Condition => Sin (2.0*"V", 8.0*"V") = One,
+  Assert (Condition => Sin (2.0*"V", Cycle => 8.0*"V") = One,
           Message   => "Sin correctly dimensioned",
           Only_Report_Error => False);
-  Assert (Condition => Arcsin (One, 8.0*"V") = 2.0*"V",
+  Assert (Condition => Arcsin (One, Cycle => 8.0*"V") = 2.0*"V",
           Message   => "Arcsin correctly dimensioned",
           Only_Report_Error => False);
 
   begin
-    Assert (Condition => Sin (2.0*"V", 8.0*"C") = One and False,
+    Assert (Condition => Sin (2.0*"V", Cycle => 8.0*"C") = One and False,  -- result irrelevant
             Message   => "Sin incorrectly dimensioned",
             Only_Report_Error => False);
   exception
@@ -275,14 +274,14 @@ begin
               Only_Report_Error => False);
   end;
 
-  Assert (Condition => Arcsin (One, 8.0*"V") /= 2.0*"rad",
+  Assert (Condition => Arcsin (One, Cycle => 8.0*"V") /= 2.0*"rad",  -- result irrelevant
           Message   => "Arcsin incorrectly dimensioned",
           Only_Report_Error => False);
 
   ----------------------------------------------------------
 
   Test_Step (Title => "Test Hyperbolic Sin",
-             Description => "");
+             Description => "Argument must be dimensionless");
 
   begin
     Assert (Condition => Sinh (8.0*"V") = One,  -- result irrelevant
@@ -294,6 +293,41 @@ begin
               Message   => "Sinh dimensioned Unit_Error expected",
               Only_Report_Error => False);
   end;
+
+  ----------------------------------------------------------
+
+  Test_Step (Title => "Test Tan and Arctan",
+             Description => "Arguments and results must be correctly dimensioned");
+
+  Assert (Condition => Tan ((Pi/4.0)*"rad") = One,
+          Message   => "Tan rad",
+          Only_Report_Error => False);
+  Assert (Condition => Tan ((Pi/4.0)*One) = One,
+          Message   => "Tan One",
+          Only_Report_Error => False);
+  Assert (Condition => Arctan (One) = (Pi/4.0)*"rad",
+          Message   => "Arctan One",
+          Only_Report_Error => False);
+
+  begin
+    Assert (Condition => Tan (2.0*"V") = One and False,  -- result irrelevant
+            Message   => "Tan for dimensioned item",
+            Only_Report_Error => False);
+  exception
+    when Unit_Error =>
+      Assert (Condition => True,
+              Message   => "Tan for dimensioned item Unit_Error expected",
+              Only_Report_Error => False);
+  end;
+
+  Assert (Condition => Arctan (2.0*"V", 2.0*"V") = (Pi/4.0)*"rad",
+          Message   => "Arctan correctly dimensioned",
+          Only_Report_Error => False);
+  Assert (Condition => Arctan (2.0*"V", 2.0*"V", Cycle => 8.0*"m") = 1.0*"m",
+          Message   => "Arctan correctly dimensioned",
+          Only_Report_Error => False);
+
+  ----------------------------------------------------------
 
   Test_Result;
 
