@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2002, 2003, 2005, 2006, 2011, 2018, 2020, 2021, 2025
+-- Copyright (C) 2002, 2003, 2005, 2006, 2011, 2018, 2020, 2021, 2025, 2026
 -- Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
@@ -51,8 +51,8 @@ package Generic_SI is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   8.1
-  -- Date      23 October 2025
+  -- Version   8.2
+  -- Date      13 February 2026
   --====================================================================
   -- Magnetic_Flux_Density is the classical name. Nowadays it's often
   -- just called Magnetic_Field.
@@ -64,13 +64,13 @@ package Generic_SI is
   -- For the exact syntax of unit strings see package Generic_Text_IO.
   --
   -- Examples:
-  --   1.0*""                        one dimensionless (unequal to 1.0)
-  --   1.0*"mm"                      one millimeter
-  --  10.0/"ms"                      ten per millisecond
-  --   5.0*"MS"                      five megasiemens
-  --   1.0*"km**2"                   one square kilometer
-  --   1.0*"cm**(3/2)*g(1/2)*s(-1)"  esu (Gaussian electrostatic unit)
-  --   6.674_2E-11*"m**3/(kg*s**2)"  gravitational constant
+  --   1.0*""                          one dimensionless (unequal to 1.0)
+  --   1.0*"mm"                        one millimeter
+  --  10.0/"ms"                        ten per millisecond
+  --   5.0*"MS"                        five megasiemens
+  --   1.0*"km**2"                     one square kilometer
+  --   1.0*"cm**(3/2)*g**(1/2)*s(-1)"  esu (Gaussian electrostatic unit)
+  --   6.674_2E-11*"m**3/(kg*s**2)"    gravitational constant
   --
   -- Not allowed:
   --   1.0*"(km/s)**2"               parentheses in units only after /
@@ -117,6 +117,7 @@ package Generic_SI is
   --  C.G.    7.3  12.09.2025 function SI_is_Unchecked is new
   --  C.G.    8.0  14.10.2025 Ada 2022: Redefine 'Image attribute
   --  C.G.    8.1  23.10.2025 Elementary_Functions generic parameter
+  --  C.G.    8.2  13.02.2026 Postcondition for Arctan and Arccot
   --====================================================================
 
   type Item is private with Put_Image => Image;
@@ -252,19 +253,21 @@ package Generic_SI is
   function Cot (X, Cycle: Item ) return Dimensionless with Pre => Same_Dimension (X, Cycle) or else raise Unit_Error;
 
   function Arcsin (X: Dimensionless             ) return Angle;
-  function Arcsin (X: Dimensionless; Cycle: Item) return Item with Post => Same_Dimension (Arcsin'Result, Cycle);
+  function Arcsin (X: Dimensionless; Cycle: Item) return Item   with Post => Same_Dimension (Arcsin'Result, Cycle);
   function Arccos (X: Dimensionless             ) return Angle;
-  function Arccos (X: Dimensionless; Cycle: Item) return Item with Post => Same_Dimension (Arccos'Result, Cycle);
+  function Arccos (X: Dimensionless; Cycle: Item) return Item   with Post => Same_Dimension (Arccos'Result, Cycle);
   function Arctan (Y    : Item;
-                   X    : Item := One) return Angle with Pre => Same_Dimension (Y, X) or else raise Unit_Error;
+                   X    : Item := One) return Angle with Pre  => Same_Dimension (Y, X) or else raise Unit_Error;
   function Arctan (Y    : Item;
                    X    : Item := One;
-                   Cycle: Item       ) return Item  with Pre => Same_Dimension (Y, X) or else raise Unit_Error;
+                   Cycle: Item       ) return Item  with Pre  => Same_Dimension (Y, X) or else raise Unit_Error,
+                                                         Post => Same_Dimension (Arctan'Result, Cycle);
   function Arccot (X    : Item;
-                   Y    : Item := One) return Angle with Pre => Same_Dimension (X, Y) or else raise Unit_Error;
+                   Y    : Item := One) return Angle with Pre  => Same_Dimension (X, Y) or else raise Unit_Error;
   function Arccot (X    : Item;
                    Y    : Item := One;
-                   Cycle: Item       ) return Item  with Pre => Same_Dimension (X, Y) or else raise Unit_Error;
+                   Cycle: Item       ) return Item  with Pre  => Same_Dimension (X, Y) or else raise Unit_Error,
+                                                         Post => Same_Dimension (Arccot'Result, Cycle);
 
   function Sinh    (X: Dimensionless) return Dimensionless;
   function Cosh    (X: Dimensionless) return Dimensionless;
