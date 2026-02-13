@@ -41,6 +41,7 @@
       7.1  14.12.2025  Unit Nit mentioned
       7.2  01.01.2026  function Same_Dimension behaviour in unchecked variant;
                        bug fix in font color attribute
+      7.3  13.02.2026  Postcondition for Arctan and Arccot
 //-->
 </head>
 
@@ -225,19 +226,21 @@ variant, of course.</p>
   <b>function </b>Cot <b>(</b>X, Cycle: Item <b>) return </b>Dimensionless <b>with </b>Pre =&gt; Same_Dimension <b>(</b>X, Cycle<b>) or else raise </b>Unit_Error;
 
   <b>function </b>Arcsin <b>(</b>X: Dimensionless             <b>) return </b>Angle;
-  <b>function </b>Arcsin <b>(</b>X: Dimensionless; Cycle: Item<b>) return </b>Item <b>with </b>Post =&gt; Same_Dimension <b>(</b>Arcsin'Result, Cycle<b>)</b>;
+  <b>function </b>Arcsin <b>(</b>X: Dimensionless; Cycle: Item<b>) return </b>Item  <b>with </b>Post =&gt; Same_Dimension <b>(</b>Arcsin'Result, Cycle<b>)</b>;
   <b>function </b>Arccos <b>(</b>X: Dimensionless             <b>) return </b>Angle;
-  <b>function </b>Arccos <b>(</b>X: Dimensionless; Cycle: Item<b>) return </b>Item <b>with </b>Post =&gt; Same_Dimension <b>(</b>Arccos'Result, Cycle<b>)</b>;
+  <b>function </b>Arccos <b>(</b>X: Dimensionless; Cycle: Item<b>) return </b>Item  <b>with </b>Post =&gt; Same_Dimension <b>(</b>Arccos'Result, Cycle<b>)</b>;
   <b>function </b>Arctan <b>(</b>Y    : Item;
-                   X    : Item := One<b>) return </b>Angle <b>with </b>Pre =&gt; Same_Dimension <b>(</b>Y, X<b>) or else raise </b>Unit_Error;
+                   X    : Item := One<b>) return </b>Angle <b>with </b>Pre  =&gt; Same_Dimension <b>(</b>Y, X<b>) or else raise </b>Unit_Error;
   <b>function </b>Arctan <b>(</b>Y    : Item;
                    X    : Item := One;
-                   Cycle: Item       <b>) return </b>Item  <b>with </b>Pre =&gt; Same_Dimension <b>(</b>Y, X<b>) or else raise </b>Unit_Error;
+                   Cycle: Item       <b>) return </b>Item  <b>with </b>Pre  =&gt; Same_Dimension <b>(</b>Y, X<b>) or else raise </b>Unit_Error,
+                                                         Post => Same_Dimension (Arctan'Result, Cycle);
   <b>function </b>Arccot <b>(</b>X    : Item;
-                   Y    : Item := One<b>) return </b>Angle <b>with </b>Pre =&gt; Same_Dimension <b>(</b>X, Y<b>) or else raise </b>Unit_Error;
+                   Y    : Item := One<b>) return </b>Angle <b>with </b>Pre  =&gt; Same_Dimension <b>(</b>X, Y<b>) or else raise </b>Unit_Error;
   <b>function </b>Arccot <b>(</b>X    : Item;
                    Y    : Item := One;
-                   Cycle: Item       <b>) return </b>Item  <b>with </b>Pre =&gt; Same_Dimension <b>(</b>X, Y<b>) or else raise </b>Unit_Error;
+                   Cycle: Item       <b>) return </b>Item  <b>with </b>Pre  =&gt; Same_Dimension <b>(</b>X, Y<b>) or else raise </b>Unit_Error,
+                                                         Post => Same_Dimension (Arccot'Result, Cycle);
 
   <b>function </b>Sinh    <b>(</b>X: Dimensionless<b>) return </b>Dimensionless;
   <b>function </b>Cosh    <b>(</b>X: Dimensionless<b>) return </b>Dimensionless;
