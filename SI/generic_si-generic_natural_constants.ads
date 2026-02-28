@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2002, 2005, 2006, 2018, 2019, 2020
+-- Copyright (C) 2002, 2005, 2006, 2018, 2019, 2020, 2026
 --               Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
@@ -35,13 +35,15 @@ package Generic_SI.Generic_Natural_Constants is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   4.1
-  -- Date      9 August 2020
+  -- Version   4.2
+  -- Date      28 February 2026
   --====================================================================
   -- SI Redefinition became effective on May 20, 2019.
   -- Didn't find a better abbreviation for e_e, normally named just e.
   -- e_e stands for e(elementary).
   -- Change values, if necessary, to the newest measured values.
+  -- Attention: Use at least digits 15 for approximate precision; best
+  -- is digits 18.
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
@@ -55,6 +57,7 @@ package Generic_SI.Generic_Natural_Constants is
   --  C.G.    3.2  07.03.2020 Stefan-Boltzmann and Gas constants
   --  C.G.    4.0  11.05.2020 Parent renamed to Generic_SI
   --  C.G.    4.1  09.08.2020 Name Speed_of_Light added
+  --  C.G.    4.2  27.02.2028 Digits 18 is needed for precision
   --====================================================================
 
   -- Speed of Light in Vacuum
@@ -84,7 +87,7 @@ package Generic_SI.Generic_Natural_Constants is
   h     :          Item renames Planck;
   h_bar : constant Item := h / (2.0*Pi);
 
-  Alpha: constant Dimensionless := e_e**2/(2.0*Eps_0*h*c);  -- 1/137.035_999_11
+  Alpha: constant Dimensionless := e_e**2/(2.0*Eps_0*h*c);  -- 1/137.035_999_177
 
   -- Thermodynamics
 
