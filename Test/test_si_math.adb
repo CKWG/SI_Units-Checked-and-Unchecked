@@ -40,8 +40,8 @@ procedure Test_SI_Math is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   2.4
-  -- Date      13 February 2026
+  -- Version   2.5
+  -- Date      23 February 2026
   --====================================================================
   -- Test correct dimenioning of the mathematical functions.
   -- Note: The test cannot be run with the unchecked version since
@@ -59,6 +59,7 @@ procedure Test_SI_Math is
   --                          gnat_native=15.2.1; instead use new
   --                          function SI_is_Unchecked
   --  C.G.    2.4  13.02.2026 Added test for Tan and Arctan
+  --  C.G.    2.5  23.02.2026 Added test Tan, Cot and Inverses in degree
   --====================================================================
 
 begin
@@ -297,7 +298,7 @@ begin
   ----------------------------------------------------------
 
   Test_Step (Title => "Test Tan and Arctan",
-             Description => "Arguments and results must be correctly dimensioned");
+             Description => "Arguments and results must be correctly dimensioned.");
 
   Assert (Condition => Tan ((Pi/4.0)*"rad") = One,
           Message   => "Tan rad",
@@ -326,6 +327,31 @@ begin
   Assert (Condition => Arctan (2.0*"V", 2.0*"V", Cycle => 8.0*"m") = 1.0*"m",
           Message   => "Arctan correctly dimensioned",
           Only_Report_Error => False);
+
+  ----------------------------------------------------------
+
+  Test_Step (Title => "Test Tan, Cot and Inverses",
+             Description => "Beware of doing this: Use Dimensionless as a surrogate for Degree.");
+
+  declare
+    subtype Degree is Dimensionless;
+    Deg   : constant Degree :=   1.0*"";
+    Right : constant Degree :=  90.0*"";
+    Circle: constant Degree := 360.0*Deg;
+    Alpha : constant Degree :=  30.0*Deg;
+    Beta  : constant Degree :=  60.0*Deg;
+    TA    : constant Dimensionless := Tan (Alpha, Cycle => Circle);
+    CB    : constant Dimensionless := Cot (Beta , Cycle => Circle);
+    ATA   : constant Degree := Arctan (TA, Cycle => Circle);
+    ACB   : constant Degree := Arccot (CB, Cycle => Circle);
+  begin
+    Assert (Condition => abs (TA - CB) < 1.0E-7*"",
+            Message   => "Cot complement of Tan: " & TA'Image,
+            Only_Report_Error => False);
+    Assert (Condition => abs (ATA - (Right - ACB)) < 1.0E-5*"",
+            Message   => "Arccot complement of Arctan: " & ACB'Image & "°",
+            Only_Report_Error => False);
+  end;
 
   ----------------------------------------------------------
 
