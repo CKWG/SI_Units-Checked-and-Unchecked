@@ -17,6 +17,8 @@
       3.3  07.03.2020  Stefan_Boltzmann and Gas constants
       4.0  12.05.2020  Completely reworked; dimensions generic parameter
       4.1  21.10.2021  Name Speed_of_Light added
+      4.2  28.02.2026  Value of Alpha in comment changed from 1/137.035_999_11 to 1/137.035_999_177
+  --                   in accordance with CODATA; digits 18 is needed for enough precision
 //-->
 </head>
 
@@ -56,6 +58,8 @@ They were calculated from data available before the 1st of July 2017.
 See <a href="https://arxiv.org/ftp/arxiv/papers/1512/1512.03668.pdf">ArXiv</a>,
 Table 1.</p>
 
+<p>Attention: For enough precision, <span style="background-color: #FA4532">digits 18</span> is needed!</p>
+
 <h3 align="left">Specification</h3>
 
 <pre><b>generic
@@ -89,7 +93,7 @@ package </b>Generic_<a href="SI.html">SI</a>.Generic_Natural_Constants <b>is</b>
   h     :          Item <b>renames </b>Planck;
   h_bar : <b>constant </b>Item := h / <b>(</b>2.0*Pi<b>)</b>;
 
-  Alpha: <b>constant </b>Item := e_e**2/<b>(</b>2.0*Eps_0*h*c<b>)</b>;  <i>-- exact; 1/137.035_999_11</i>
+  Alpha: <b>constant </b>Item := e_e**2/<b>(</b>2.0*Eps_0*h*c<b>)</b>;  <i>-- exact; 1/137.035_999_177</i>
 
   -- <i>Thermodynamics</i>
 
