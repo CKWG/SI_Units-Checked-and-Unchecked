@@ -42,6 +42,7 @@
       7.2  01.01.2026  function Same_Dimension behaviour in unchecked variant;
                        bug fix in font color attribute
       7.3  13.02.2026  Postcondition for Arctan and Arccot
+      7.4  03.03.2026  Improve description of 'Image
 //-->
 </head>
 
@@ -390,9 +391,10 @@ Unit_Error is raised in case of wrong dimensions.</p>
 <p>In older versions of this library, the attributes 'Image and 'Value
 (which then did not exist for private types) were emulated by homonymous
 functions in the child package Generic_Strings (a rather unfortunate name).
-In Ada 2022, 'Image has been defined for any type and is now <font color="#0000F0">user-definable</font>;
-the replacement must be done here and hence Generic_Strings, now osolete,
-has been removed.
+In Ada 2022, 'Image has been defined for any type and is now
+<font color="#0000F0">user-definable</font>;
+the replacement must be done where the type is defined.
+Hence Generic_Strings, now osolete, has been removed.
 Also Value, the partner of 'Image, has therefore been moved here.</p>
 
 <pre>  <b>type </b>Item <b>is private <font color="#0000F0">with </b>Put_Image =&gt; Image</font>;</pre>
@@ -427,20 +429,25 @@ by the ARG for the time being, it might be resumed eventually.</p>
    DENOMINATOR =>  1)),
  VALUE =>  1.00000E+01)</pre>
  and similar output for other units.
- The following procedure is used to redefine the attribute 'Image.</p>
+ The following procedure is used to redefine the attribute 'Image:</p>
 
-<p><pre><b>procedure </b>Image <b>(</b>B: <b>in out </b>Ada.Strings.Text_Buffers.Root_Buffer_Type'Class; X: Item<b>)</b>;</pre>
-For the numeric part, the attribute works exactly like the corresponding
-numeric attribute, the unit is displayed in the
+<pre><b>procedure </b>Image <b>(</b>B: <b>in out </b>Ada.Strings.Text_Buffers.Root_Buffer_Type'Class; X: Item<b>)</b>;</pre>
+
+<p>For the numeric part, the attribute works exactly like the corresponding
+numeric attribute where the exact format of the numeric value depends of
+course on the actual floating point type; the unit is displayed in the
 <a href="SI-Text_IO.html#def">default representation</a>, for instance the
 above example produces</p>
+
 <pre>T := 10.0*&quot;K&quot;;
-T'Image = &quot;1.00000E+01*K&quot;  <i>-- <font color="#008000">in the checked variant</font></i>
-T'Image = &quot;1.00000E+01&quot;    <i>-- <font color="#FF0000">in the unchecked variant</font></i></pre>
+T'Image = &quot; 1.00000E+01*K&quot;  <i>-- <font color="#008000">in the checked variant</font></i>
+T'Image = &quot; 1.00000E+01&quot;    <i>-- <font color="#FF0000">in the unchecked variant</font></i></pre>
 
 <p>Value returns the argument as an item ignoring any leading or
 trailing blanks.</p>
+
 <pre><b>function </b>Value <b>(</b>X: String<b>) return </b>Item;</pre>
+
 <p><font color="#008000">In the checked variant, it takes into account
 the unit in any representation.</font>
 <font color="#FF0000">In the unchecked variant, it takes into account
