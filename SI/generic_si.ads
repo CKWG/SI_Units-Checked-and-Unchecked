@@ -51,8 +51,8 @@ package Generic_SI is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   8.2
-  -- Date      13 February 2026
+  -- Version   8.3
+  -- Date      14 March 2026
   --====================================================================
   -- Magnetic_Flux_Density is the classical name. Nowadays it's often
   -- just called Magnetic_Field.
@@ -118,6 +118,7 @@ package Generic_SI is
   --  C.G.    8.0  14.10.2025 Ada 2022: Redefine 'Image attribute
   --  C.G.    8.1  23.10.2025 Elementary_Functions generic parameter
   --  C.G.    8.2  13.02.2026 Postcondition for Arctan and Arccot
+  --  C.G.    8.3  14.03.2026 Body of SI_is_Unchecked moved to pckg body
   --====================================================================
 
   type Item is private with Put_Image => Image;
@@ -365,7 +366,5 @@ private
   Lux      : constant Item := (cd/m**2            , 1.0);  -- lx = lm/m**2
 
   Katal    : constant Item := (mol/s              , 1.0);  -- kat = mol/s
-
-  function SI_is_Unchecked return Boolean is (Meter = Mole);  -- any pair will do
 
 end Generic_SI;

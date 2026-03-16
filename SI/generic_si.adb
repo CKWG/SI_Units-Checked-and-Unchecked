@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2002, 2003, 2006, 2011, 2018, 2020, 2025
+-- Copyright (C) 2002, 2003, 2006, 2011, 2018, 2020, 2025, 2026
 -- Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
@@ -35,8 +35,8 @@ package body Generic_SI is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   8.0
-  -- Date      15 October 2025
+  -- Version   8.1
+  -- Date      14 March 2026
   --====================================================================
   --
   --====================================================================
@@ -69,7 +69,18 @@ package body Generic_SI is
   --  C.G.    8.0  15.10.2025 Ada 2022: Redefine 'Image attribute;
   --                          Generic_Strings renamed to
   --                          Generic_Unformatted_IO
+  --  C.G.    8.1  14.03.2026 SI_is_Unchecked considers assertion policy
   --====================================================================
+
+  function SI_is_Unchecked return Boolean is
+    T: Time;
+  begin
+    T := 1.0*"S";
+    return True;
+  exception
+    when Unit_Error =>
+      return False;
+  end SI_is_Unchecked;
 
   package Unformatted_IO is new Generic_Unformatted_IO;
 
