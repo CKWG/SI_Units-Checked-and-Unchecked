@@ -13,6 +13,7 @@
       1.3  07.11.2025  Bugzilla 122574
       1.4  24.11.2025  Added km/h example to proposed input check
       2.0  11.02.2026  Celsius
+      2.1  21.03.2026  Bug Assertion_Error in assignment
 //-->
 </head>
 
@@ -39,7 +40,7 @@ I will add them together with your name as author.</p>
 <a href="#degC">Celsius</a><br/>
 <a href="#Bugs">GNAT Bugs</a></p>
 
-<h3 align="center"><a name="Input">Input from Files</h3>
+<h3 align="center"><a name="Input">Input from Files</a></h3>
 
 <p>I ponder the idea of one perhaps important addition:</p>
 
@@ -82,7 +83,7 @@ be needed.</p>
 
 <p>Any thoughts?</p>
 
-<h3 align="center"><a name="degC">Celsius</h3>
+<h3 align="center"><a name="degC">Celsius</a></h3>
 
 <p>Celsius degrees are an addition that can easily be omitted from any
 application, just remove its packages.</p>
@@ -105,14 +106,26 @@ Celsius + Diff    &rarr; Celsius</pre>
 If you do need it, do not forget to define an appropriate IO functionality for
 <i>Diff</i>.</p>
 
-<h3 align="center"><a name="Bugs">GNAT Bugs</h3>
+<h3 align="center"><a name="Bugs">GNAT Bugs</a></h3>
 
 <p>This is a list of GNAT bugs affecting the code.</p>
 
 <ul>
-<li>Work-around for <b>[T526-002 public]</b> in generic_si.generic_vector_space.adb:
+<li>Known bug in <b>GNAT CE 2021</b>:<br/>
+    The wrong exception Assertion_Error (expected: Unit_Error) is raised for an assignment
+    with an incompatible dimension like
+    <pre>    declare
+      X: Time;  -- := 1.0*"m";  -- correct: Unit_Error
+    begin
+      X := 1.0*"m";  -- wrong: Assertion_Error
+    end;</pre>
+    For a wrong initialization, the correct exception is raised.<br/>
+    What is astonishing is that exactly this code is used in function SI_is_Unchecked,
+    where it works correctly.<br/>
+    This bug does not occur in <b>GNAT 15.2.1</b>.</li>
+<li>Work-around for <b>[T526-002 public]</b> in generic_si.generic_vector_space.adb:<br/>
     reported 26.05.2020: fixed in <b>GNAT 15.2.1</b>; [T520-013 public] did not fix it.</li>
-<li>Work-around for <b>Bugzilla 122161</b> in generic_si.generic_vector_space.ads:
+<li>Work-around for <b>Bugzilla 122161</b> in generic_si.generic_vector_space.ads:<br/>
     reported 04.10.2025: being fixed.</li>
 <li><b>Bugzilla 122574</b>, reported 05.11.2025: being fixed.<br/>
     This bug exists in <b>GNAT 15.2.1</b>; <b>GNAT CE 2021</b> is not affected.
