@@ -1,0 +1,33 @@
+Earth Data
+123456789012345678901234
+Mass                   5.9722E+24*kg
+                       5.9722E+0*Rg
+Equatorial Radius      6378.1370*km
+Polar Radius           6356.7523*km
+Mean Radius            6371.0088*km
+Gravitational Constant 6.67430E-11*m**3*kg**(-1)*s**(-2)
+Acceleration           9.8203*m/s**2
+
+12345678901234567890123|23456789012*
+Mass                     5.9722E+24*kg
+                             5.9722*Rg
+Equatorial Radius         6378.1370*km
+Polar Radius              6356.7523*km
+Mean Radius               6371.0088*km
+Gravitational Constant  6.67430E-11*m**3*kg**(-1)*s**(-2)
+Acceleration                 9.8203*m/s**2
+
+Mass                   TRUE
+                       TRUE
+Equatorial Radius      TRUE
+Polar Radius           TRUE
+Mean Radius            FALSE 3.33333333333030168E-02*m
+Gravitational Constant TRUE
+Acceleration           FALSE 2.47325566173758546E-05*m*s**(-2)
+Mass                   TRUE
+                       TRUE
+Equatorial Radius      TRUE
+Polar Radius           TRUE
+Mean Radius            FALSE 3.33333333333030168E-02*m
+Gravitational Constant TRUE
+Acceleration           FALSE 2.47325566173758546E-05*m*s**(-2)
