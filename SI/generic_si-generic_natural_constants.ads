@@ -34,8 +34,8 @@ package Generic_SI.Generic_Natural_Constants is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   4.3
-  -- Date      14 March 2026
+  -- Version   4.4
+  -- Date      30 March 2026
   --====================================================================
   -- SI Redefinition became effective on May 20, 2019.
   -- Didn't find a better abbreviation for e_e, normally named just e.
@@ -59,6 +59,7 @@ package Generic_SI.Generic_Natural_Constants is
   --  C.G.    4.1  09.08.2020 Name Speed_of_Light added
   --  C.G.    4.2  27.02.2026 Digits 18 is needed for precision
   --  C.G.    4.3  14.03.2026 Better unit H/m for Mu_0
+  --  C.G.    4.4  30.03.2026 Updated value Gravity (Wikipedia)
   --====================================================================
 
   -- Speed of Light in Vacuum
@@ -107,6 +108,6 @@ package Generic_SI.Generic_Natural_Constants is
 
   -- Gravity
 
-  Gravity: constant Item := 6.674_2E-11*"m**3/(kg*s**2)";
+  Gravity: constant Item := 6.674_30E-11*"m**3/(kg*s**2)";
 
 end Generic_SI.Generic_Natural_Constants;
