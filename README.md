@@ -15,7 +15,7 @@ The method comes in two variants, checked and unchecked, selected with a generic
 - *Checked*: Physical items carry with them their current dimension, so that all assignments and expressions are checked with respect to correct dimensions.
 - *Unchecked*: This variant has the exact same specification, but physical items only carry their numerical values, dimensions are stripped.
 
-**This is release 2.0.0.**<br>
+**This is release 2.0.0; Apr 7, 2026.**<br>
 Incompatible User Interface change: Ada 2022 defines the 'Image attribute for any type and allows its redefinition &ndash;
 since its default is impractical, the 'Image attribute has been redefined to deliver the same result as its previous homonymous
 replacement function, which does no longer exist; its partner, the Value function, has been moved to the base package where
