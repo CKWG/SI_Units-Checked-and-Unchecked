@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2008, 2018, 2020, 2025 Christoph Karl Walter Grein
+-- Copyright (C) 2008, 2018, 2020, 2025, 2026 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -40,8 +40,8 @@ procedure Test_SI_Text_IO_Strings is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   4.0
-  -- Date      21 August 2025
+  -- Version   4.3
+  -- Date      20 January 2026
   --====================================================================
   -- Test the Text_IO to and from string procedure.
   -- Note: Since output with default Dim parameter is tested, the test
@@ -54,6 +54,11 @@ procedure Test_SI_Text_IO_Strings is
   --  C.G.    2.1  29.09.2018 Unit syntax changed
   --  C.G.    3.0  13.05.2020 Dimensions generic parameter
   --  C.G.    4.0  21.08.2025 Test adapted to new impl. of Gen_Text_IO
+  --  C.G.    4.1  22.09.2025 [UA09-009 public] fixed  in alr 2.1.0
+  --                          gnat_native=15.2.1; instead use new
+  --                          function SI_is_Unchecked
+  --  C.G.    4.2  12.10.2025 Allow µ
+  --  C.G.    4.3  20.01.2026 Test case added "  -1.0 *km/h"
   --====================================================================
 
   procedure Test_Aft_Exp (Value: Item; Expected_D, Expected_F: String) is
@@ -102,21 +107,15 @@ begin
   Test_Step (Title => "Assertions",
              Description => "Test that Assertion_Policy is Check.");
 
-  declare
-    T: Time;
-  begin
-    T := 1.0*"S";
-    Assert (Condition => False,
-            Message   => "Switch on Assertion_Policy and use checked instantiation",
-            Only_Report_Error => False);
+  Assert (Condition => not SI_is_Unchecked,
+          Message   => "Assertion_Policy is Check",
+          Only_Report_Error => False);
+
+  if SI_is_Unchecked then
+    Put_Line ("Switch on Assertion_Policy and use checked instantiation");
     Test_Result;
     return;
-  exception
-    when Ada.Assertions.Assertion_Error =>
-      Assert (Condition => True,
-              Message   => "Exception Assertion_Error as expected",
-              Only_Report_Error => False);
-  end;
+  end if;
 
   -----------------------------------------------------------
 
@@ -139,44 +138,34 @@ begin
   Test_Prefix ( 2.0/"s**(1/3)", "/hs**(1/3)"    , Expected => "      9.28E+00/hs**(1/3)");
   Test_Prefix ( 2.0/"s*Em"    , "/(Ms*km**(+1))", Expected => "  2.00E-09/(Ms*km**(+1))");
   Test_Prefix (-3.0*"kV/mm"   , "V/m"           , Expected => "           -3.00E+06*V/m");
+  Test_Prefix (+4.0*"uF"      , "µF"            , Expected => "             4.00E+00*µF");
 
   ------------------------------------------------------------------------------
   Test_Step (Title => "Further Get tests",
-             Description => "Charakters foreign to syntax stop reading; others raise Illegal_Unit.");
+             Description => "Charakters foreign to syntax stop reading.");
 
   declare
     Value: Item;
     Last : Positive;
-  begin
-    for C in Character when C in 'A' .. 'Z' | 'a' .. 'z' | '(' | '+' | '-' | ')' loop
-      begin
-        Get ("1.0" & C, Value, Last);
-        Assert (Condition => False,
-                Message   => C & "Illegal_Unit raised",
-                Only_Report_Error => False);
-      exception
-        when Ex: Data_Error | Illegal_Unit =>
-          Assert (Condition => True,
-                  Message   => C & " consumed => " & Exception_Name (Ex) &
-                  -- Exception message for Data_Error is compiler specific, so omit it.
-                  (if Exception_Name (Ex) = "ADA.IO_EXCEPTIONS.DATA_ERROR" then ""
-                   else ' ' & Exception_Message (Ex)),
-                  Only_Report_Error => False);
-      end;
-    end loop;
-  end;
-
-  declare
-    Value: Item;
-    Last : Positive;
-  begin --12345   rest not read
+  begin --123456  rest not read
+    Get ("  -1.0 *km/h", Value, Last);
+    Assert (Condition => Value = -1.0*"" and Last = 6,
+            Message   => "space stops reading and is not read (Last =" & Last'Image & ')',
+            Only_Report_Error => False);
+        --12345   rest not read
     Get ("1.0*m k", Value, Last);
     Assert (Condition => Value = 1.0*"m" and Last = 5,
             Message   => "space stops reading and is not read (Last =" & Last'Image & ')',
             Only_Report_Error => False);
+        --123456   rest not read
     Get ("2.02*S;", Value, Last);
     Assert (Condition => Value = 2.02/"Ohm" and Last = 6,
             Message   => "semicolon stops reading and is not read (Last =" & Last'Image & ')',
+            Only_Report_Error => False);
+        --123456789   rest not read
+    Get ("  3.30*µF  ", Value, Last);
+    Assert (Condition => Value = 3.3*"uF" and Last = 9,
+            Message   => "space stops reading and is not read (Last =" & Last'Image & ')',
             Only_Report_Error => False);
   end;
 

@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2018, 2020, 2025 Christoph Karl Walter Grein
+-- Copyright (C) 2006, 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -24,37 +24,55 @@
 -- covered by the GNU Public License.
 --
 -- Author's email address:
---   christ-Usch.grein@t-online.de
+--   Christ-Usch.Grein@T-Online.de
 ------------------------------------------------------------------------------
 
-generic
+with Ada.Strings.Fixed;
 
-package Generic_SI.Generic_Strings is
+package body Rational_Arithmetics.Unformatted_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   2.1
-  -- Date      15 August 2025
+  -- Version   2.0
+  -- Date      16 October 2025
   --====================================================================
-  -- For the numeric part, Image and Value behave like the corresponding
-  -- attributes.
-  -- Image returns the argument as a string, the unit in default
-  -- representation; first index 1.
-  -- Value returns the argument as an item ignoring any leading or
-  -- trailing blanks. Constraint_Error is raised if the numeric string
-  -- does not have the correct format, Illegal_Unit is raised if the
-  -- unit string does not have the correct format.
+  --
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
-  --  C.G.    1.0  29.07.2018
-  --  C.G.    2.0  11.05.2020 Parent renamed to Generic_SI
-  --  C.G.    2.1  15.08.2025 Postcondition added
+  --  C.G.    1.0  27.02.2006
+  --  C.G.    2.0  16.10.2025 Renamed from Strings (was bad name)
   --====================================================================
 
-  pragma Elaborate_Body;
+  function Image (X: Rational) return String is
+    N: constant String := Whole'Image (X.Numerator);
+    D: constant String := Whole'Image (X.Denominator);
+  begin
+    if X.Denominator = 1 then
+      return N;
+    else
+      return N & '/' & D (2 .. D'Last);
+    end if;
+  end Image;
 
-  function Image (X: Item  ) return String with Post => Image'Result'First = 1;
-  function Value (X: String) return Item;
+  function Value (X: String) return Rational is
+    use Ada.Strings;
+    Y: String renames Fixed.Trim (X, Side => Both);
+    -- Append '/' so that it is always found:
+    S: Natural := Fixed.Index (Y & '/', "/");
+    N: constant Whole:= Whole'Value (Y (Y'First .. S-1));
+    D: Positive_Whole;
+  begin
+    if Y (S-1) = ' ' then  -- blank before /
+      raise Constraint_Error;
+    end if;
+    if S > Y'Last then
+      return (N, 1);
+    elsif Y (S+1) = ' ' then  -- blank after /
+      raise Constraint_Error;
+    end if;
+    D := Whole'Value (Y (S+1 .. Y'Last));
+    return N/D;
+  end Value;
 
-end Generic_SI.Generic_Strings;
+end Rational_Arithmetics.Unformatted_IO;

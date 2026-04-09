@@ -32,8 +32,8 @@ function Evaluate (Symbol: String) return Item is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   4.5
-  -- Date      11 August 2025
+  -- Version   4.6
+  -- Date      15 September 2025
   --====================================================================
   -- Symbol index starts always with 1.
   -- This is the time killer, so try to be efficient.
@@ -49,6 +49,7 @@ function Evaluate (Symbol: String) return Item is
   --  C.G.    4.3  27.02.2025 deka -> deca
   --  C.G.    4.4  11.04.2025 ha added
   --  C.G.    4.5  11.08.2025 Added reason string to raise
+  --  C.G.    4.6  15.09.2025 Allow µ
   --====================================================================
 
   pragma Optimize (Time);
@@ -120,7 +121,8 @@ function Evaluate (Symbol: String) return Item is
                   Prefix := ronto;
       when 's' => if Symbol = Symbol_List (s  ).Symbol then return Symbol_List (s  ).Value;
                elsif Symbol = Symbol_List (sr ).Symbol then return Symbol_List (sr ).Value; end if;
-      when 'u' => Prefix := micro;
+      when 'u' |
+           'µ' => Prefix := micro;
       when 'y' => Prefix := yocto;
       when 'z' => Prefix := zepto;
       when others => null;

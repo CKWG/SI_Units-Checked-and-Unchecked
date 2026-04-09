@@ -27,13 +27,15 @@
 --   Christ-Usch.Grein@T-Online.de
 ------------------------------------------------------------------------------
 
+with Ada.Strings.Text_Buffers;  -- 'Image redefinition
+
 generic
 package Generic_SI.Generic_Temperatures is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   2.0
-  -- Date      1 July 2025
+  -- Version   3.0
+  -- Date      20 October 2025
   --====================================================================
   -- Kelvin and Celsius use the same unit interval.
   -- So do Rankine and Fahrenheit.
@@ -74,9 +76,14 @@ package Generic_SI.Generic_Temperatures is
   --  C.G.    1.1  26.02.2006 pragma Pure
   --  C.G.    2.0  01.07.2025 Resurrect unconstrained_checked_si-
   --                          generic_temperatures and rename; overhaul
+  --  C.G.    3.0  20.10.2025 Redefine 'Image attribute
   --====================================================================
 
-  type Celsius is private;
+  type Celsius is private with Put_Image => Image;
+
+  -- Redefine attribute and add its inverse
+  procedure Image (B: in out Ada.Strings.Text_Buffers.Root_Buffer_Type'Class; X: Celsius);
+  function  Value (X: String) return Celsius;
 
   function "*" (Left: Real'Base; Right: String) return Celsius with Pre => Right = "°C" or else raise Unit_Error;
 

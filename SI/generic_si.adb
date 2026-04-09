@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2002, 2003, 2006, 2011, 2018, 2020, 2025
+-- Copyright (C) 2002, 2003, 2006, 2011, 2018, 2020, 2025, 2026
 -- Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
@@ -28,14 +28,15 @@
 --   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Generic_SI.Generic_Symbols;
+with Generic_SI.Generic_Unformatted_IO,
+     Generic_SI.Generic_Symbols;
 
 package body Generic_SI is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   7.4
-  -- Date      22 August 2025
+  -- Version   8.1
+  -- Date      14 March 2026
   --====================================================================
   --
   --====================================================================
@@ -65,7 +66,30 @@ package body Generic_SI is
   --  C.G.    7.3  16.08.2025 Implementation has_Dimension changed
   --  C.G.    7.4  22.08.2025 Common interface for evaluating all kinds
   --                          of unit indications
+  --  C.G.    8.0  15.10.2025 Ada 2022: Redefine 'Image attribute;
+  --                          Generic_Strings renamed to
+  --                          Generic_Unformatted_IO
+  --  C.G.    8.1  14.03.2026 SI_is_Unchecked considers assertion policy
   --====================================================================
+
+  function SI_is_Unchecked return Boolean is
+    T: Time;
+  begin
+    T := 1.0*"S";
+    return True;
+  exception
+    when Unit_Error =>
+      return False;
+  end SI_is_Unchecked;
+
+  package Unformatted_IO is new Generic_Unformatted_IO;
+
+  function Value (X: String) return Item renames Unformatted_IO.Value;
+
+  procedure Image (B: in out Ada.Strings.Text_Buffers.Root_Buffer_Type'Class; X: Item) is
+  begin
+    B.Put (Unformatted_IO.Image (X));
+  end Image;
 
   function Same_Dimension (X, Y: Item) return Boolean is (X.Unit = Y.Unit);
 

@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2025 Christoph Karl Walter Grein
+-- Copyright (C) 2025, 2026 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -32,8 +32,8 @@ package body Worker is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   1.00
-  -- Date      21 August 2025
+  -- Version   1.2
+  -- Date      22 January 2026
   --====================================================================
   -- Unit, the prefix and symbol, is created character per character;
   -- it might be correct if Read (the number of characters read from the
@@ -49,6 +49,8 @@ package body Worker is
   --                          works without exponents
   --  C.G.    0.3  11.08.2025 Works for unit strings
   --  C.G.    1.0  21.08.2025 Final touch
+  --  C.G.    1.1  15.09.2025 Allow µ
+  --  C.G.    1.2  22.01.2026 Replace forgotten 5 by Max
   --====================================================================
 
   Ident: Item := One;  -- the identifier in the syntax
@@ -71,7 +73,7 @@ package body Worker is
     Length := Length + 1;
     case U is
       when ' ' => Length := Length - 1;  -- must not be consumed
-                  return EoT;
+                  return EoT;            -- expected end of unit string
       when '*' => return '*';
       when '/' => return '/';
       when '(' => return '(';
@@ -79,9 +81,9 @@ package body Worker is
            '-' => return Sign;
       when ')' => return ')';
       when '0' .. '9' => return Digit;
-      when 'A' .. 'Z' | 'a' .. 'z' => return Letter;
+      when 'A' .. 'Z' | 'a' .. 'z' | 'µ' => return Letter;
       when others => Length := Length - 1;  -- must not be consumed
-                     return EoT;
+                     return EoT;            -- forced end of unit string
     end Case;
   end Next_Character;
 
@@ -98,7 +100,7 @@ package body Worker is
 
   procedure Evaluate_Symbol is
   begin
-    if Read > 5 then
+    if Read > Max then
       raise Illegal_Unit with "Symbol too long";
     end if;
     Ident := Evaluate (Unit (1 .. Read));

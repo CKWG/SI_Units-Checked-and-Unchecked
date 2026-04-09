@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2025 Christoph Karl Walter Grein
+-- Copyright (C) 2018, 2020, 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -27,39 +27,55 @@
 --   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Ada.Strings.Fixed;
+with Ada.Strings.Fixed,
+     Ada.Strings.Maps;
 
-package body Generic_SI.Generic_Temperatures.Generic_Strings is
+package body Generic_SI.Generic_Unformatted_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   1.0
-  -- Date      2 July 2025
+  -- Version   4.0
+  -- Date      15 October 2025
   --====================================================================
   --
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
-  --  C.G.    1.0  02.07.2025
+  --  C.G.    1.0  29.07.2018
+  --  C.G.    2.0  13.05.2020 Parent renamed to Generic_SI
+  --  C.G.    3.0  15.08.2025 Value reimplemented
+  --  C.G.    3.1  22.08.2025 Ensure_Task_Safety is new
+  --  C.G.    4.0  15.10.2025 Renamed from Generic_Strings
   --====================================================================
 
-  function Image (X: Celsius) return String is
-    Image: constant String := X.Value'Image;
+  function Image (X: Item) return String is
   begin
-    return Image & "°C";
+    return X.Value'Image & Image (X.Unit);
   end Image;
 
-  function Value (X: String) return Celsius is
-    Unit_Start: constant Natural := Ada.Strings.Fixed.Index (X, "°");
+  function Value (X: String) return Item is
+    Unit_Start: constant Natural := Ada.Strings.Fixed.Index (X, Ada.Strings.Maps.To_Set ("*/"));
+    use Ada.Strings, Ada.Strings.Fixed;
   begin
     if Unit_Start = 0 then
-      raise Unit_Error;
+      return Real'Base'Value (X) * One;  -- will raise Constraint_Error if X is not OK
+    elsif X (Unit_Start - 1) = ' ' then
+      raise Illegal_Unit with "illegal space";
+    else
+      declare
+        Value : constant Real'Base := Real'Base'Value (X (X'First .. Unit_Start - 1));
+        Trim_X: constant String    := Trim (X (Unit_Start .. X'Last), Right);
+        Result: Item;
+        Length: Positive;
+        package String_Interface is new Ensure_Task_Safety (Trim_X);  -- make task-safe
+      begin
+        Construct (String_Interface.Get'Access, Result, Length);
+        if Length /= Trim_X'Length then
+          raise Illegal_Unit with "string not exhausted";
+        end if;
+        return Value * Result;
+      end;
     end if;
-    declare
-      Num: constant Real'Base := Real'Value (X (X'First .. Unit_Start - 1));  -- will raise Constraint_Error if X is not OK
-    begin
-      return Num * Ada.Strings.Fixed.Trim (X (Unit_Start .. X'Last), Ada.Strings.Right);  -- will raise Unit_Error if unit is not OK
-    end;
-  end value;
+  end Value;
 
-end Generic_SI.Generic_Temperatures.Generic_Strings;
+end Generic_SI.Generic_Unformatted_IO;

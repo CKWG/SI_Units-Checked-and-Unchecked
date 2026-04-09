@@ -27,54 +27,36 @@
 --   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Ada.Strings.Fixed,
-     Ada.Strings.Maps;
+private generic
 
-package body Generic_SI.Generic_Strings is
+package Generic_SI.Generic_Unformatted_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   3.1
-  -- Date      22 August 2025
+  -- Version   3.0
+  -- Date      15 October 2025
   --====================================================================
-  --
+  -- For the numeric part, Image and Value behave like the corresponding
+  -- attributes.
+  -- Image returns the argument as a string, the unit in default
+  -- representation; first index 1.
+  -- Value returns the argument as an item ignoring any leading or
+  -- trailing blanks. Constraint_Error is raised if the numeric string
+  -- does not have the correct format, Illegal_Unit is raised if the
+  -- unit string does not have the correct format.
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
   --  C.G.    1.0  29.07.2018
-  --  C.G.    2.0  13.05.2020 Parent renamed to Generic_SI
-  --  C.G.    3.0  15.08.2025 Value reimplemented
-  --  C.G.    3.1  22.08.2025 Ensure_Task_Safety is new
+  --  C.G.    2.0  11.05.2020 Parent renamed to Generic_SI
+  --  C.G.    2.1  15.08.2025 Postcondition added
+  --  C.G.    3.0  15.10.2025 Made private for redefining 'Image;
+  --                          renamed from Generic_Strings
   --====================================================================
 
-  function Image (X: Item) return String is
-  begin
-    return X.Value'Image & Image (X.Unit);
-  end Image;
+  pragma Elaborate_Body;
 
-  function Value (X: String) return Item is
-    Unit_Start: constant Natural := Ada.Strings.Fixed.Index (X, Ada.Strings.Maps.To_Set ("*/"));
-    use Ada.Strings, Ada.Strings.Fixed;
-  begin
-    if Unit_Start = 0 then
-      return Real'Base'Value (X) * One;  -- will raise Constraint_Error if X is not OK
-    elsif X (Unit_Start - 1) = ' ' then
-      raise Illegal_Unit with "illegal space";
-    else
-      declare
-        Value : constant Real'Base := Real'Base'Value (X (X'First .. Unit_Start - 1));
-        Trim_X: constant String    := Trim (X (Unit_Start .. X'Last), Right);
-        Result: Item;
-        Length: Positive;
-        package String_Interface is new Ensure_Task_Safety (Trim_X);  -- make task-safe
-      begin
-        Construct (String_Interface.Get'Access, Result, Length);
-        if Length /= Trim_X'Length then
-          raise Illegal_Unit with "string not exhausted";
-        end if;
-        return Value * Result;
-      end;
-    end if;
-  end Value;
+  function Image (X: Item  ) return String with Post => Image'Result'First = 1;
+  function Value (X: String) return Item;
 
-end Generic_SI.Generic_Strings;
+end Generic_SI.Generic_Unformatted_IO;

@@ -1,5 +1,6 @@
 1.0 2.0*km 3.0/h
 4.0*km/h
+4.0*km/(h*dm**(-1)*hm) just for fun
 5.0; stays in input stream
 6.0/min; stays in input stream
 7.0m/s stays in input stream
@@ -10,3 +11,14 @@
 1.3*m**(3/kg stays in input stream
 1.4*m-3/kg stays in input stream
 1.5*As
+6_*ms stays in input stream
+0.0*K
+0.0°C stays in input stream (no Celsius)
+42.0*C
+44.0*°C stays in input stream
+-1
+-2*kA*s
+-3.E-3
+-.4
+-5.*pF
+-.6*K/hm

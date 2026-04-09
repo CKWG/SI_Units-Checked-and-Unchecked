@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2006, 2018, 2020 Christoph Karl Walter Grein
+-- Copyright (C) 2006, 2018, 2020, 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -23,24 +23,19 @@
 -- however invalidate any other reasons why the executable file might be
 -- covered by the GNU Public License.
 --
--- Source:
--- https://www.adaic.org/ada-resources/tools-libraries/
---   (see Christoph Grein's Essentials)
--- http://archive.adaic.com/tools/CKWG/Dimension/Dimension.html
---
 -- Author's email address:
 --   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
 with Generic_SI;
-with Actual_Dimensions;
+with Elementary_Functions, Actual_Dimensions;
 
-package SI is new Generic_SI (Float, Actual_Dimensions);
+package SI is new Generic_SI (Float, Elementary_Functions, Actual_Dimensions);
 
 --====================================================================
 -- Author    Christoph Grein
--- Version   3.0
--- Date      11 May 2020
+-- Version   4.0
+-- Date      23 October 2025
 --====================================================================
 --
 --====================================================================
@@ -49,4 +44,5 @@ package SI is new Generic_SI (Float, Actual_Dimensions);
 --  C.G.    1.0  22.02.2006
 --  C.G.    2.0  05.08.2018 Unit strings
 --  C.G.    3.0  11.05.2020 Dimensions generic parameter
+--  C.G.    4.0  23.10.2025 Elementary_Functions generic parameter
 --====================================================================

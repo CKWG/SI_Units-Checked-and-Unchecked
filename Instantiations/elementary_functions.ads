@@ -1,10 +1,10 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2006, 2018, 2020 Christoph Karl Walter Grein
+-- Copyright (C) 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
--- as published by the Free Software Foundation; either version 3
+-- as published by the Free Software Foundation; either version 2
 -- of the License, or any later version.
 --
 -- This program is distributed in the hope that it will be useful,
@@ -23,28 +23,22 @@
 -- however invalidate any other reasons why the executable file might be
 -- covered by the GNU Public License.
 --
--- Source:
--- https://www.adaic.org/ada-resources/tools-libraries/
---   (see Christoph Grein's Essentials)
--- http://archive.adaic.com/tools/CKWG/Dimension/Dimension.html
---
 -- Author's email address:
---   christ-Usch.grein@t-online.de
+--   Christ-Usch.Grein@T-Online.de
 ------------------------------------------------------------------------------
 
-with Generic_SI.Generic_Strings;
+with Ada.Numerics.Generic_Elementary_Functions;
 
-package SI.Strings is new SI.Generic_Strings;
+package Elementary_Functions is new Ada.Numerics.Generic_Elementary_Functions (Float);
 
 --====================================================================
 -- Author    Christoph Grein
--- Version   2.0
--- Date      11 May 2020
+-- Version   1.0
+-- Date      23 October 2025
 --====================================================================
--- Uncomment one of the two instantiations.
+--
 --====================================================================
 -- History
 -- Author Version   Date    Reason for change
---  C.G.    1.0  06.08.2018 Unit strings
---  C.G.    2.0  11.05.2020 Dimensions generic parameter
+--  C.G.    1.0  23.10.2025
 --====================================================================

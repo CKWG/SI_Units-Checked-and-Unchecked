@@ -28,6 +28,11 @@
       6.2  18.04.2025  Preconditions
       6.3  18.08.2025  Bug fix and more precision in syntax; link to Bureau International des Poids et Mesures
       6.4  04.09.2025  Generic parameter is new; improved examples
+      6.5  15.09.2025  Allow µ; corrected typos in description
+      6.6  11.10.2025  Presentation improved
+      6.7  20.01.2026  More precision in the presentation
+      6.8  27.01.2026  correct typos
+      6.9  29.03.2026  Again more precision
 //-->
 </head>
 
@@ -39,7 +44,7 @@
 like Ada.Text_IO.
 An additional parameter Dim, the <b>dimension format modifier</b>, is provided
 for the Put procedures, enabling output with a dimension indication
-different from the defalt one.</p>
+different from the default one.</p>
 
 <p><a href="#Specification">Specification</a><br/>
 <a href="#Unit">Unit Syntax</a><br/>
@@ -102,10 +107,10 @@ correct dimension format modifier it would be evaluated at least twice on each c
 
 <h3 align="left"><a name="Unit">Unit Syntax</a></h3>
 
-<p>An item is a value of generic type <code>Real'Base</code> multiplied by its dimension.
+<p>An item is a value of generic type <code>Real'Base</code> multiplied by its unit.
 There are two forms of items: an internal one as written in programs
-(e.g. 1.0*&quot;m&quot;) and an external one as output to or read from files
-or strings (e.g. 1.0*m).</p>
+(e.g. 1.0*&quot;m&quot;) and an external one as output to or read from files or
+strings (e.g. 1.0*m).</p>
 
 <p>This is the syntax of an external item:</p>
 
@@ -124,6 +129,9 @@ or strings (e.g. 1.0*m).</p>
    rational      ::= numeral [ / numeral]
    numeral       ::= digit {digit}</pre>
 
+<p>The exponent is included in parentheses as necessary according to normal Ada
+rules.</p>
+
 <p>There may be no spaces in an external item.</p>
 
 <p>This is the syntax of an internal item:</p>
@@ -136,13 +144,17 @@ or strings (e.g. 1.0*m).</p>
 
 <p>There may be no spaces between the string quotes.</p>
 
-<p>A <code>letter</code> is a character that is in one of the ranges <code>'A'..'Z'</code>
-or <code>'a'..'z'</code>.
+<p>A <code>letter</code> is a character that is in one of the ranges
+<code>'A'..'Z'</code> or <code>'a'..'z'</code> or is <code>'&micro;'</code>.<br/>
 The <code>identifier</code> must be interpretable as <code>[prefix] symbol</code>.</p>
 
 <p><code>prefix</code> and <code>symbol</code> are as defined in SI
-(case sensitive); <code>'u'</code> is used for micro instead of <code>'&micro;'</code>;
+(case sensitive); <code>'u'</code> may be used for micro instead of
+<code>'&micro;'</code>;
 <code>&quot;Ohm&quot;</code> is used for <code>'&Omega;'</code>.</p>
+
+<p>The <b>complete list of symbols and prefixes</b> can be found in
+package body Generic_SI.Generic_Symbols.</p>
 
 <p>Any prefixed SI unit may be used as defined in
 <a href="https://www.bipm.org/documents/20126/41483022/SI-Brochure-9-EN.pdf">
@@ -152,14 +164,11 @@ Of the non-SI units listed in this document, only hectare (ha), minute (min),
 hour (h), liter (l, L), and electronvolt (eV) are currently allowed; of these,
 only the last three may take prefixes.</p>
 
-<p>Note: &quot;ha&quot; (10,000 m<sup>2</sup>) is a special case; it is composed
-of the prefix hecto and the unit &quot;are&quot; ((10 m)<sup>2</sup>),
-but &quot;are&quot; is not allowed with SI, thus no prefixes are allowed and
-neither e.g. &quot;ka&quot; nor &quot;hha&quot; (allegedly 1 km<sup>2</sup>)
-are legal units.</p>
-
-<p>The <b>complete list of symbols</b> can be found in package body
-Generic_SI.Generic_Symbols.</p>
+<p>Note: &quot;ha&quot; (100*(10*m)<sup>2</sup> = (100*m)<sup>2</sup> = 10_000*m<sup>2</sup>)
+is a special case; it is composed of the prefix &quot;hecto&quot; and the unit &quot;are&quot;
+((10*m)<sup>2</sup> = 100*m<sup>2</sup>), but &quot;are&quot; is not allowed with SI, thus no
+prefixes are allowed and neither e.g. &quot;ka&quot; nor the alleged 1*km<sup>2</sup>
+&quot;hha&quot; are legal units.</p>
 
 <p>Deviations from the syntax will propagate <code>Illegal_Unit</code>.</p>
 
@@ -170,8 +179,8 @@ Generic_SI.Generic_Symbols.</p>
     1.0 * &quot;km/h&quot;                     1.0*km/h
     1.0 /&quot;ks&quot;                        1.0/ks
     1.0*&quot;N/cm**2&quot;                    1.0*N/cm**2
-    1.0/&quot;mol*s&quot;                      1.0/(mol*s)  -- <i>note the difference in parentheses</i>
-    1.0/&quot;(mol*s)&quot;                                 -- <i>illegal</i>
+    1.0/&quot;mol*s&quot;                      1.0/(mol*s)      -- <i>note the difference in parentheses</i>
+    1.0/&quot;(mol*s)&quot;                                     -- <i>illegal</i>
     6.674_2E-11*&quot;m**3/(kg*s**2)&quot;     6.674_2E-11*m**3/(kg*s**2)  -- <i>gravitational constant</i>
     1.0 * &quot;W&quot;                        1.0*W s          -- <i>legal (reading will stop after W, see syntax above)</i>
     1.0*&quot;&quot;                           1.0              -- <i>dimension 1</i>
@@ -182,18 +191,16 @@ Generic_SI.Generic_Symbols.</p>
     1.0*&quot;m/s**2*kg&quot;                  1.0*m/s**2*kg    -- <i>illegal (misleading), would be 1.0*m*kg/s**2</i>
     1.0*&quot;m/(s**2/kg)&quot;                1.0*m/(s**2/kg)  -- <i>illegal (no / in divisor)</i></pre>
 
-<a name="def"></a><p><font color="#008000">In the Checked variant, the default
-representation of the <code>dimension</code> is a product of all base units
-(m, kg, s, A, K, cd, mol in that sequence)
-with an exponent different from 0.
+<p><font color="#008000">In the Checked variant, the
+<b>default representation</b> of the <code>dimension</code> is a product of all
+base units (m, kg, s, A, K, cd, mol in that sequence) with an exponent different
+from 0.
 If the dimension is 1, the default representation is empty.
 Each base unit is given either as the pure unit (if the exponent is 1),
 or as the unit with an integer exponent if the exponent is a whole number
-(other than 1), or as the unit with a fractional exponent.
-The exponent is included in parentheses as necessary according to normal Ada
-rules.</font></p>
+(other than 1), or as the unit with a fractional exponent.</font></p>
 
-<p><font color="#FF0000">In the Unchecked variant, the default representation
+<p><font color="#FF0000">In the Unchecked variant, the <b>default representation</b>
 of the <code>dimension</code> is empty</font></p>
 
 <p>In the non-default representation, unit factors may be given with any
@@ -201,12 +208,16 @@ prefixes and symbols in any sequence and with any exponents.</p>
 
 <h3><a name="InOut">Input and Output</a></h3>
 
-<h4>Dimension format modifiers:</h4>
+<p>Additionally to the standard numeric format modifiers <code>Fore</code>,
+<code>Aft</code>, <code>Exp</code> of the <code>Get</code> operations,
+there is a dimension format modifier <code>Dim</code>.</p>
+
+<h4>Dimension format modifier:</h4>
 
 <p>Other than the unit strings, which have to begin with index 1, a format modifier
 may occupy any range.
 This is the syntax of a dimension format modifier after stripping any leading or
-trailing spaces (there may of course  be no spaces in the inside of the string):</p>
+trailing spaces (there may of course be no spaces inside the remaining string):</p>
 
 <pre>   modifier ::= &quot;&quot; | &quot;[*]quotient&quot; | &quot;/divisor&quot;</pre>
 
@@ -215,23 +226,24 @@ dimension (see examples below).</p>
 
 <pre>  <b>function</b> Valid_Modifier (X: Item; Dim: String) <b>return</b> Boolean;</pre>
 
-<p><font color="#008000">returns True if the Dim parameter is compatible with
-the dimension of X, else False.</font>
-<font color="#FF0000">In the unchecked variant, it returns always True.</font>
+<p><font color="#008000">in the Checked variant returns True if the Dim parameter
+is compatible with the dimension of X, else False.</font>
+<font color="#FF0000">In the Unchecked variant, it returns always True.</font>
 It raises Illegal_Unit if Dim does not have the syntax of a dimension
 format modifier.</p>
 
+<p>If the dimension format modifier is &quot;&quot; (the default), the default
+representation of the dimension is output.
+Else the numeric value is adapted according to the prefixes and the modifier is
+output (stripped of any leading or trailing spaces).</p>
+
 <h4>Output to Files or Strings:</h4>
 
-<p>If the dimension format modifier is &quot;&quot;, the numeric value and the
-default representation are output.
-If a modifier is given, the numeric value modified according to the
-prefixes is output followed by the modifier.</p>
+<p>For output to files, the numeric part is output first according to the rules of
+the RM, followed by the dimension.</p>
 
-<p>For output to files, the numeric part is output first, followed by the
-dimension.
-For output to strings, first the length of the dimension string is calculated,
-the remaining string part is used for the numeric value.</p>
+<p>For output to strings, first the dimension string is output right-aligned, the
+remaining string part is used for the numeric value according to the rules of the RM.</p>
 
 <p>The precondition has been commented out because otherwise the modifier
 would be evaluated at least twice.</p>
@@ -241,76 +253,105 @@ would be evaluated at least twice.</p>
 <pre><span>  Put (1.0/&quot;ks&quot;);&nbsp; -- output <font color="#008000">in the default representation as 0.001*s**(-1) for the
                    -- checked variant</font>, <font color="#FF0000">as 0.001 for the unchecked variant</font>
                    -- (for appropriately chosen numeric format modifiers)
-  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;mBq&quot;);&nbsp;  -- output as 1.0*mBq in both variants
-  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;*mBq&quot;);&nbsp; -- the same
-  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;/s&quot;);&nbsp;   -- output as 0.001/s in both variants
-  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;/s*2&quot;);&nbsp; -- exception Illegal_Unit
-  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;m&quot;);&nbsp;    -- <font color="#008000">exception Unit_Error for the checked variant</font>, 
-                                  -- <font color="#FF0000">output as 0.001*m for the unchecked variant</font></span></pre>
+  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;mBq&quot;);&nbsp;    -- output as 1.0*mBq in both variants
+  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot; *mBq &quot;);&nbsp; -- the same; note the stripped blanks
+  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;/s&quot;);&nbsp;     -- output as 0.001/s in both variants
+  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;/s*2&quot;);&nbsp;   -- exception Illegal_Unit
+  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;m&quot;);&nbsp;      -- <font color="#008000">exception Unit_Error for the checked variant</font>, 
+                                    -- <font color="#FF0000">output as 0.001*m for the unchecked variant</font>
+  Put (1.0*&quot;&deg;C&quot;);  -- impossible, you have to use the operation in Temperatures.Text_IO
+</span></pre>
 
 <h4>Input from Files or Strings:</h4>
 
 <p>Items may be read in any representation.</p>
 
-<p>If the value of the parameter Width is zero, first the value is read
-as with Get of standard Text_IO.Float_IO (i.e. skipping any leading blanks,
-line terminators, or page terminators; see RM A.10.9(13)); Data_Error may
-be raised in this step.
-In case Data_Error is not raised, then reads the longest possible sequence
-of characters matching the syntax given above.
-[This sentence is an exact copy of RM A.10.9(13), applied to the unit string.]</p>
+<p>For input from file, if the value of the parameter <code>Width</code> is
+zero, first the numeric value is read as with Get of standard Text_IO.Float_IO
+(i.e. skipping any leading blanks, line terminators, or page terminators;
+see RM A.10.9(13));</p>
 
-<p>If a nonzero value of Width is supplied, then exactly Width characters are
-input, or the characters (possibly none) up to a line terminator, whichever
-comes first; any skipped leading blanks are included in the count.
+<p>For input from string, first the numeric value is read from the
+beginning of the string, following the same rule as the Get procedure
+above, but treating the end of the string as a file terminator.</p>
+
+<p>Data_Error may be raised in these steps.</p>
+
+<p>In case Data_Error is not raised, then reads the longest possible sequence
+of characters matching the syntax of the dimension of an external item given
+above, or a prefix of such syntax.
+[This last sentence is an exact copy of RM A.10.9(13/7), applied to the unit
+string.]</p>
+
+<p>If a nonzero value of <code>Width</code> is supplied, then exactly Width
+characters are input, or the characters (possibly none) up to a line terminator,
+whichever comes first; any skipped leading blanks are included in the count.
 [This sentence is an exact copy of RM A.10.9(19).]</p>
 
-<p>Returns in the parameter X the value of type Item that corresponds to the
-sequence input.
+<p>Returns, in the parameter X, the value of type Item that corresponds to
+the sequence input.
+For input from string, additionally returns in Last the index value such that
+From (Last) is the last character read as with Get of standard Text_IO.Float_IO.
 Illegal_Unit is raised if the sequence input does not have the required syntax.
 [This sentence is an adaptation of RM A.10.9(21).]</p>
 
 <h4>Examples of Input for Width=0:</h4>
 
-<p>The following will be read as the pure number; reading stops after the number
-(there is no operator nor a letter after it), the characters after the number,
-i.e. ;m/s in the first example and m/s together with the leading space in the
-second sample will stay in the input stream.
-<i>Pure number</i> means a dimensionless item (or better an item with dimension 1),
-not a floating point value (numbers are read as with Ada.Text_IO.Float_IO, but this
-is SI.Text_IO, not Ada.Text_IO)!
+<p>The following will all be sucessfully read:</p>
 
-The internal representation would thus be 42.0*"".</p>
+<pre>  100.0*km/h
+  273.15*K
+  10.0*N/m**2</pre>
+
+<p>The following will be read as the dimensionless item (or better an item with
+dimension 1); reading stops after the number (there is no operator nor a letter
+after it), the characters after the number, i.e. <code>;m/s</code> in the first
+example and <code> m/s</code> together with the leading space in the second sample
+will stay in the input stream.
+[A <i>dimensionless item</i> is not a floating point value (those are read as with
+<code>Ada.Text_IO.Float_IO</code>, but this is <code>SI.Text_IO</code>, not
+<code>Ada.Text_IO</code>)!]
+The internal representation would thus be <code>42.0*&quot;&quot;</code>.</p>
 
 <pre>  42.0;m/s
   42.0 m/s</pre>
 
-<p>It is debatable whether the next input should better return the pure number as
-above but this looks too much like an oversight so that Illegal_Unit will be raised
-leaving m/s in the input stream.
+<p>It is debatable whether the next input should better return the dimensionless
+item as above but this looks too much like an oversight so that
+<code>Illegal_Unit</code> will be raised leaving <code>m/s</code> in the input
+stream.
 (Treating the examples above also like an oversight would mean to consume a
 character that is not part of the syntax.)</p>
 
 <pre>  42.0m/s</pre>
 
-<p>Both will be read the same; in the second sample, reading will stop at
-'[', leaving &quot;[-1]&quot; in the input stream.</p>
+<p>The following two lines will be read the same; in the second exsample, reading
+will stop at <code>[</code>, leaving <code>[-1]</code> in the input stream.</p>
 
 <pre>  42.0*m*s
   42.0*m*s[-1]</pre>
 
-<p>All the following items show syntax errors and will raise Illegal_Unit upon
-evaluation at different places, the offending character will stay in the input
+<p>All the following items show syntax errors and will raise <code>Illegal_Unit</code>
+upon evaluation at different places, the offending character will stay in the input
 stream.</p>
 
 <pre>  42.0*m/s*2
   42.0*m**(3/kg
   42.0*m-3/kg</pre>
 
-<p>The following item will be completely read and raise Illegal_Unit upon evaluation
-because A is an unknown prefix (Ampere-second would need an operator).</p>
+<p>The string <code>abcd</code> will be completely read because it is an
+<code>identifier</code> and thus legal syntax, but will raise <code>Illegal_Unit</code>
+because there is no such unit (leaving the exponent operator in the input stream).
+The same holds for the second example because <code>A</code> is an unknown prefix
+(Ampere-second would need an operator).</p>
+  
+<pre>  42.0*abcd**2
+  42.0*As</pre>
 
-<pre>  42.0*As</pre>
+<p>Celsius data will raise <code>Illegal_Unit</code> because it is alien to an
+<code>si_item</code> and has to be read with <code>Temperatures.Text_IO</code>.</p>
+
+<pre>  0.0&deg;C</pre>
 
 <p><a href="Table_of_Contents.html">Table_of_Contents</a></p>
 

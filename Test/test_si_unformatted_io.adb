@@ -34,21 +34,21 @@ with Ada.Strings.Fixed;
 with Test_Support;
 use  Test_Support;
 
-with SI.Strings;
-use  SI.Strings, SI;
+with SI;
+use  SI;
 
-procedure Test_SI_Strings is
+procedure Test_SI_Unformatted_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   3.0
-  -- Date      15 August 2025
+  -- Version   4.0
+  -- Date      20 October 2025
   --====================================================================
-  -- Test the Image and Value functions.
+  -- Test the 'Image attribute and the Value function.
   -- (Only a few simple tests. More extensive tests are performed in
   -- Test_SI_Units.)
-  -- Note: Since reversity of Image and Value is tested, the test cannot
-  --       run correctly on the unchecked version.
+  -- Note: Since reversity of 'Image and Value is tested, the test
+  --       cannot run correctly on the unchecked version.
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
@@ -57,13 +57,17 @@ procedure Test_SI_Strings is
   --  C.G.    1.2  13.02.2019 Test slightly improved
   --  C.G.    2.0  13.05.2020 Dimensions generic parameter
   --  C.G.    3.0  15.08.2025 New test: Value reimplemented
+  --  C.G.    3.1  22.09.2025 [UA09-009 public] fixed  in alr 2.1.0
+  --                          gnat_native=15.2.1; instead use new
+  --                          function SI_is_Unchecked
+  --  C.G.    4.0  20.10.2025 Renamed from Test_SI_Strings, use 'Image
   --====================================================================
 
   procedure Test_Image_Value (Legal_Image: String; Expected: Item) is
   begin
     -- Comparing images rather than values avoids small rounding errors:
-    Assert (Condition => Image (Value (Legal_Image)) = Image (Expected),
-            Message   => "Value of """ & Legal_Image & """ => """ & Image (Expected) & '"',
+    Assert (Condition => Value (Legal_Image)'Image = Expected'Image,
+            Message   => "Value of """ & Legal_Image & """ => """ & Expected'Image & '"',
             Only_Report_Error => False);
   exception
     when Illegal_Unit =>
@@ -94,34 +98,28 @@ procedure Test_SI_Strings is
 begin
 
   Test_Header (Title => "Test SI.Strings",
-               Description => "Test the Image and Value functions.");
+               Description => "Test the 'Image attribute and the Value function.");
 
   Test_Step (Title => "Assertions",
              Description => "Test that Assertion_Policy is Check.");
 
-  declare
-    T: Time;
-  begin
-    T := 1.0*"S";
-    Assert (Condition => False,
-            Message   => "Switch on Assertion_Policy and use checked instantiation",
-            Only_Report_Error => False);
+  Assert (Condition => not SI_is_Unchecked,
+          Message   => "Assertion_Policy is Check",
+          Only_Report_Error => False);
+
+  if SI_is_Unchecked then
+    Put_Line ("Switch on Assertion_Policy and use checked instantiation");
     Test_Result;
     return;
-  exception
-    when Ada.Assertions.Assertion_Error =>
-      Assert (Condition => True,
-              Message   => "Exception Assertion_Error as expected",
-              Only_Report_Error => False);
-  end;
+  end if;
 
   -----------------------------------------------------------
 
-  Test_Step (Title => "Image and Value",
+  Test_Step (Title => "'Image and Value",
              Description => "Functions must be inverses of one another.");
 
-  Assert (Condition => Image (Value (Image (5.0*"pF"))) = " 5.00000E-12*m**(-2)*kg**(-1)*s**4*A**2",
-          Message   => "Image of Value of Image """ & Image (5.0*"pF") & '"',
+  Assert (Condition => Value (Item'(5.0*"pF")'Image)'Image = " 5.00000E-12*m**(-2)*kg**(-1)*s**4*A**2",
+          Message   => "Image of Value of Image """ & Item'(5.0*"pF")'Image & '"',
           Only_Report_Error => False);
 
   Test_Image_Value ("  1.0"         ,   One);
@@ -130,7 +128,7 @@ begin
   Test_Image_Value ("  5.0*daOhm  " ,   5.0E+1*"Ohm" );  -- daOhm is longest legal symbol; leading and trailing spaces are ignored
   Test_Image_Value ("-42.0*Mg"      , -42.0E+3*"kg"  );
   Test_Image_Value (" -2.0/ms"      ,  -2.0E+3*"Hz"  );
-  Test_Image_Value ("-02.0/us  "    ,  -2.0E+3*"kBq" );
+  Test_Image_Value ("-02.0/µs  "    ,  -2.0E+3*"kBq" );
   Test_Image_Value ("  1.0/(m)"     ,   1.0   / "m"  );
   Test_Image_Value ("  1.0/(s*m)"   ,   1.0   / "m*s");
   Test_Image_Value (" 18.1*W/(m*K)" ,  18.1E+0*"kg*m*s**(-3)*K**(-1)");
@@ -179,4 +177,4 @@ begin
 
   Test_Result;
 
-end Test_SI_Strings;
+end Test_SI_Unformatted_IO;

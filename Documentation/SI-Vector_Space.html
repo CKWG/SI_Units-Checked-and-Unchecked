@@ -20,6 +20,7 @@
       4.1  14.10.2021  Predicate_Failure for subtypes
       5.0  01.04.2025  ToC Subheaders
       5.1  18.04.2025  Preconditions
+      5.2  23.10.2025  Real_Arrays renamed inside package
 //-->
 </head>
 
@@ -45,7 +46,8 @@ indirectly via dimensionless prototypes is used.</p>
 <a href="#Vectors">Vectors</a><br/>
 <a href="#Matrices">Matrices</a><br/>
 <a href="#Algebra">Algebra</a><br/>
-<a href="#Conv">Conversion to Prototypes</a></p>
+<a href="#Conv">Conversion to Prototypes</a><br/>
+<a href="#Real_Array">Notes to Real_Arrays</a></p>
 
 <h3><a name="Spec">Specification</a></h3>
 
@@ -53,10 +55,12 @@ indirectly via dimensionless prototypes is used.</p>
 
 <b>generic
 
-  with package </b>Real_Arrays <b>is new </b>Ada.Numerics.Generic_Real_Arrays (Generic_SI.Real);
-  <b>use </b>Real_Arrays;
+  with package </b>Instance <b>is new </b>Ada.Numerics.Generic_Real_Arrays (Generic_SI.Real);
 
 <b>package </b>Generic_<a href="SI.html">SI</a>.Generic_Vector_Space <b>is
+
+  package </b>Real_Arrays <b>renames</b> Instance;  -- <i>make name visible for clients</i>
+  <b>use </b>Real_Arrays;
 
   subtype </b>Axis <b>is </b>Integer <b>range </b>1 .. 3;
 
@@ -405,6 +409,13 @@ The following functions may be used to ease interfacing to that package.</p>
 <p>The functions Dim return the value 1.0 with the dimension of the argument.</p>
 
 <p>These functions fulfil the equation <code>to_Proto (X) * Dim (X) = X</code>.</p>
+
+<h3><a name="Real_Array">Notes to Real_Arrays</a></h3>
+
+<p>The package Instance is visible inside the generic, but not outside for clients
+of the instantiation of Generic_Vector_Space.
+Therefore it is renamed to Real_Arrays inside the specification in order to make
+the additional operations of Real_Arrays accessible for clients.</p>
 
 <h4>Example:</h4>
 

@@ -2,6 +2,8 @@
  2.00000E+03*m
  8.33333E-04*s**(-1)
  1.11111E+00*m*s**(-1)
+ 1.11111E-03*m*s**(-1)
+ADA.IO_EXCEPTIONS.DATA_ERROR "just for fun"
  5.00000E+00
 ADA.IO_EXCEPTIONS.DATA_ERROR "; stays in input stream"
  1.00000E-01*s**(-1)
@@ -16,3 +18,15 @@ SI.ILLEGAL_UNIT => syntax error after symbol "2 stays in input stream"
 SI.ILLEGAL_UNIT => unexpected character in number "kg stays in input stream"
 SI.ILLEGAL_UNIT => syntax error in symbol "-3/kg stays in input stream"
 SI.ILLEGAL_UNIT => prefix illegal ""
+ADA.IO_EXCEPTIONS.DATA_ERROR "*ms stays in input stream"
+ 0.00000E+00*K
+ 0.00000E+00
+ADA.IO_EXCEPTIONS.DATA_ERROR "°C stays in input stream (no Celsius)"
+ 4.20000E+01*s*A
+SI.ILLEGAL_UNIT => EoT no letter in symbol "°C stays in input stream"
+-1.00000E+00
+-2.00000E+03*s*A
+-3.00000E-03
+-4.00000E-01
+-5.00000E-12*m**(-2)*kg**(-1)*s**4*A**2
+-6.00000E-03*m**(-1)*K

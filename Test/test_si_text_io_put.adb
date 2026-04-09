@@ -43,8 +43,8 @@ procedure Test_SI_Text_IO_Put is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   4.0
-  -- Date      19 August 2025
+  -- Version   4.1
+  -- Date      22 September 2025
   --====================================================================
   -- The Fore, Aft, Exp format modifiers apply unchanged to the numeric
   -- value only, so no test is neede.
@@ -64,6 +64,9 @@ procedure Test_SI_Text_IO_Put is
   --  C.G.    3.0  14.05.2020 Dimensions generic parameter
   --  C.G.    3.1  03.07.2020 Split a test string into two
   --  C.G.    4.0  19.08.2025 New test: Put to file reimplemented
+  --  C.G.    4.1  22.09.2025 [UA09-009 public] fixed  in alr 2.1.0
+  --                          gnat_native=15.2.1; instead use new
+  --                          function SI_is_Unchecked
   --====================================================================
 
   package A renames Ada.Text_IO;
@@ -87,21 +90,15 @@ begin
   Test_Step (Title => "Assertions",
              Description => "Test that Assertion_Policy is Check.");
 
-  declare
-    T: Time;
-  begin
-    T := 1.0*"S";
-    Assert (Condition => False,
-            Message   => "Switch on Assertion_Policy and use Checked instantiation",
-            Only_Report_Error => False);
+  Assert (Condition => not SI_is_Unchecked,
+          Message   => "Assertion_Policy is Check",
+          Only_Report_Error => False);
+
+  if SI_is_Unchecked then
+    Put_Line ("Switch on Assertion_Policy and use checked instantiation");
     Test_Result;
     return;
-  exception
-    when Ada.Assertions.Assertion_Error =>
-      Assert (Condition => True,
-              Message   => "Exception Assertion_Error as expected",
-              Only_Report_Error => True);
-  end;
+  end if;
 
   -----------------------------------------------------------
 

@@ -28,14 +28,13 @@
 ------------------------------------------------------------------------------
 
 with Ada.Strings.Fixed;
-with Rational_Arithmetics.Strings;
 
 package body Generic_SI.Generic_Symbols is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   3.1
-  -- Date      22 August 2025
+  -- Version   3.2
+  -- Date      20 October 2025
   --====================================================================
   -- List of all unit symbols.
   --
@@ -59,6 +58,7 @@ package body Generic_SI.Generic_Symbols is
   --  C.G.    2.5  11.04.2025 ha added
   --  C.G.    3.0  02.08.2025 Completely new implementation started
   --  C.G.    3.1  22.08.2025 New profile for Construct
+  --  C.G.    3.2  20.10.2025 Remove useless "with Rat_Arith.Strings"
   --====================================================================
 
   subtype Symbol_Length is Positive range 1 .. 3;

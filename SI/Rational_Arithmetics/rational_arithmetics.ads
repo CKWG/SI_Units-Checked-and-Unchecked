@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2002, 2005, 2006, 2009, 2018 Christoph Karl Walter Grein
+-- Copyright (C) 2002, 2005, 2006, 2009, 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -23,17 +23,18 @@
 -- however invalidate any other reasons why the executable file might be
 -- covered by the GNU Public License.
 --
--- Author's homepage and email address:
---   http://www.christ-usch-grein.homepage.t-online.de/
+-- Author's email address:
 --   Christ-Usch.Grein@T-Online.de
 ------------------------------------------------------------------------------
 
-package Rational_Arithmetics is
+with Ada.Strings.Text_Buffers;
+
+package Rational_Arithmetics with Preelaborate is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   3.1
-  -- Date      24 July 2009
+  -- Version   4.0
+  -- Date      16 October 2025
   --====================================================================
   -- Define rational (n/m) and mixed (i + n/m) numbers.
   --====================================================================
@@ -48,10 +49,9 @@ package Rational_Arithmetics is
   --  C.G.    2.1  27.11.2005 Denominator returns Positive_Whole
   --  C.G.    3.0  27.02.2006 pragma Pure: Put Image and Value in child
   --  C.G.    3.1  24.07.2009 overriding
+  --  C.G.    4.0  16.10.2025 'Image and Value again here;
+  --                          attribute Preelaborate (cannot be pure)
   --====================================================================
-
-  pragma Pure;
-  pragma Elaborate_Body;
 
   -- Whole numbers
 
@@ -68,7 +68,11 @@ package Rational_Arithmetics is
 
   -- Rational numbers
 
-  type Rational is private;
+  type Rational is private with Put_Image => Image;
+
+  -- Redefine attribute and add its inverse
+  procedure Image (B: in out Ada.Strings.Text_Buffers.Root_Buffer_Type'Class; X: Rational);
+  function  Value (X: String) return Rational;
 
   function Numerator   (R: Rational) return Whole;
   function Denominator (R: Rational) return Positive_Whole;

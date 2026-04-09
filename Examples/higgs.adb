@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
--- Checked and Unchecked ComImageation with SI Units
--- Copyright (C) 2018, 2020, 2025 Christoph Karl Walter Grein
+-- Checked and Generic Computation with SI Units
+-- Copyright (C) 2026 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -24,54 +24,46 @@
 -- covered by the GNU Public License.
 --
 -- Author's email address:
---   christ-Usch.grein@t-online.de
+--   christ-usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Ada.Strings.Fixed;
+with Ada.Text_IO;
+use  Ada.Text_IO;
 
-separate (Generic_SI.Generic_Symbols)
-function Image (X: Dimensions.Dimension) return String is
+with SI.Nat, SI.IO;
+use  SI.Nat, SI.IO, SI;
+
+procedure Higgs is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   2.1
-  -- Date      20 October 2025
+  -- Version   1.0
+  -- Date      28 February 2026
   --====================================================================
+  -- From:
+  -- Spektrum der Wissenschaft 3.26 (the German edition of Scientific
+  -- American)
+  -- Manon Bischoff - When the Simpsons predicted the mass of the Higgs
+  -- boson.
   --
+  -- This is just for fun.
+  -- Float (digits 6) is not exact enough to produce the correct values,
+  -- Long_Float (digits 15) is near; Long_Long_Float (digits 18) is
+  -- appropriate.
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
-  --  C.G.    1.0  29.07.2018 Extracted from Text_IO
-  --  C.G.    2.0  13.05.2020 Parent renamed to Generic_Symbols
-  --  C.G.    2.1  20.10.2025 Use new Rational 'Image attribute
+  --  C.G.    1.0  28.02.2026 Just for fun
   --====================================================================
 
-  function Image (Symbol: String; Value: in Rational) return String is
-  begin
-    if Value = 0 then
-      return "";
-    else
-      declare
-        use Ada.Strings, Ada.Strings.Fixed;
-        Exp  : constant String := (if Value = 1 then "" else "**");
-        Open : constant String := (if Value < 0 or Denominator (Value) /= 1 then "(" else "");
-        Close: constant String := (if Value < 0 or Denominator (Value) /= 1 then ")" else "");
-        Image: constant String := (if Value = 1 then "" else Trim (Value'Image, Left));
-      begin
-        return
-          '*' & Symbol & Exp & Open & Image & Close;
-      end;
-    end if;
-  end Image;
+  Higgs_Mass: constant Energy := 125.0*"GeV";                         -- measured 2012
+  Simpsons  : constant Mass   := Pi * Alpha**8 * Sqrt (h*c/Gravity);  -- predicted 20 Sept 1988, about 775 GeV
+  Improved  : constant Mass   := Simpsons / 6.0;
 
 begin
 
-  return Image ("m"  , Dimensions.m   (X)) &
-         Image ("kg" , Dimensions.kg  (X)) &
-         Image ("s"  , Dimensions.s   (X)) &
-         Image ("A"  , Dimensions.A   (X)) &
-         Image ("K"  , Dimensions.K   (X)) &
-         Image ("cd" , Dimensions.cd  (X)) &
-         Image ("mol", Dimensions.mol (X));
+  Put (Higgs_Mass     , Aft => 1, Exp => 0, Dim => "GeV");  Put_Line (" measured");   --   Float     Long_Float
+  Put (Simpsons * c**2, Aft => 1, Exp => 0, Dim => "GeV");  Put_Line (" predicted");  -- 1113.7*GeV   773.1*GeV
+  Put (Improved * c**2, Aft => 1, Exp => 0, Dim => "GeV");  Put_Line (" improved");   --  185.6*GeV   128.9*GeV
 
-end Image;
+end Higgs;

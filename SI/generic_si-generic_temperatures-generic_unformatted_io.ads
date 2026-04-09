@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2006, 2018, 2025 Christoph Karl Walter Grein
+-- Copyright (C) 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -23,35 +23,35 @@
 -- however invalidate any other reasons why the executable file might be
 -- covered by the GNU Public License.
 --
--- Author's homepage and email address:
---   http://www.christ-usch-grein.homepage.t-online.de/
---   Christ-Usch.Grein@T-Online.de
+-- Author's email address:
+--   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-package Rational_Arithmetics.Strings with Preelaborate is
+private generic
+
+package Generic_SI.Generic_Temperatures.Generic_Unformatted_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   1.2
-  -- Date      3 August 2025
+  -- Version   2.0
+  -- Date      17 October 2025
   --====================================================================
-  -- Image returns the argument as a string.
-  -- If the denominator is 1, the string has the format "sn", else it
-  -- has the format "sn/m" where there is no white space around '/',
-  -- and the sign 's' is blank for non-negative numbers.
-  -- Value returns the argument into a rational number ignoring any
-  -- leading or trailing blanks.
-  -- It raises Constraint_Error if the string does not have the
-  -- aforementioned format.
+  -- For the numeric part, Image and Value behave like the corresponding
+  -- attributes and may raise the appropriate exceptions.
+  -- If no exception is raised, then:
+  -- Image appends the unit "°C".
+  -- Value checks if the numeric part is followed by the correct unit,
+  -- else Unit_Error is raised. Trailing blanks are ignored.
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
-  --  C.G.    1.0  27.02.2006
-  --  C.G.    1.1  29.07.2018 pragma Preelaborate
-  --  C.G.    1.2  03.08.2025 aspect Preelaborate
+  --  C.G.    1.0  02.07.2025
+  --  C.G.    2.0  17.10.2025 Renamed from Generic_Strings, private
   --====================================================================
 
-  function Image (X: Rational) return String;
-  function Value (X: String  ) return Rational;
+  pragma Elaborate_Body;
 
-end Rational_Arithmetics.Strings;
+  function Image (X: Celsius) return String;
+  function Value (X: String ) return Celsius;
+
+end Generic_SI.Generic_Temperatures.Generic_Unformatted_IO;

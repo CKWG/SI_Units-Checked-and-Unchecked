@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2006 Christoph Karl Walter Grein
+-- Copyright (C) 2006, 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -23,13 +23,12 @@
 -- however invalidate any other reasons why the executable file might be
 -- covered by the GNU Public License.
 --
--- Author's homepage and email address:
---   http://www.christ-usch-grein.homepage.t-online.de/
+-- Author's email address:
 --   Christ-Usch.Grein@T-Online.de
 ------------------------------------------------------------------------------
 
-with Rational_Arithmetics.Strings;
-use  Rational_Arithmetics.Strings, Rational_Arithmetics;
+with Rational_Arithmetics;
+use  Rational_Arithmetics;
 
 with Test_Support;
 use  Test_Support;
@@ -38,8 +37,8 @@ procedure Test_Rational_Image_Value is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   1.1
-  -- Date      27 February 2006
+  -- Version   2.0
+  -- Date      16 October 2025
   --====================================================================
   -- Test the Image and Value functions.
   --====================================================================
@@ -47,7 +46,15 @@ procedure Test_Rational_Image_Value is
   -- Author Version   Date    Reason for change
   --  C.G.    1.0  15.02.2006
   --  C.G.    1.1  27.02.2006 Image and Value were moved into child
+  --  C.G.    2.0  16.10.2025 'Image redefined
   --====================================================================
+
+  procedure Valid_Image (X: Rational; Fraction, Expected: String) is
+  begin
+    Assert (Condition         => X'Image = Expected,
+            Message           => "Image of " & Fraction & " =" & X'Image,
+            Only_Report_Error => False);
+  end Valid_Image;
 
   procedure Value_Exc (X: in String) is
     R: Rational;  -- must not call Value here
@@ -70,53 +77,42 @@ begin
 
   -----------------------------------------------------------------------
   Test_Step (Title       => "Test Image",
-             Description => "");
+             Description => "No exceptions");
 
-  Assert (Condition         => Image (5/1) = " 5",
-          Message           => "Image (5/1) =" & Image (5/1),
-          Only_Report_Error => False);
-
-  Assert (Condition         => Image (-14/2) = "-7",
-          Message           => "Image (-14/2) = " & Image (-14/2),
-          Only_Report_Error => False);
-
-  Assert (Condition         => Image (3/4) = " 3/4",
-          Message           => "Image (3/4) =" & Image (3/4),
-          Only_Report_Error => False);
-
-  Assert (Condition         => Image (-12/9) = "-4/3",
-          Message           => "Image (-12/9) = " & Image (-12/9),
-          Only_Report_Error => False);
+  Valid_Image (  5/1, Fraction => "  5/1", Expected => " 5");
+  Valid_Image (-14/2, Fraction => "-14/2", Expected => "-7");
+  Valid_Image (  3/4, Fraction => "  3/4", Expected => " 3/4");
+  Valid_Image (-12/9, Fraction => "-12/9", Expected => "-4/3");
 
   -----------------------------------------------------------------------
   Test_Step (Title       => "Test Value",
              Description => "No exceptions");
 
-  Assert (Condition         => Image (Value ("5")) = " 5",
+  Assert (Condition         => Value ("5")'Image = " 5",
           Message           => "Value (""5"")",
           Only_Report_Error => False);
 
-  Assert (Condition         => Image (Value ("  5  ")) = " 5",
+  Assert (Condition         => Value ("  5  ")'Image = " 5",
           Message           => "Value (""  5  "")",
           Only_Report_Error => False);
 
-  Assert (Condition         => Image (Value ("  +8  ")) = " 8",
+  Assert (Condition         => Value ("  +8  ")'Image = " 8",
           Message           => "Value (""  +8  "")",
           Only_Report_Error => False);
 
-  Assert (Condition         => Image (Value ("  -5  ")) = "-5",
+  Assert (Condition         => Value ("  -5  ")'Image = "-5",
           Message           => "Value (""  -5  "")",
           Only_Report_Error => False);
 
-  Assert (Condition         => Image (Value ("  15/3  ")) = " 5",
+  Assert (Condition         => Value ("  15/3  ")'Image = " 5",
           Message           => "Value (""  15/3  "")",
           Only_Report_Error => False);
 
-  Assert (Condition         => Image (Value ("  +3/15  ")) = " 1/5",
+  Assert (Condition         => Value ("  +3/15  ")'Image = " 1/5",
           Message           => "Value (""  +3/15  "")",
           Only_Report_Error => False);
 
-  Assert (Condition         => Image (Value ("  -15/3  ")) = "-5",
+  Assert (Condition         => Value ("  -15/3  ")'Image = "-5",
           Message           => "Value (""  -15/3  "")",
           Only_Report_Error => False);
 

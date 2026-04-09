@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2002, 2005, 2006, 2018 Christoph Karl Walter Grein
+-- Copyright (C) 2002, 2005, 2006, 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -23,17 +23,18 @@
 -- however invalidate any other reasons why the executable file might be
 -- covered by the GNU Public License.
 --
--- Author's homepage and email address:
---   http://www.christ-usch-grein.homepage.t-online.de/
+-- Author's email address:
 --   Christ-Usch.Grein@T-Online.de
 ------------------------------------------------------------------------------
+
+with Rational_Arithmetics.Unformatted_IO;
 
 package body Rational_Arithmetics is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   3.0
-  -- Date      27 February 2006
+  -- Version   4.0
+  -- Date      16 October 2025
   --====================================================================
   -- Because we've made some operators abstract, we've to use some type
   -- conversions to obtain the needed operations. They will not produce
@@ -50,7 +51,15 @@ package body Rational_Arithmetics is
   --  C.G.    2.1  27.11.2005 Denominator returns Positive_Whole
   --  C.G.    2.2  01.02.2006 Bug fix in Value
   --  C.G.    3.0  27.02.2006 pragma Pure: Put Image and Value in child
+  --  C.G.    4.0  16.10.2025 'Image and Value again here
   --====================================================================
+
+  function Value (X: String) return Rational renames Unformatted_IO.Value;
+
+  procedure Image (B: in out Ada.Strings.Text_Buffers.Root_Buffer_Type'Class; X: Rational) is
+  begin
+    B.Put (Unformatted_IO.Image (X));
+  end Image;
 
   function GCD (Left, Right: Whole) return Integer is
     L: Whole := Left;

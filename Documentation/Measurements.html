@@ -13,6 +13,9 @@
       1.2  16.08.2025  Link to Kazakov's work and AdaCore's language extension;
                        colored important results
       1.3  05.09.2025  Further coloring
+      1.4  26.10.2025  GNAT 15.2.1 optimized -O3, but -gnatn (Inline) does not link:
+                       only assertion effect
+      1.5  24.01.2026  Final measurement interpretation
 //-->
 </head>
 
@@ -22,45 +25,52 @@
 
 <p>Checking units of measurement during runtime will inevitably slow down the
 execution time compared to the pure numerics, a waste (?) of execution time
-which 
-may be prohibitive for some applications.
-This library enables using strict unit checking during the development
-phase (until unit test phase), and switching off the checks when releasing
-the project into the wild.
-Nevertheless, there will be residues of the checking in the code which
-<b>slow down the execution time by a factor of around 10, see the relative
-timing below in the comparison of the <i>Nude</i> and the <i>Optimized</i>
-values in the <i>Unchecked</i> variant, which represent the truly important
-results</b>.</p>
+which may be prohibitive for some applications.
+This library enables using strict unit checking during the development phase
+(until unit test phase), and switching off the checks when releasing the project
+into the wild.
+Nevertheless, there will be residues of the checking in the code which <b>slow down
+the execution time, see the relative timing below in the comparison of the <i>Nude</i>
+and the <i>Optimized</i> values in the <i>Unchecked</i> variant, which represent the
+truly important results</b>.</p>
 
-<p>So before you now delve into the measurement results because you are
-pondering the idea of unit checking, keep in mind that the results presented
-here are not representative.
+<p>So before you now delve into the measurement results because you are pondering
+the idea of unit checking, keep in mind that the results presented here are not
+representative.
 <b>Do measure your project yourself!</b></p>
 
-<p>If you feel this library inappropriate, think about trying Dmitry Kazakov's
-<a href="https://www.dmitry-kazakov.de/ada/units.htm">Units of Measurement for Ada</a>
-or <a href="https://gcc.gnu.org/onlinedocs/gnat_ugn.pdf">AdaCore's language extension</a>
-(see chapter 6.5) of which I gave a (meanwhile outdated) assessment here:
-<a href="http://archive.adaic.com/tools/CKWG/Dimension/Physical_units_with_GNAT_GPL_2013-AUJ35.1.pdf">
-Physical units with GNAT</a> (I do not know if there has been any progress,
-I have never used it myself &ndash; but note: <i>This is not Ada standard</i>
-and probably never will be).</p>
+<p>If you feel this library inappropriate, think about trying one of these alternatives:</p>
+
+<ul>
+<li>Dmitry Kazakov's <a href="https://www.dmitry-kazakov.de/ada/units.htm">Units of Measurement for Ada</a></li>
+<li><a href="https://gcc.gnu.org/onlinedocs/gnat_ugn.pdf">AdaCore's language extension</a>
+    (see chapter 6.5) of which I gave a (meanwhile outdated) assessment here:
+    <a href="http://archive.adaic.com/tools/CKWG/Dimension/Physical_units_with_GNAT_GPL_2013-AUJ35.1.pdf">
+    Physical units with GNAT</a> (I do not know if there has been any progress,
+    I have never used it myself &ndash; but note: <i>This is not Ada standard</i>
+    and probably never will be).</li>
+</ul>
 
 <hr width="100%">
-
-<p>Measurements of relative speeds were performed with
-<b>GNAT CE 2021</b> on <b>Windows 8.1 with an old and slow
-machine</b> and on <b>Windows 11 with a brandnew fast
-machine</b>.</p>
 
 <p>The Schottky Langmuir equation is used for execution time
 measurements because it has rational exponents.
 Quaternions may be used similarly to matrices for coordinate
 transformations but need much more time.</p>
 
-<p>For details, see the program <code>measure.adb</code> in
-directory <code>Examples</code>.</p>
+<p>Measurements of relative speeds were performed with:</p>
+
+<ul>
+<li>GNAT CE 2021 on Windows 8.1 with an old and slow machine,</li>
+<li>GNAT CE 2021 on Windows 11 with a brandnew fast machine;</li>
+</ul>
+
+<p>Unfortunately, there is a <b>bug in GNAT 15.2.1</b> (reported 05.11.2025,
+Bugzilla 122574): <b>The switch -gnatn for inlining prevents linking because
+it produces unresolved references.</b>
+Inlining function calls is essential for this library &ndash; without it,
+execution time literally explodes.</b>
+The correction is expected in the next GNAT generation 16.</p>
 
 <p>Loops are used with one million repetitions.</p>
 
@@ -74,23 +84,29 @@ directory <code>Examples</code>.</p>
 
 <p>Before the measurements are discussed, a strange effect has to be
 discussed.
-We are interested in the speed of the checked and unchecked versions
-in comparison with the pure mathematics, i. e. the time consumed for
-the <b>nude</b> Schottky Langmuir equation with only floating point
-data.</p>
+We are interested in the speed of the <b>checked</b> and <b>unchecked</b>
+versions in comparison with the <b>pure mathematics</b>, i. e. the time
+consumed for the <b>nude</b> Schottky Langmuir equation with
+<b>only floating point data</b>.
+For the different Ada code versions of the equation used for
+measurements see below.</p>
 
-<p>This <b>nude</b> equation is compiled twice, once with Assertion Policy
-set to <code>Ignore</code> and once set to <code>Check</code>.
+<p>Thus, first the effect of switching on and off the
+<code>Assertion_Policy</code> pragma on the nude equations is measured:</p>
+
+<p>This <b>nude</b> equation is compiled twice,
+<font color="#0000F0">once with Assertion Policy set to <code>Ignore</code>
+and once set to <code>Check</code></font>.
 Although the code is identical and there are no assertions, the
-execution time different by an astonishing big factor.
-This difference must be attributed to the executable produced by GNAT
-depending on the switch <code>-gnata</code>, which corresponds to the
-<code>Assertion_Policy</code> pragma.</p>
+execution times differ by an astonishing big factor.
+This difference must solely be attributed to the differences in the executables
+produced by GNAT depending on the <code>Assertion_Policy</code> pragma, which
+corresponds to the switch <code>-gnata</code>.</p>
 
 <!-- ============= Assertion Effect ============ -->
 <table align="center">
 
-<caption><b>GNAT CE 2021 Windows 8.1</b><br/>&nbsp;</caption>
+<caption><b>GNAT CE 2021 Windows 8.1</b><br/>(slow machine)<br/>&nbsp;</caption>
 
 <colgroup>
 <col width=" 70"/>
@@ -106,7 +122,7 @@ depending on the switch <code>-gnata</code>, which corresponds to the
 
 <tr>
 <th>Ignore</th>
-<td>0.015771666 s</td>
+<td><font color="#CA7D0C">0.015771666 s</font></td>
 <td><font color="#0000F0">1.00</font></td>
 </tr>
 
@@ -124,7 +140,7 @@ depending on the switch <code>-gnata</code>, which corresponds to the
 <!-- ============= Assertion Effect ============ -->
 <table align="center">
 
-<caption><b>GNAT CE 2021 Windows 11</b><br/>&nbsp;</caption>
+<caption><b>GNAT CE 2021 Windows 11</b><br/>(fast machine)<br/>&nbsp;</caption>
 
 <colgroup>
 <col width=" 70"/>
@@ -140,7 +156,7 @@ depending on the switch <code>-gnata</code>, which corresponds to the
 
 <tr>
 <th>Ignore</th>
-<td>0.002838900 s</td>
+<td><font color="#CA7D0C">0.002838900 s</font></td>
 <td><font color="#0000F0">1.00</font></td>
 </tr>
 
@@ -153,15 +169,64 @@ depending on the switch <code>-gnata</code>, which corresponds to the
 </table>
 <!-- =========== Assertion Effect End ========== -->
 
+<p>Comparing the above pair
+<font color="#CA7D0C">slow vs. fast machine</font>, you see a speed-up with
+the new fast machne by a factor of <font color="#CA7D0C">about 5.5</font>,
+whereas the relative time differences remain approximately the same
+<font color="#0000F0">between 6 and 7</font>.</p>
+
+<!-- ============= Assertion Effect 15.2.1 opt ============ -->
+<table align="center">
+
+<caption><b>GNAT 15.2.1 Windows 11</b><br/>
+(-O3, no Inline)<br/>&nbsp;</caption>
+
+<colgroup>
+<col width=" 70"/>
+<col width="110"/>
+<col width=" 50"/>
+</colgroup>
+
+<tr>
+<th>Assertion</th>
+<th>Absolute</th>
+<th>Relative</th>
+</tr>
+
+<tr>
+<th>Ignore</th>
+<td><font color="#983D10">0.001956300 s</font></td>
+<td><font color="#0000F0">1.00</font></td>
+</tr>
+
+<tr>
+<th>Check</th>
+<td>0.006612500 s</td>
+<td><font color="#0000F0">3.38</font></td>
+</tr>
+
+</table>
+<!-- =========== Assertion Effect 15.2.1 opt End ========== -->
+
+<p>There is a minimal speed-up of about <font color="#983D10">1.5</font>
+in comparison to GNAT CE 2021, but a remarkable reduction in the
+<font color="#0000F0">assertion effect</font>.</p>
+
+<p>However, because of the bug with inlining mentioned above, the use of
+this compiler is deprecated.
+Its performance of the Schottky Langmuir equation is a real disaster!</p>
+
 <p>In the measurements below, please take into account the
 distortion.</p>
+
+<hr width="100%">
 
 <!-- ============= Schottky Langmuir Equation ============ -->
 
 <h3 align="center"><a name="SchoLa">Schottky Langmuir</a></h3>
 
 <p>The Schottky Langmuir equation<br/>
-<img src="Schottky-Langmuir.gif" height="60" width="119" alt="Equation"/><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <img src="Schottky-Langmuir.gif" height="60" width="119" alt="Equation"/><br/>
 is ideal for measurements: It has a lot of dimensioned items, a root,
 and rational exponents.
 The reference is the evaluation time of the <b>nude</b> equation,
@@ -176,21 +241,37 @@ do not normally occur in formulas.
 Thus in the <b>stringless</b> version, the parameter unit
 initialization is taken out of the loop.</p>
 
-<p>Last, the <b>optimized</b> version also precompiles the constant
+<p>Last, the <b>optimized</b> version also precomputes the constant
 part outside the loop.
 This is what an optimizing compiler will do (in the nude version),
-but cannot here because of the dimension components.</p>
+but cannot here because of the dimension components.
+(Do not confuse the optimized equation with the -O3 optimized
+executable.)</p>
 
-<p>These four versions are computed once with unit checking enabled
-and once disabled.
+<ul>
+<li><b>Dressed:</b> complete evaluation inside loop</li>
+<li><b>Stringless:</b> unit strings precomputed outside loop</li>
+<li><b>Optimized:</b> constant part precomputed outside loop</li>
+<li><b>Nude:</b> pure numerics</li>
+</ul>
+
+
+<p>These four versions (for details, see the program <code>measure.adb</code>
+in directory <code>Examples</code>) are computed once with unit checking
+enabled and once disabled.
 The results are quite astonishing.
 (Of course the absolute values depend on the speed of the machine
 in use; important are the relative speed values only.)</p>
 
-<!-- ============= Schottky Langmuir Unchecked ============ -->
+<hr width="100%">
+<h4 align="center">Comparing Nude and Optimized</h4>
+<hr width="100%">
+
+<!-- ================= Schottky Langmuir CE 8.1 ================ -->
+<!-- ========================= Unchecked ======================= -->
 <table align="center">
 
-<caption><b>GNAT CE 2021 Windows 8.1</b><br/>&nbsp;</caption>
+<caption><b>GNAT CE 2021 Windows 8.1</b><br/>(slow machine)<br/>&nbsp;</caption>
 
 <colgroup>
 <col width=" 70"/>
@@ -208,7 +289,7 @@ in use; important are the relative speed values only.)</p>
 
 <tr>
 <th><font color="#00B050">Nude</font></th>
-<td>0.015771666 s</td>
+<td><font color="#0000F0">0.015771666 s</font></td>
 <td><font color="#00B050">1.0</font></td>
 <td></td>
 <td></td>
@@ -239,11 +320,11 @@ in use; important are the relative speed values only.)</p>
 </tr>
 
 </table>
-<!-- =========== Schottky Langmuir Unchecked End ========== -->
+<!-- ======================= Unchecked End ===================== -->
 
 <br/>
 
-<!-- ============= Schottky Langmuir Checked ============ -->
+<!-- ========================== Checked ======================== -->
 <table align="center">
 
 <colgroup>
@@ -255,23 +336,23 @@ in use; important are the relative speed values only.)</p>
 </colgroup>
 
 <tr>
-<th>Checked</th>
+<th><font color="#CA7D0C">Checked</font></th>
 <th>Absolute</th>
 <th colspan="3">Relative</th>
 </tr>
 
 <tr>
-<th>Nude</th>
-<td>0.109398771 s</td>
-<td>1.0</td>
+<th><font color="#CA7D0C">Nude</font></th>
+<td><font color="#0000F0">0.109398771 s</font></td>
+<td><font color="#CA7D0C">1.0</font></td>
 <td></td>
 <td></td>
 </tr>
 
 <tr>
-<th>Optimized</th>
+<th><font color="#CA7D0C">Optimized</font></th>
 <td>5.908864053 s</td>
-<td>54.0</td>
+<td><font color="#CA7D0C">54.0</font></td>
 <td>1.0</td>
 <td></td>
 </tr>
@@ -293,14 +374,16 @@ in use; important are the relative speed values only.)</p>
 </tr>
 
 </table>
-<!-- =========== Schottky Langmuir Checked End ========== -->
+<!-- ======================== Checked End ====================== -->
+<!-- =============== Schottky Langmuir CE 8.1 End ============== -->
 
 <br/>
 
-<!-- ============= Schottky Langmuir Unchecked ============ -->
+<!-- ================= Schottky Langmuir CE 11 ================= -->
+<!-- ========================= Unchecked ======================= -->
 <table align="center">
 
-<caption><b>GNAT CE 2021 Windows 11</b><br/>&nbsp;</caption>
+<caption><b>GNAT CE 2021 Windows 11</b><br/>(fast machine)<br/>&nbsp;</caption>
 
 <colgroup>
 <col width=" 70"/>
@@ -318,7 +401,7 @@ in use; important are the relative speed values only.)</p>
 
 <tr>
 <th><font color="#00B050">Nude</font></th>
-<td>0.002838900 s</td>
+<td><font color="#0000F0">0.002838900 s</font></td>
 <td><font color="#00B050">1.0</font></td>
 <td></td>
 <td></td>
@@ -349,11 +432,11 @@ in use; important are the relative speed values only.)</p>
 </tr>
 
 </table>
-<!-- =========== Schottky Langmuir Unchecked End ========== -->
+<!-- ======================= Unchecked End ===================== -->
 
 <br/>
 
-<!-- ============= Schottky Langmuir Checked ============ -->
+<!-- ========================= Checked ========================= -->
 <table align="center">
 
 <colgroup>
@@ -365,23 +448,23 @@ in use; important are the relative speed values only.)</p>
 </colgroup>
 
 <tr>
-<th>Checked</th>
+<th><font color="#CA7D0C">Checked</font></th>
 <th>Absolute</th>
 <th colspan="3">Relative</th>
 </tr>
 
 <tr>
-<th>Nude</th>
-<td>0.018112100 s</td>
-<td>1.0</td>
+<th><font color="#CA7D0C">Nude</font></th>
+<td><font color="#0000F0">0.018112100 s</font></td>
+<td><font color="#CA7D0C">1.0</font></td>
 <td></td>
 <td></td>
 </tr>
 
 <tr>
-<th>Optimized</th>
+<th><font color="#CA7D0C">Optimized</font></th>
 <td>0.869659000 s</td>
-<td>48.0</td>
+<td><font color="#CA7D0C">48.0</font></td>
 <td>1.0</td>
 <td></td>
 </tr>
@@ -403,33 +486,42 @@ in use; important are the relative speed values only.)</p>
 </tr>
 
 </table>
-<!-- =========== Schottky Langmuir Checked End ========== -->
+<!-- ======================== Checked End ====================== -->
+<!-- =============== Schottky Langmuir CE 11 End =============== -->
 
-<p><font color="#00B050">Comparing the <i>nude</i> and the
-<i>optimized</i> versions</font> in the <i>checked</i> variant,
-you can see that the dimension calculation makes the execution
-time explode.
-This melts down when <font color="#00B050">checking is off</font>.
+<p>The relative factor between <i>Nude</i> and <i>Optimized</i> is
+approximately independent of the machine,
+<font color="#00B050">11 resp. 12 in the unchecked version</font> versus
+<font color="#CA7D0C">54 resp. 48 in the checked variant</font>,
+so switching off the dimension check is quite effective: about
+<font color="#CA7D0C">50</font> to <font color="#00B050">10</font>
+compared with the nude equation.
+A slow unit testing is tolerable.
+You have to decide by your own measurements whether
+<font color="#00B050">the residue of 10 in the Unchecked case</font>
+is tolerable for your application.
 <font color="#00B050">These figures are in effect the most
-interesting ones</font>.
-The rest must be attributed to the compiler ignoring the
-<code>Inline</code> pragma for the operations in the dimension
-signature package.</p>
+interesting ones</font>.</p>
 
-<p>Comparing <font color="#F00000">the <i>stringless</i> and the
-<i>dressed</i></font> execution times, you can see that the
-dimension string evaluation is extremely expensive in the
-<i>unchecked</i> version, thus be careful to only use them for
-data initilization and avoid them in calculations.
-In the <i>checked</i> version, this effect is smaller since the
-computation of the dimension components consumes most of the time,
-whereas in the unchecked version, only the dimension string
-evaluation is left.</p>
+<p>Comparing the <i>stringless</i> and the <i>dressed</i> execution times,
+you can see that the <font color="#F00000">unit string evaluation</font>
+is extremely expensive in the <font color="#00B050">Unchecked</font> version,
+thus be careful to only use them for data initialization and avoid them in
+calculations.
+In the <font color="#CA7D0C">Checked</font> version, this effect is smaller
+since the computation of the dimension components consumes most of the time,
+whereas in the unchecked version, only the dimension string evaluation is
+left.</p>
 
-<!-- ============= Unchecked v. Checked ============ -->
+<hr width="100%">
+<h4 align="center">Comparing Unchecked and Checked</h4>
+<hr width="100%">
+
+<!-- ==================== Unchecked v. Checked ================= -->
+<!-- ================== Schottky Langmuir CE 8.1 =============== -->
 <table align="center">
 
-<caption><b>GNAT CE 2021 Windows 8.1</b><br/>&nbsp;</caption>
+<caption><b>GNAT CE 2021 Windows 8.1</b><br/>(slow machine)<br/>&nbsp;</caption>
 
 <colgroup>
 <col width=" 70"/>
@@ -453,7 +545,7 @@ evaluation is left.</p>
 
 <tr>
 <th>Unchecked</th>
-<td>0.015771666 s</td>
+<td><font color="#0000F0">0.015771666 s</font></td>
 <td><font color="#0000F0">1.00</font></td>
 <td>0.167998892 s</td>
 <td>1.00</td>
@@ -465,7 +557,7 @@ evaluation is left.</p>
 
 <tr>
 <th>  Checked</th>
-<td>0.109398771 s</td>
+<td><font color="#0000F0">0.109398771 s</font></td>
 <td><font color="#0000F0">6.94</font></td>
 <td>5.908864053 s</td>
 <td>35.17</td>
@@ -476,14 +568,14 @@ evaluation is left.</p>
 </tr>
 
 </table>
-<!-- =========== Unchecked v. Checked End ========== -->
+<!-- =============== Schottky Langmuir CE 8.1 End ============== -->
 
 <br/>
 
-<!-- ============= Unchecked v. Checked ============ -->
+<!-- ================= Schottky Langmuir CE 11 ================= -->
 <table align="center">
 
-<caption><b>GNAT CE 2021 Windows 11</b><br/>&nbsp;</caption>
+<caption><b>GNAT CE 2021 Windows 11</b><br/>(fast machine)<br/>&nbsp;</caption>
 
 <colgroup>
 <col width=" 70"/>
@@ -507,7 +599,7 @@ evaluation is left.</p>
 
 <tr>
 <th>Unchecked</th>
-<td>0.002838900 s</td>
+<td><font color="#0000F0">0.002838900 s</font></td>
 <td><font color="#0000F0">1.00</font></td>
 <td>0.035072600 s</td>
 <td>1.00</td>
@@ -519,7 +611,7 @@ evaluation is left.</p>
 
 <tr>
 <th>  Checked</th>
-<td>0.018112100 s</td>
+<td><font color="#0000F0">0.018112100 s</font></td>
 <td><font color="#0000F0">6.38</font></td>
 <td>0.869659000 s</td>
 <td>24.80</td>
@@ -530,12 +622,16 @@ evaluation is left.</p>
 </tr>
 
 </table>
-<!-- =========== Unchecked v. Checked End ========== -->
+<!-- =============== Schottky Langmuir CE 11 End =============== -->
+
+<!-- ================== Unchecked v. Checked End =============== -->
 
 <p>Last the <i>unchecked versus checked</i> equations.
 (The <i>Nude</i> column is the same as above.)
 You again can see the big effect of suppressing the dimension
 checking.</p>
+
+<hr width="100%">
 
 <!-- ============= Matrix and Quaternion ============ -->
 

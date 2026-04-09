@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2006, 2018 Christoph Karl Walter Grein
+-- Copyright (C) 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -23,56 +23,60 @@
 -- however invalidate any other reasons why the executable file might be
 -- covered by the GNU Public License.
 --
--- Author's homepage and email address:
---   http://www.christ-usch-grein.homepage.t-online.de/
---   Christ-Usch.Grein@T-Online.de
+-- Author's email address:
+--   christ-usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Ada.Strings.Fixed;
+with Elementary_Functions;
+use  Elementary_Functions;
 
-package body Rational_Arithmetics.Strings is
+with SI.VS;
+use  SI.VS, SI;
+
+with Test_Support;
+use  Test_Support;
+
+procedure Test_SI_Vectors is
 
   --====================================================================
   -- Author    Christoph Grein
   -- Version   1.0
-  -- Date      27 February 2006
+  -- Date      23 October 2025
   --====================================================================
-  --
+  -- Test D = V * T, D and V vectors.
+  -- More tests in directory Examples.
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
-  --  C.G.    1.0  27.02.2006
+  --  C.G.    1.0  23.10.2025
   --====================================================================
 
-  function Image (X: Rational) return String is
-    N: constant String := Whole'Image (X.Numerator);
-    D: constant String := Whole'Image (X.Denominator);
-  begin
-    if X.Denominator = 1 then
-      return N;
-    else
-      return N & '/' & D (2 .. D'Last);
-    end if;
-  end Image;
+  N: constant Vector := Normalize ((1.0, 1.0, 1.0));
 
-  function Value (X: String) return Rational is
-    use Ada.Strings;
-    Y: String renames Fixed.Trim (X, Side => Both);
-    -- Append '/' so that it is always found:
-    S: Natural := Fixed.Index (Y & '/', "/");
-    N: constant Whole:= Whole'Value (Y (Y'First .. S-1));
-    D: Positive_Whole;
-  begin
-    if Y (S-1) = ' ' then  -- blank before /
-      raise Constraint_Error;
-    end if;
-    if S > Y'Last then
-      return (N, 1);
-    elsif Y (S+1) = ' ' then  -- blank after /
-      raise Constraint_Error;
-    end if;
-    D := Whole'Value (Y (S+1 .. Y'Last));
-    return N/D;
-  end Value;
+  D: constant Position :=  N * (1.0*"km");
+  V: constant Velocity := -N * (1.0*"dam/min");
 
-end Rational_Arithmetics.Strings;
+begin
+
+  Test_Header (Title       => "Test Vectorspace",
+               Description => "Linear motion with constant velocity.");
+
+  -----------------------------------------------------------------------
+  Test_Step (Title       => "Test vector movement",
+             Description => "Compute time to reach home.");
+
+  Put_Line (Position'(D + V * (abs D / abs V))'Image);  -- less accurate than scalar
+  Put_Line ("Distance to origin:" & Length'(abs (D + V * (abs D / abs V) - 1.0*"µm" * Null_Vector))'Image);
+  Assert (Condition => abs (D + V * (abs D / abs V) - 1.0*"µm" * Null_Vector) <= 0.11*"mm",
+          Message   => "(Vector) Time to reach origin:" & Time'(abs D / abs V)'Image,
+          Only_Report_Error => False);
+
+  Put_Line (Length'(abs D - abs V * (abs D / abs V))'Image);
+  Assert (Condition => abs D - abs V * (abs D / abs V) = 0.0*"dam",
+          Message   => "(Salar) Time to reach origin:" & Time'(abs D / abs V)'Image,
+          Only_Report_Error => False);
+
+  -----------------------------------------------------------------------
+  Test_Result;
+
+end Test_SI_Vectors;

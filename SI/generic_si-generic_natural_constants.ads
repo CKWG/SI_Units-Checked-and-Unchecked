@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2002, 2005, 2006, 2018, 2019, 2020
+-- Copyright (C) 2002, 2005, 2006, 2018, 2019, 2020, 2026
 --               Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
@@ -24,8 +24,7 @@
 -- however invalidate any other reasons why the executable file might be
 -- covered by the GNU Public License.
 --
--- Author's homepage and email address:
---   http://archive.adaic.com/tools/CKWG/CKWG.html
+-- Author's email address:
 --   Christ-Usch.Grein@T-Online.de
 ------------------------------------------------------------------------------
 
@@ -35,13 +34,16 @@ package Generic_SI.Generic_Natural_Constants is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   4.1
-  -- Date      9 August 2020
+  -- Version   4.4
+  -- Date      30 March 2026
   --====================================================================
   -- SI Redefinition became effective on May 20, 2019.
   -- Didn't find a better abbreviation for e_e, normally named just e.
   -- e_e stands for e(elementary).
   -- Change values, if necessary, to the newest measured values.
+  --
+  -- Attention: Use at least digits 15 for approximate precision; best
+  -- is digits 18.
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
@@ -55,6 +57,9 @@ package Generic_SI.Generic_Natural_Constants is
   --  C.G.    3.2  07.03.2020 Stefan-Boltzmann and Gas constants
   --  C.G.    4.0  11.05.2020 Parent renamed to Generic_SI
   --  C.G.    4.1  09.08.2020 Name Speed_of_Light added
+  --  C.G.    4.2  27.02.2026 Digits 18 is needed for precision
+  --  C.G.    4.3  14.03.2026 Better unit H/m for Mu_0
+  --  C.G.    4.4  30.03.2026 Updated value Gravity (Wikipedia)
   --====================================================================
 
   -- Speed of Light in Vacuum
@@ -73,10 +78,10 @@ package Generic_SI.Generic_Natural_Constants is
   m_e: Mass renames Electron_Mass;
   m_p: Mass renames Proton_Mass;
 
-  -- Permittivity and Permeability of Vacuum
+  -- Permittivity and Permeability of Vacuum: c = 1/Sqrt(Eps_0*Mu_0)
 
-  Mu_0 : constant Item := 4.0E-7*Pi*"kg*m/C**2";  -- exact; c = 1/Sqrt(Eps_0*Mu_0)
-  Eps_0: constant Item := 1.0/(Mu_0*c**2);        -- 8.854_187_817E-12 F/m
+  Mu_0 : constant Item := 4.0E-7*Pi*"H/m";  -- exact; 1.256_637_062E-06 H/m
+  Eps_0: constant Item := 1.0/(Mu_0*c**2);  -- exact; 8.854_187_817E-12 F/m
 
   -- Quantum Mechanics
 
@@ -84,7 +89,7 @@ package Generic_SI.Generic_Natural_Constants is
   h     :          Item renames Planck;
   h_bar : constant Item := h / (2.0*Pi);
 
-  Alpha: constant Dimensionless := e_e**2/(2.0*Eps_0*h*c);  -- 1/137.035_999_11
+  Alpha: constant Dimensionless := e_e**2/(2.0*Eps_0*h*c);  -- 1/137.035_999_177
 
   -- Thermodynamics
 
@@ -103,6 +108,6 @@ package Generic_SI.Generic_Natural_Constants is
 
   -- Gravity
 
-  Gravity: constant Item := 6.674_2E-11*"m**3/(kg*s**2)";
+  Gravity: constant Item := 6.674_30E-11*"m**3/(kg*s**2)";
 
 end Generic_SI.Generic_Natural_Constants;

@@ -1,10 +1,10 @@
 ------------------------------------------------------------------------------
--- Checked and Generic Computation with SI Units
+-- Checked and Unchecked Computation with SI Units
 -- Copyright (C) 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
--- as published by the Free Software Foundation; either version 3
+-- as published by the Free Software Foundation; either version 2
 -- of the License, or any later version.
 --
 -- This program is distributed in the hope that it will be useful,
@@ -24,40 +24,40 @@
 -- covered by the GNU Public License.
 --
 -- Author's email address:
---   christ-usch.grein@t-online.de
+--   Christ-Usch.Grein@T-Online.de
 ------------------------------------------------------------------------------
 
-with Ada.Numerics;
-with Elementary_Functions;
-use  Ada.Numerics, Elementary_Functions;
+with Ada.Characters.Conversions;
 
-separate (Measure)
-package body Nude is
+with Generic_SI.Generic_Temperatures.Generic_Unformatted_IO;
+
+package body Generic_SI.Generic_Temperatures is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   1.1
-  -- Date      30 October 2025
+  -- Version   1.0
+  -- Date      20 October 2025
   --====================================================================
-  -- Just the nude data.
+  -- I do not really understand what there is going on.
+  -- Only Latin_1 characters are used, so why does the call
+  --   B.Put (Unformatted_IO.Image (X));
+  -- raise ADA.STRINGS.UTF_ENCODING.ENCODING_ERROR?
+  -- Culprit is the character '°'.
+  -- Conversion to Wide_Wide_String works correctly, but attribute
+  -- 'Image returns String, not Wide_Wide_String.
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
-  --  C.G.    1.0  09.04.2025 New
-  --  C.G.    1.1  30.10.2025 Replace Ada.Numerics.Generic_Elementary_
-  --                          Functions by Elementary_Functions
+  --  C.G.    1.0  20.10.2025 Redefine 'Image attribute
   --====================================================================
 
-  Elementary_Charge: constant Float := 1.602_176_634E-19;
-  Electron_Mass    : constant Float := 9.109_382_6E-31;
-  c                : constant Float := 2.997_924_58E+8;
-  Mu_0             : constant Float := 4.0E-7*Pi;
-  Eps_0            : constant Float := 1.0/(Mu_0*c**2);
+  package Unformatted_IO is new Generic_Temperatures.Generic_Unformatted_IO;
 
-  function Schottky_Langmuir (Volt, Dist: Float) return Float is
+  function Value (X: String) return Celsius renames Unformatted_IO.Value;
+
+  procedure Image (B: in out Ada.Strings.Text_Buffers.Root_Buffer_Type'Class; X: Celsius) is
   begin
-    return (4.0/9.0) * Eps_0 * Sqrt (2.0 * Elementary_Charge / Electron_Mass) *
-           Volt**1.5 / Dist**2;
-  end Schottky_Langmuir;
+    B.Wide_Wide_Put (Ada.Characters.Conversions.To_Wide_Wide_String (Unformatted_IO.Image (X)));
+  end Image;
 
-end Nude;
+end Generic_SI.Generic_Temperatures;

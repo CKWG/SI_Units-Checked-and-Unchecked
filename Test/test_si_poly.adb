@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2002, 2005, 2018, 2020 Christoph Karl Walter Grein
+-- Copyright (C) 2002, 2005, 2018, 2020, 2025 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -23,17 +23,12 @@
 -- however invalidate any other reasons why the executable file might be
 -- covered by the GNU Public License.
 --
--- Source:
--- https://www.adaic.org/ada-resources/tools-libraries/
---   (see Christoph Grein's Essentials)
--- http://archive.adaic.com/tools/CKWG/Dimension/Dimension.html
---
 -- Author's email address:
 --   christ-usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with SI.Poly, SI.Strings;
-use  SI.Poly, SI.Strings, SI;
+with SI.Poly;
+use  SI.Poly, SI;
 
 with Test_Support;
 use  Test_Support;
@@ -42,8 +37,8 @@ procedure Test_SI_Poly is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   4.0
-  -- Date      14 May 2020
+  -- Version   5.0
+  -- Date      16 October 2025
   --====================================================================
   -- Test polynomials, linear regression and interpolation.
   --====================================================================
@@ -55,6 +50,7 @@ procedure Test_SI_Poly is
   --                          Test_Unconstrained_Polynomial_Numerics
   --  C.G.    3.0  26.08.2018 Unit strings
   --  C.G.    4.0  14.05.2020 Dimensions generic parameter
+  --  C.G.    5.0  16.10.2025 'Image redefined
   --====================================================================
 
 begin
@@ -77,7 +73,7 @@ begin
   begin
     for E of Exp loop
       Assert (Condition => Polynomial (Coeff, E.X) = E.Y,
-              Message   => Image (E.X) & " => " & Image (E.Y),
+              Message   => E.X'Image & " => " & E.Y'Image,
               Only_Report_Error => False);
       Assert (Condition => Polynomial (Coeff, E.X) = (E.X + 2.0*"s") * E.X**3 * (E.X - 1.0*"s") * (E.X - 3.0*"s") * (1.0*"m/s**6"),
               Message   => "   factored",
@@ -101,7 +97,7 @@ begin
       Coeff: Coefficients renames Linear_Regression (S);
     begin
       Assert (Condition => SL = Coeff,
-              Message   => Image (Coeff (0)) & ' ' & Image (Coeff (1)),
+              Message   => Coeff (0)'Image & ' ' & Coeff (1)'Image,
               Only_Report_Error => False);
     end;
   end;
@@ -134,7 +130,7 @@ begin
   begin
     for E of Expect loop
       Assert (Condition => Linear_Interpolation (Inter, E.X) = E.Y,
-              Message   => Image (E.X) & " => " & Image (E.Y) & "   OK",
+              Message   => E.X'Image & " => " & E.Y'Image & "   OK",
               Only_Report_Error => False);
     end loop;
   end;

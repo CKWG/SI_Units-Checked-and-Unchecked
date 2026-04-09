@@ -1,6 +1,7 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2002, 2005-2009, 2018, 2020, 2025 Christoph Karl Walter Grein
+-- Copyright (C) 2002, 2005-2009, 2018, 2020, 2025, 2026
+-- Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -27,8 +28,8 @@ project SI.Test is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   6.1
-  -- Date      16 August 2025
+  -- Version   7.2
+  -- Date      21 March 2026
   --====================================================================
   --
   --====================================================================
@@ -55,6 +56,9 @@ project SI.Test is
   --  C.G.    5.3  01.07.2025 new test_si_celsius
   --  C.G.    6.0  09.07.2025 Make it a child project
   --  C.G.    6.1  16.08.2025 -gnat2022
+  --  C.G.    7.0  17.10.2025 Rework because of new 'Image attribute
+  --  C.G.    7.1  23.10.2025 Add test_si_vectors
+  --  C.G.    7.2  21.03.2026 Add test_predicates
   --====================================================================
 
   for Object_Dir use "GnatLib";
@@ -65,11 +69,14 @@ project SI.Test is
                 "test_rational_image_value",
                 "test_rational_text_io",
                 --
+                "test_predicates",
+                --
                 "test_si_units",
                 "test_si_math",
                 "test_si_poly",
+                "test_si_vectors",
                 "test_si_celsius",
-                "test_si_strings",
+                "test_si_unformatted_io",
                 "test_si_text_io_strings",
                 "test_si_text_io_file",
                 "test_si_text_io_put");
@@ -78,7 +85,7 @@ project SI.Test is
   for Source_Dirs use (".", "../Instantiations/", "../Instantiations/" & SI.Safety);
 
   package Compiler is
-    for Default_Switches ("ada") use ("-gnata", "-gnat2022", "-gnatyOr",
+    for Default_Switches ("ada") use ("-gnata", "-gnat2022", "-gnatyOr", "-gnatf",
                                       "-gnato", "-O3", "-fstack-check");
   end Compiler;
 

@@ -24,21 +24,43 @@
 -- covered by the GNU Public License.
 --
 -- Author's email address:
---   christ-usch.grein@t-online.de
+--   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Generic_SI.Generic_Temperatures.Generic_Strings;
+with Ada.Strings.Fixed;
 
-package SI.Temp.Strings is new SI.Temp.Generic_Strings;
+package body Generic_SI.Generic_Temperatures.Generic_Unformatted_IO is
 
---====================================================================
--- Author    Christoph Grein
--- Version   1.0
--- Date      2 July 2025
---====================================================================
---
---====================================================================
--- History
--- Author Version   Date    Reason for change
---  C.G.    1.0  02.07.2025
---====================================================================
+  --====================================================================
+  -- Author    Christoph Grein
+  -- Version   2.0
+  -- Date      17 October 2025
+  --====================================================================
+  --
+  --====================================================================
+  -- History
+  -- Author Version   Date    Reason for change
+  --  C.G.    1.0  02.07.2025
+  --  C.G.    2.0  17.10.2025 Renamed from Generic_Strings
+  --====================================================================
+
+  function Image (X: Celsius) return String is
+    Image: constant String := X.Value'Image;
+  begin
+    return Image & "°C";
+  end Image;
+
+  function Value (X: String) return Celsius is
+    Unit_Start: constant Natural := Ada.Strings.Fixed.Index (X, "°");
+  begin
+    if Unit_Start = 0 then
+      raise Unit_Error;
+    end if;
+    declare
+      Num: constant Real'Base := Real'Value (X (X'First .. Unit_Start - 1));  -- will raise Constraint_Error if X is not OK
+    begin
+      return Num * Ada.Strings.Fixed.Trim (X (Unit_Start .. X'Last), Ada.Strings.Right);  -- will raise Unit_Error if unit is not OK
+    end;
+  end value;
+
+end Generic_SI.Generic_Temperatures.Generic_Unformatted_IO;

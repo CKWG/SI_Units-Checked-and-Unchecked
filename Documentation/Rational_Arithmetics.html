@@ -11,6 +11,7 @@
       1.1  01.03.2006  pragma Pure: Put Image and Value in child
       1.2  10.08.2018  Ada.ico
       1.3  21.08.2018  Validated
+      2.0  17.10.2025  'Image redefined
 //-->
 </head>
 
@@ -23,12 +24,13 @@ mixed (i + n/m) numbers, where i, n and m are whole numbers.
 All operations resulting in rational numbers are implemented such that the
 result is reduced and has a positive denominator.</p>
 
+<p><a href="#Unform">Unformatted IO</a></p>
+
 <h3 align="left">Specification</h3>
 
-<pre><b>package</b> Rational_Arithmetics <b>is
+<pre><b>with</b> Ada.Strings.Text_Buffers;
 
-  pragma</b> Pure;
-  <b>pragma</b> Elaborate_Body;
+<b>package</b> Rational_Arithmetics <b>with</b> Preelaborate <b>is</b>
 
   -- <i>Whole numbers</i>
 
@@ -38,14 +40,18 @@ result is reduced and has a positive denominator.</p>
 
   -- <i>Undefine unwanted operations</i>
 
-  <b>function</b> &quot;+&quot; (Right: Whole) <b>return</b> Whole <b>is abstract</b>;
-  <b>function</b> &quot;-&quot; (Right: Whole) <b>return</b> Whole <b>is abstract</b>;
+  <b>overriding function</b> &quot;+&quot; (Right: Whole) <b>return</b> Whole <b>is abstract</b>;
+  <b>overriding function</b> &quot;-&quot; (Right: Whole) <b>return</b> Whole <b>is abstract</b>;
 
-  <b>function</b> &quot;/&quot; (Left, Right: Whole) <b>return</b> Whole <b>is abstract</b>;
+  <b>overriding function</b> &quot;/&quot; (Left, Right: Whole) <b>return</b> Whole <b>is abstract</b>;
 
   -- <i>Rational numbers</i>
 
-  <b>type</b> Rational <b>is private</b>;
+  <b>type</b> Rational <b>is private with</b> Put_Image => Image;
+
+  -- <i>Redefine attribute and add its inverse</i>
+  <b>procedure</b> Image (B: <b>in out</b> Ada.Strings.Text_Buffers.Root_Buffer_Type'Class; X: Rational);
+  <b>function</b>  Value (X: String) <b>return</b> Rational;
 
   <b>function</b> Numerator   (R: Rational) <b>return</b> Whole;
   <b>function</b> Denominator (R: Rational) <b>return</b> Positive_Whole;
@@ -129,15 +135,31 @@ result is reduced and has a positive denominator.</p>
 
   <b>function</b> &quot;/&quot; (Left, Right: Whole) <b>return</b> Rational;</pre>
 
+<p><code>&quot;/&quot;</code> raises <code>Constraint_Error</code> if <code>Right</code>,
+the denominator, is 0.</p>
+
 <p>All binary operators are defined such that they can be applied on rational
 numbers alone or on a rational and a whole number in any sequence.</p>
 
+<h3><a name="Unform">Unformatted IO</a></h3>
+
+<p>The attribute <code>'Image</code> returns the argument as a string in reduced rational
+form.
+If the denominator is 1, the string has the format &quot;sn&quot;,
+else it has the format &quot;sn/m&quot; where there is no white space around
+'/', and the sign 's' is blank for non-negative numbers, n is a whole number and
+m is positive.</p>
+
+<p><code>Value</code>, the inverse of <code>'Image</code>, turns the argument into a (reduced)
+rational number ignoring any leading or trailing space.
+It raises <code>Constraint_Error</code> if the string does not have the aforementioned
+format.</p>
+
 <p><a href="Table_of_Contents.html">Table of Contents</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="Rational_Arithmetics-Strings.html">Rational_Arithmetics.Strings</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <a href="Rational_Arithmetics-Text_IO.html">Rational_Arithmetics.Text_IO</a></p>
 
 <p align="center"><a href="http://validator.w3.org/check?uri=referer">
-   <img src="valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a></p>
+<img src="valid-xhtml10.png" alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a></p>
 
 </body>
 

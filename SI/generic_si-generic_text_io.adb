@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2002, 2003, 2006, 2008, 2018, 2020, 2025
+-- Copyright (C) 2002, 2003, 2006, 2008, 2018, 2020, 2025, 2026
 --               Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
@@ -34,8 +34,8 @@ package body Generic_SI.Generic_Text_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   8.2
-  -- Date      22 August 2025
+  -- Version   8.4
+  -- Date      26 January 2026
   --====================================================================
   --
   --====================================================================
@@ -66,6 +66,9 @@ package body Generic_SI.Generic_Text_IO is
   --                          for Get with Width > 0
   --  C.G.    8.2  22.08.2025 Ensure_Task_Safety is new; Get for Width=0
   --                          new implementation
+  --  C.G.    8.3  20.01.2026 Add µ in Get from file;
+  --                          simplified code in Get from string
+  --  C.G.    8.4  26.01.2026 Remove outdated and irritating comment
   --====================================================================
 
   use Real_Text_IO;
@@ -133,7 +136,7 @@ package body Generic_SI.Generic_Text_IO is
       begin
         Get (File, Num);
         Look_Ahead (File, C, EoF);
-        if EoF or else C not in '*' | '/' | 'A' .. 'Z' | 'a' ..'z' then
+        if EoF or else C not in '*' | '/' | 'A' .. 'Z' | 'a' ..'z' | 'µ' then
           X := Num * One;
         else
           Construct (Get_Interface.Get_and_Look_Ahead'Access, Unit, Length);
@@ -151,11 +154,7 @@ package body Generic_SI.Generic_Text_IO is
           Avail := Avail + 1;
           Get (File, Got (C));
         end loop;
-        Get (Got (1 .. Avail), X, Last);  -- may raise Data_Error
-        -- Gnat: 5_ does not raise Data_Error here.
-        -- Discriminating between Data_Error and Illegal_Unit is difficult.
-        -- In any case, this is a syntax error in the input.
-        -- Choose the simple way.
+        Get (Got (1 .. Avail), X, Last);
         if Last < Avail then
           raise Illegal_Unit with "string not exhausted";
         end if;
@@ -209,11 +208,8 @@ package body Generic_SI.Generic_Text_IO is
     Value: Real'Base;
   begin
     Get (From, Value, Last);  -- get the numeric value
-    if Last = From'Last then
+    if Last = From'Last or else From (Last + 1) not in '*' | '/' | 'A' .. 'Z' | 'a' ..'z' | 'µ' then
       X := Value * One;  -- no unit follows
-    elsif Last + 1 <= From'Last and then  -- any first unit character unexpected in syntax
-          From (Last + 1) in 'A' .. 'Z' | 'a' .. 'z' | '(' | '+' | '-' | ')' then
-      raise Illegal_Unit with "Spurious character after value";
     else
       declare
         package String_Interface is new Generic_SI.Ensure_Task_Safety (From (Last + 1 .. From'Last));

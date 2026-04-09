@@ -8,6 +8,13 @@
 <title>Final Thoughts</title>
 <!-- Version  Date
       1.0  08.09.2025
+      1.1  11.10.2025  Celsius degrees read as Kelvin no good idea
+      1.2  30.10.2025  Work-arounds for GNAT Bugs
+      1.3  07.11.2025  Bugzilla 122574
+      1.4  24.11.2025  Added km/h example to proposed input check
+      2.0  11.02.2026  Celsius
+      2.1  21.03.2026  Bug Assertion_Error in assignment
+      2.2  01.04.2026  Tables
 //-->
 </head>
 
@@ -30,29 +37,14 @@ missing definitions and perhaps a very simple example for the <i>Examples</i>
 directory.
 I will add them together with your name as author.</p>
 
-<p>I ponder the idea for two small additions:</p>
-
-<p><a href="#Celsius">Celsius Degrees</a><br/>
-<a href="#Input">Input from Files</a></p>
-
-<h3 align="center"><a name="Celsius">Celsius Degrees</a></h3>
-
-<p>Celsius temperatures have purposely been defined separately from SI items
-with different syntax.
-Of course transformations to and from Kelvin are provided.
-They also have to be read and written with a dedicated package of their
-own.</p>
-
-<p>A possible library enhancement could be the possibility to directly
-read (<b>nota bene: not to write</b>) Celsius degrees with the IO package
-for items, but to automatically return them converted in Kelvin.
-Admittedly, this would not save much work because when reading from files,
-you normally know what to read and can easily use the appropriate package
-and convert the result.</p>
-
-<p>Any thoughts?</p>
+<p><a href="#Input">Input from Files</a><br/>
+<a href="#Table">Tables</a><br/>
+<a href="#degC">Celsius</a><br/>
+<a href="#Bugs">GNAT Bugs</a></p>
 
 <h3 align="center"><a name="Input">Input from Files</a></h3>
+
+<p>I ponder the idea of one perhaps important addition:</p>
 
 <p>When you develop with the checked variant and have 100% test coverage,
 you can be certain that there is no dimension error lurking in your code
@@ -75,13 +67,16 @@ modifier for the Get operations:</p>
 
 <p>The dimension format modifier, if given, will ignore any prefixes and
 verify the unit string input, raising <code>Unit_Error</code> in case of
-failure. For example, a modifier <code>&quot;m/s&quot;</code> will check
-that the input has dimension <i>Length/Time</i>.
+failure.
 This is not a restriction since normally you have to know what to read and
 can select the proper dimension.
 If for some reason, you do not know the expected dimension (when for instance
 reading table data), you simply omit the parameter.
 (The modifier will of course be ignored in the checked variant.)</p>
+
+<p>For example, a modifier <code>&quot;m/s&quot;</code> as well as
+<code>&quot;km/h&quot;</code> will check that the input has dimension
+<i>Length/Time</i>.</p>
 
 <p>Safety will cost execution time!</p>
 
@@ -89,6 +84,190 @@ reading table data), you simply omit the parameter.
 be needed.</p>
 
 <p>Any thoughts?</p>
+
+<h3 align="center"><a name="Table">Tables</a></h3>
+
+<p>The Get procedure of RM A.10.9(12) offers the parameter Width that defines
+how many characters are read from the file:</p>
+
+<pre>  <b>procedure </b>Get (File : <b>in</b>  File_Type;
+                 Item : <b>out</b> Num;
+                 Width: <b>in</b>  Field := 0);</pre>
+
+<p>The default 0 is for reading syntactically correct input as long as possible.
+For a nonzero value, Get reads exactly so many characters (or up to a line
+terminator, whichever comes first) irrespective of the syntax and evaluates the
+input afterwards.
+Thus this option is ideal for reading  tabular data.
+Width corresponds roughly to the sum of Fore, Aft and Exp of the corresponding
+Put procedure.
+Such a table might look like this (the first line is not data, it just shows the
+layout):</p>
+
+<pre>  <i>12345678901234567890--123456789012345----123456789012345</i>
+  Earth Mass                 5.9722E+24    kg
+  Equatorial Radius           6378.1370    km
+  Polar Radius                6356.7523    km
+  Mean Radius                 6371.0088    km
+  Gravitational Const.      6.67430E-11    m**3*/(kg*s**2)
+  Acceleration                   9.8203    m/s**2</pre>
+
+<p>The first block with the data description occupies the first 20 columns;
+a padding of 2 blanks follows as a block separator;
+then Width&nbsp;=&nbsp;15 characters of numeric data, right-aligned in the second
+block;
+another padding of 4 blanks;
+the physical dimension is given in the third block (left-aligned as shown here
+or right-aligned).
+The first block und following padding are of no interest here; we're interested
+solely in the two data blocks and the separating padding.</p>
+
+<p>As can easily be seen, such a table is impossible to write or read with the
+current SI IO features; especially the Width parameter is completely useless.</p>
+
+<p>In directory Examples, procedure Tables writes and reads two tables, one
+with data left-aligned starting with column 24:</p>
+
+<pre>  <i>123456789012345678901234</i>
+  Earth Mass             5.9722E+24*kg
+                         5.9722E+0*Rg
+  Equatorial Radius      6378.1370*km
+  Polar Radius           6356.7523*km
+  Mean Radius            6371.0088*km
+  Gravitational Constant 6.67430E-11*m**3*kg**(-1)*s**(-2)
+  Acceleration           9.8203*m/s**2</pre>
+
+<p>the other also starting at the same column (denoted by '|'), but shifted so
+that units are aligned at column 13 (counting from '|' as 1) in the second block
+denoted by '*':</p>
+
+<pre>  <i>12345678901234567890123|23456789012*</i>
+  Earth Mass               5.9722E+24*kg
+                               5.9722*Rg
+  Equatorial Radius         6378.1370*km
+  Polar Radius              6356.7523*km
+  Mean Radius               6371.0088*km
+  Gravitational Constant  6.67430E-11*m**3*kg**(-1)*s**(-2)
+  Acceleration                 9.8203*m/s**2</pre>
+
+<p>Both are not what one would expect for a pleasant table.
+Also here, the Width parameter is useless!</p>
+
+<p>A better implementation is needed for a nonzero value of Width.</p>
+
+<p>So in order to split the numeric data and the unit into two blocks, the Put
+and Get operations will need additional parameters like the following.
+(Note that because of the defaults legacy code is not affected by this change.)</p>
+
+<pre>  <b>procedure </b>Put (File: <b>in </b>File_Type;
+                 X   : <b>in </b>Item;
+                 Fore: <b>in </b>Field  := Default_Fore;
+                 Aft : <b>in </b>Field  := Default_Aft;
+                 Exp : <b>in </b>Field  := Default_Exp;
+                 Dim : <b>in </b>String := &quot;&quot;;
+                 Pad : <b>in</b> Field  := 0;
+                 Unit: <b>in</b> Field'Base := 0) <b>with</b>
+    Pre => (<b>if</b> Unit = 0 <b>then</b> Pad = 0);</pre>
+
+<p>If the new parameters Pad and Unit are zero, the resulting output will be
+the same as currently: the numeric value output according to Fore, Aft, Exp,
+the unit following as requested by Dim: <code>-9.82*m/s**2</code></p>
+
+<p>For a nonzero value of Unit, however, it is the duty of the programmer to
+choose the values for Fore, Aft and Exp such that the numbers are
+right-aligned.
+The numeric value will be written as before to the first table block, followed
+by Pad spaces for the padding, then the dimension string will be written to
+the second table block with <code><b>abs</b>&nbsp;Unit</code> characters,
+right-aligned for a positive value, left-aligned for a negative one (without
+the leading '*', but with the leading '/') like in the very first example
+above.</p>
+
+<p>The corresponding Get operation also needs the same new parameters Pad and
+Unit (ignore the Dim parameter for now &ndash; it's only there as a reminder that
+the idea of unit input checking of above might be implemented):</p>
+
+<pre>  <b>procedure </b>Get (File : <b>in  </b>File_Type;
+                 X    : <b>out </b>Item;
+                 Width: <b>in  </b>Field  := 0;
+              <font color="969696"> [ Dim  : <b>in</b>  String := &quot;&quot;; ] </font>
+                 Pad  : <b>in</b>  Field  := 0;
+                 Unit : <b>in</b>  Field  := 0) <b>with</b>
+    Pre => (<b>if</b> Width = 0 <b>then</b> Pad = 0 <b>and</b> Unit = 0);</pre>
+
+<p>If Width = 0, the result will be the same as currently, reading continues as
+long as the syntax allows.</p>
+
+<p>For a nonzero value of Width, for all three parameters Width, Pad, Unit,
+exactly so many characters will be input or the characters (possibly none) up
+to a line terminator, whichever comes first, then reading stops.
+Then the three fields will each be evaluated.
+Contrary to the current beviour, Width applies only to the numeric value of X
+as prescribed in RM A.10.9(19).
+Data_Error will be raised if any of the Pad characters is a nonblank
+character.
+Illegal_Unit will be raised if the unit sequence does not have the syntax of
+a dimension format modifier after stripping any leading and trailing blanks
+(thus there is no difference in reading left-aligned or right-aligned unit
+strings).</p>
+
+<p>Returns in X the (dimensioned) Item.</p>
+
+<p>Proposals for other parameter profiles?</p>
+
+<p>Any thoughts?</p>
+
+<h3 align="center"><a name="degC">Celsius</a></h3>
+
+<p>Celsius degrees are an addition that can easily be omitted from any
+application, just remove its packages.</p>
+
+<p>As currently defined, they have only limited operations, for instance
+they cannot be added, differences are measured in Kelvin.
+This might be too limiting.
+However, the <code>to_Kelvin</code> function has to be able to discriminate
+between temperatures and their differences.
+Thus, the model to define a Celsius algebra is Ada's handling of time and
+duration.
+Differences must be measured in a separate type, let us call it <i>Diff</i>;
+its conversion to Kelvin keeps the numeric value, its unit symbol may also be
+&deg;C.</p>
+
+<p>This leads to additional functions like</p>
+
+<pre>Celsius - Celsius &rarr; Diff
+Celsius + Diff    &rarr; Celsius</pre>
+
+<p>I do not see this as a relevant feature.
+If you do need it, do not forget to define an appropriate IO functionality for
+<i>Diff</i>.</p>
+
+<h3 align="center"><a name="Bugs">GNAT Bugs</a></h3>
+
+<p>This is a list of GNAT bugs affecting the code.</p>
+
+<ul>
+<li>Known bug in <b>GNAT CE 2021</b>:<br/>
+    The wrong exception Assertion_Error (expected: Unit_Error) is raised for an
+    assignment with an incompatible dimension like
+    <pre>    declare
+      X: Time;  -- := 1.0*"m";  -- correct: Unit_Error
+    begin
+      X := 1.0*"m";  -- wrong: Assertion_Error
+    end;</pre>
+    For a wrong initialization, the correct exception is raised.<br/>
+    What is astonishing is that exactly this code is used in function SI_is_Unchecked,
+    where it works correctly.<br/>
+    This bug does not occur in <b>GNAT 15.2.1</b>.</li>
+<li>Work-around for <b>[T526-002 public]</b> in generic_si.generic_vector_space.adb:<br/>
+    reported 26.05.2020: fixed in <b>GNAT 15.2.1</b>; [T520-013 public] did not fix it.</li>
+<li>Work-around for <b>Bugzilla 122161</b> in generic_si.generic_vector_space.ads:<br/>
+    reported 04.10.2025: being fixed.</li>
+<li><b>Bugzilla 122574</b>, reported 05.11.2025: being fixed.<br/>
+    This bug exists in <b>GNAT 15.2.1</b>; <b>GNAT CE 2021</b> is not affected.
+    It prevents inlining and leads to extremely bad performance.<br/>
+    <b>Thus use of GNAT 15.2.1 is not recommended.</b></li>
+</ul>
 
 <p><a href="Table_of_Contents.html">Table_of_Contents</a></p>
 

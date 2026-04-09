@@ -17,6 +17,10 @@
       3.3  07.03.2020  Stefan_Boltzmann and Gas constants
       4.0  12.05.2020  Completely reworked; dimensions generic parameter
       4.1  21.10.2021  Name Speed_of_Light added
+      4.2  28.02.2026  Value of Alpha in comment changed from 1/137.035_999_11 to 1/137.035_999_177
+                       in accordance with CODATA; digits 18 is needed for enough precision
+      4.3  14.03.2026  Better unit H/m for Mu_0
+      4.4  30.03.2026  Updated value Gravity (Wikipedia)
 //-->
 </head>
 
@@ -56,6 +60,8 @@ They were calculated from data available before the 1st of July 2017.
 See <a href="https://arxiv.org/ftp/arxiv/papers/1512/1512.03668.pdf">ArXiv</a>,
 Table 1.</p>
 
+<p>Attention: For enough precision, <span style="background-color: #FA4532">digits 18</span> is needed!</p>
+
 <h3 align="left">Specification</h3>
 
 <pre><b>generic
@@ -78,10 +84,10 @@ package </b>Generic_<a href="SI.html">SI</a>.Generic_Natural_Constants <b>is</b>
   m_e: Mass <b>renames </b>Electron_Mass;
   m_p: Mass <b>renames </b>Proton_Mass;
 
-  -- <i>Permittivity and Permeability of Vacuum</i>
+  -- <i>Permittivity and Permeability of Vacuum: c = 1/Sqrt(Eps_0*Mu_0)</i>
 
-  Mu_0 : <b>constant </b>Item := 4.0E-7*Pi*&quot;kg*m/C**2&quot;;  <i>-- exact; c = 1/Sqrt(Eps_0*Mu_0)</i>
-  Eps_0: <b>constant </b>Item := 1.0/<b>(</b>Mu_0*c**2<b>)</b>;        <i>-- exact; 8.854_187_817E-12 F/m</i>
+  Mu_0 : <b>constant </b>Item := 4.0E-7*Pi*&quot;H/m&quot;;  <i>-- exact; 1.256_637_062E-06 H/m</i>
+  Eps_0: <b>constant </b>Item := 1.0/<b>(</b>Mu_0*c**2<b>)</b>;  <i>-- exact; 8.854_187_817E-12 F/m</i>
 
   -- <i>Quantum Mechanics</i>
 
@@ -89,7 +95,7 @@ package </b>Generic_<a href="SI.html">SI</a>.Generic_Natural_Constants <b>is</b>
   h     :          Item <b>renames </b>Planck;
   h_bar : <b>constant </b>Item := h / <b>(</b>2.0*Pi<b>)</b>;
 
-  Alpha: <b>constant </b>Item := e_e**2/<b>(</b>2.0*Eps_0*h*c<b>)</b>;  <i>-- exact; 1/137.035_999_11</i>
+  Alpha: <b>constant </b>Item := e_e**2/<b>(</b>2.0*Eps_0*h*c<b>)</b>;  <i>-- exact; 1/137.035_999_177</i>
 
   -- <i>Thermodynamics</i>
 
@@ -108,7 +114,7 @@ package </b>Generic_<a href="SI.html">SI</a>.Generic_Natural_Constants <b>is</b>
 
   -- <i>Gravity</i>
 
-  Gravity: <b>constant </b>Item := 6.674_2E-11*&quot;m**3/(kg*s**2)&quot;;
+  Gravity: <b>constant </b>Item := 6.674_30E-11*&quot;m**3/(kg*s**2)&quot;;
 
 <b>end </b>Generic_SI.Generic_Natural_Constants;</pre>
 

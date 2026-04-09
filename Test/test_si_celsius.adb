@@ -33,15 +33,15 @@ with Ada.Text_IO;
 with Test_Support;
 use  Test_Support;
 
-with SI.Temp.IO, SI.Temp.Strings;
-use  SI.Temp.IO, SI.Temp.Strings, SI.Temp, SI;
+with SI.Temp.IO;
+use  SI.Temp.IO, SI.Temp, SI;
 
 procedure Test_SI_Celsius is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   1.1
-  -- Date      30 August 2025
+  -- Version   2.0
+  -- Date      20 October 2025
   --====================================================================
   -- Test SI.Temperature and children, i.e. the Celsius operations.
   -- The program reads the file Test_SI_Celsius_IO.in and writes the
@@ -53,6 +53,10 @@ procedure Test_SI_Celsius is
   -- Author Version   Date    Reason for change
   --  C.G.    1.0  03.07.2025
   --  C.G.    1.1  30.08.2025 Better test structure
+  --  C.G.    1.2  22.09.2025 [UA09-009 public] fixed  in alr 2.1.0
+  --                          gnat_native=15.2.1; instead use new
+  --                          function SI_is_Unchecked
+  --  C.G.    2.0  20.10.2025 'Image redefined
   --====================================================================
 
   Physic, Result: Ada.Text_IO.File_Type;
@@ -65,26 +69,21 @@ begin
   Test_Step (Title => "Assertions",
              Description => "Test that Assertion_Policy is Check.");
 
-  declare
-    T: Time;
-  begin
-    T := 1.0*"S";
-    Assert (Condition => False,
-            Message   => "Switch on Assertion_Policy and use checked instantiation",
-            Only_Report_Error => False);
+
+  Assert (Condition => not SI_is_Unchecked,
+          Message   => "Assertion_Policy is Check",
+          Only_Report_Error => False);
+
+  if SI_is_Unchecked then
+    Put_Line ("Switch on Assertion_Policy and use checked instantiation");
     Test_Result;
     return;
-  exception
-    when Ada.Assertions.Assertion_Error =>
-      Assert (Condition => True,
-              Message   => "Exception Assertion_Error as expected",
-              Only_Report_Error => True);
-  end;
+  end if;
 
   -----------------------------------------------------------
 
   Test_Step (Title => "Test Constructor",
-             Description => "Corret and incorrect use.");
+             Description => "Correct and incorrect use.");
 
   declare
     T: Celsius := 0.0*"°C";
@@ -127,14 +126,14 @@ begin
 
   -----------------------------------------------------------
 
-  Test_Step (Title => "Test Image and Value",
-             Description => "Compare the result of Image with expectation." &
+  Test_Step (Title => "Test 'Image and Value",
+             Description => "Compare the result of 'Image with expectation." &
                             " Call Value on a modification of result.");
 
   declare
     R: constant := 0.1;
     T: constant Celsius := R*"°C";
-    I: constant String := Image (T);
+    I: constant String  := T'Image;
   begin
     Assert (Condition => I = Float'Image (R) & "°C",
             Message   => "Correct Image " & I,
@@ -154,7 +153,7 @@ begin
     Assert (Condition => True,
             Message   => "Value accepts based literal",
             Only_Report_Error => False);
-    Put_Line (Image (T));
+    Put_Line (T'Image);
   end;
 
   -----------------------------------------------------------
@@ -162,8 +161,8 @@ begin
   Test_Step (Title => "Test Value on wrong strings",
              Description => "Check that exceptions are raised.");
 
-  begin
-    Assert (Condition => Value ("   4.12°xC   ") = 4.12*"°C" and False,
+  begin                                         -- qualification needed either here
+    Assert (Condition => Value ("   4.12°xC   ") = Celsius'(4.12*"°C") and False,
             Message   => "Value raises exception with wrong unit",
             Only_Report_Error => False);
   exception
@@ -173,8 +172,8 @@ begin
             Only_Report_Error => False);
   end;
 
-  begin
-    Assert (Condition => Value ("   4.12°C  x ") = 4.12*"°C" and False,
+  begin               -- qualification needed of there
+    Assert (Condition => Celsius'(Value ("   4.12°C  x ")) = 4.12*"°C" and False,
             Message   => "Value raises exception with trailing nonblank",
             Only_Report_Error => False);
   exception
@@ -207,7 +206,6 @@ begin
         use Ada.Exceptions;
       begin
         Get (Physic, T);
-        --Ada.Text_IO.Put_Line ("Where art though?");
         Put (Result, T, Aft => 1, Exp => 0);  New_Line (Result);
       exception
         when E: Illegal_Unit | Data_Error =>

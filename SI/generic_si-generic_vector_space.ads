@@ -32,15 +32,14 @@ with Ada.Numerics.Generic_Real_Arrays;
 
 generic
 
-  with package Real_Arrays is new Ada.Numerics.Generic_Real_Arrays (Generic_SI.Real);
-  use Real_Arrays;
+  with package Instance is new Ada.Numerics.Generic_Real_Arrays (Generic_SI.Real);
 
 package Generic_SI.Generic_Vector_Space is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   8.0
-  -- Date      16 April 2025
+  -- Version   8.1
+  -- Date      23 October 2025
   --====================================================================
   -- This is not a linear algebraics package. All elements of a vector
   -- and a matrix must have the same dimension lest Unit_Error be
@@ -88,7 +87,12 @@ package Generic_SI.Generic_Vector_Space is
   --  C.G.    7.2  28.05.2021 Work-around for [T521-020 public] removed
   --  C.G.    7.3  14.10.2021 Predicate_Failure for subtypes
   --  C.G.    8.0  18.04.2025 Preconditions replace check in body
- --====================================================================
+  --  C.G.    8.1  23.04.2025 Real_Arrays renamed inside package to
+  --                          enable use of name by clients of package
+  --====================================================================
+
+  package Real_Arrays renames Instance;  -- make name visible for clients
+  use Real_Arrays;
 
   subtype Axis is Integer range 1 .. 3;
 
@@ -281,7 +285,7 @@ private
     Value: Proto_Matrix;
   end record;
 
-  Null_Matrix: constant Matrix := (Dimensions.uno, Null_Proto_Matrix);  -- don't know why uno is not directly visible
-  Unity      : constant Matrix := (Dimensions.uno, Proto_Unity);
+  Null_Matrix: constant Matrix := (Dimensions.uno, Null_Proto_Matrix);  -- uno is not directly visible:
+  Unity      : constant Matrix := (Dimensions.uno, Proto_Unity);        -- Bugzilla 122161
 
 end Generic_SI.Generic_Vector_Space;
