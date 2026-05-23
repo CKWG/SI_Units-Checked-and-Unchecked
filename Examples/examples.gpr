@@ -27,8 +27,8 @@ project Examples is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   6.3
-  -- Date      27 February 2026
+  -- Version   6.6
+  -- Date      3 May 2026
   --====================================================================
   --
   --====================================================================
@@ -48,25 +48,26 @@ project Examples is
   --  C.G.    6.2  17.08.2025 -gnat2022
   --  C.G.    6.3  27.02.2026 Higgs example (just for fun)
   --  C.G.    6.4  30.03.2026 Tables new
+  --  C.G.    6.5  28.04.2026 Precision new
+  --  C.G.    6.6  03.05.2026 Big_Bang new
   --====================================================================
 
   for Object_Dir use "GnatLib";
 
-  for Main use ("application",
-                "ambiguities",
-                "physical_computations",
-                "vector_algebra",
-                "polar_vectors",
+  for Main use ("ambiguities",
+                "application",
                 "decompose_rotation",
-                "matrix_inversion",
                 "higgs",
+                "matrix_inversion",
+                "physical_computations",
+                "polar_vectors",
+                "precision",
+                "vector_algebra",
+                --
                 "tables",
                 --
                 "measure");
   for Exec_Dir use ".";
-
-  --  type Safety_Choice is ("Checked", "Unchecked");
-  --  Safety: Safety_Choice := external ("Safety");
 
   Assertion := "";
 
@@ -75,7 +76,9 @@ project Examples is
     when "Unchecked" => Assertion := "";
   end case;
 
-  for Source_Dirs use (".", "../Instantiations/", "../Instantiations/" & SI.Safety);
+  for Source_Dirs use (".",
+                       "../Instantiations/", "../Instantiations/" & SI.Safety,
+                       "../Instantiations/Big_Bang");
 
   package Compiler is
     for Default_Switches ("Ada") use ("-gnatn", "-O2", "-gnat2022", "-gnatyOr",
