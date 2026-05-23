@@ -43,7 +43,19 @@
                        bug fix in font color attribute
       7.3  13.02.2026  Postcondition for Arctan and Arccot
       7.4  03.03.2026  Improve description of 'Image
+      7.5  16.04.2026  Higher_Derivatives
 //-->
+
+<script language="JavaScript">
+  <!--
+   var Derivatives;
+   function OpenWindow()
+   {
+     Derivatives = window.open("SI-Higher_Derivatives.html", "", "width=515,height=580");
+   }
+   // -->
+</script>
+
 </head>
 
 <body>
@@ -127,6 +139,7 @@ variant, of course.</p>
   <b>subtype </b>Angular_Frequency       <b>is </b>Item <b>with </b>Dynamic_Predicate =&gt; has_Dimension <b>(</b>Angular_Frequency      , &quot;rad/s&quot;   <b>)</b>, Predicate_Failure =&gt; <b>raise </b>Unit_Error <b>with </b>&quot;Angular_Frequency&quot;;
   <b>subtype </b>Speed                   <b>is </b>Item <b>with </b>Dynamic_Predicate =&gt; has_Dimension <b>(</b>Speed                  , &quot;m/s&quot;     <b>)</b>, Predicate_Failure =&gt; <b>raise </b>Unit_Error <b>with </b>&quot;Speed&quot;;
   <b>subtype </b>Acceleration            <b>is </b>Item <b>with </b>Dynamic_Predicate =&gt; has_Dimension <b>(</b>Acceleration           , &quot;m/s**2&quot;  <b>)</b>, Predicate_Failure =&gt; <b>raise </b>Unit_Error <b>with </b>&quot;Acceleration&quot;;
+  -- <a href="JavaScript: OpenWindow();">Further derivatives</a>
 
   <b>subtype </b>Mass                    <b>is </b>Item <b>with </b>Dynamic_Predicate =&gt; has_Dimension <b>(</b>Mass                   , &quot;kg&quot;      <b>)</b>, Predicate_Failure =&gt; <b>raise </b>Unit_Error <b>with </b>&quot;Mass&quot;;
   <b>subtype </b>Mass_Density            <b>is </b>Item <b>with </b>Dynamic_Predicate =&gt; has_Dimension <b>(</b>Mass_Density           , &quot;kg/m**3&quot; <b>)</b>, Predicate_Failure =&gt; <b>raise </b>Unit_Error <b>with </b>&quot;Mass_Density&quot;;

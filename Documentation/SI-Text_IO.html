@@ -28,11 +28,12 @@
       6.2  18.04.2025  Preconditions
       6.3  18.08.2025  Bug fix and more precision in syntax; link to Bureau International des Poids et Mesures
       6.4  04.09.2025  Generic parameter is new; improved examples
-      6.5  15.09.2025  Allow µ; corrected typos in description
+      6.5  15.09.2025  Allow  ; corrected typos in description
       6.6  11.10.2025  Presentation improved
       6.7  20.01.2026  More precision in the presentation
       6.8  27.01.2026  correct typos
       6.9  29.03.2026  Again more precision
+      7.0  11.05.2026  New better implementation Get (Width); dimension format modifier " " is new
 //-->
 </head>
 
@@ -70,22 +71,38 @@ different from the default one.</p>
   Default_Exp : Field := 3;
 
   <b>procedure </b>Get (X    : <b>out </b>Item;
-                 Width: <b>in  </b>Field := 0);
+                 Width: <b>in  </b>Field  := 0;
+              <font color="969696"> [ Dim  : <b>in</b>  String := &quot;&quot;; ] </font>
+                 Pad  : <b>in</b>  Field  := 0;
+                 Unit : <b>in</b>  Field  := 0) <b>with</b>
+    Pre => ((Width = 0) = (Unit = 0));
   <b>procedure </b>Get (File : <b>in  </b>File_Type;
                  X    : <b>out </b>Item;
-                 Width: <b>in  </b>Field := 0);
+                 Width: <b>in  </b>Field  := 0;
+              <font color="969696"> [ Dim  : <b>in</b>  String := &quot;&quot;; ] </font>
+                 Pad  : <b>in</b>  Field  := 0;
+                 Unit : <b>in</b>  Field  := 0) <b>with</b>
+    Pre => ((Width = 0) = (Unit = 0));
 
   <b>procedure </b>Put (X   : <b>in </b>Item;
-                 Fore: <b>in </b>Field  := Default_Fore;
-                 Aft : <b>in </b>Field  := Default_Aft;
-                 Exp : <b>in </b>Field  := Default_Exp;
-                 Dim : <b>in </b>String := &quot;&quot;);  <i>-- with Pre =&gt; Valid_Modifier (X, Dim) or else raise Unit_Error</i>
+                 Fore: <b>in </b>Field      := Default_Fore;
+                 Aft : <b>in </b>Field      := Default_Aft;
+                 Exp : <b>in </b>Field      := Default_Exp;
+                 Dim : <b>in </b>String     := &quot;&quot;;
+                 Pad : <b>in</b> Field      := 0;
+                 Unit: <b>in</b> Field'Base := 0) <b>with</b>
+    Pre =&gt; (<b>if</b> Unit = 0 <b>then</b> Pad = 0);
+    <i>--     and (Valid_Modifier (X, Dim) or else raise Unit_Error);</i>
   <b>procedure </b>Put (File: <b>in </b>File_Type;
                  X   : <b>in </b>Item;
-                 Fore: <b>in </b>Field  := Default_Fore;
-                 Aft : <b>in </b>Field  := Default_Aft;
-                 Exp : <b>in </b>Field  := Default_Exp;
-                 Dim : <b>in </b>String := &quot;&quot;);  <i>-- with Pre =&gt; Valid_Modifier (X, Dim) or else raise Unit_Error</i>
+                 Fore: <b>in </b>Field      := Default_Fore;
+                 Aft : <b>in </b>Field      := Default_Aft;
+                 Exp : <b>in </b>Field      := Default_Exp;
+                 Dim : <b>in </b>String     := &quot;&quot;;
+                 Pad : <b>in</b> Field      := 0;
+                 Unit: <b>in</b> Field'Base := 0) <b>with</b>
+    Pre =&gt; (<b>if</b> Unit = 0 <b>then</b> Pad = 0);
+    <i>--     and (Valid_Modifier (X, Dim) or else raise Unit_Error);</i>
 
   <b>procedure </b>Get (From: <b>in  </b>String;
                  X   : <b>out </b>Item;
@@ -99,34 +116,34 @@ different from the default one.</p>
 <b>end </b>Generic_SI.Generic_Text_IO;</pre>
 
 <p>For the numeric part, Put and Get work like the conventional operations
-in Ada.Text_IO, the formatting parameters Fore, Aft, Exp apply to the numeric value only,
-not to the dimension; Dim is the <b>dimension format modifier</b>, see below.</p>
+in Ada.Text_IO, the formatting parameters Fore, Aft, Exp apply to the numeric
+value only, not to the dimension; Dim is the <b>dimension format modifier</b>,
+see below.</p>
 
-<p>Note: The precondition on the Put procedures have been commented out because for a
-correct dimension format modifier it would be evaluated at least twice on each call.</p>
+<p>Note: The precondition on the Dim parameter of the Put procedures has been
+commented out because for a correct dimension format modifier it would be
+evaluated at least twice on each call.</p>
 
 <h3 align="left"><a name="Unit">Unit Syntax</a></h3>
 
-<p>An item is a value of generic type <code>Real'Base</code> multiplied by its unit.
+<p>An item is a value of generic type <code>Real'Base</code> multiplied by its
+unit.
 There are two forms of items: an internal one as written in programs
 (e.g. 1.0*&quot;m&quot;) and an external one as output to or read from files or
 strings (e.g. 1.0*m).</p>
 
 <p>This is the syntax of an external item:</p>
 
-<pre>   external_item ::= value [dimension]
-   dimension     ::= * quotient
-                   | / divisor
-   quotient      ::= product [ / divisor]
-   divisor       ::= unit_factor
-                   | ( product )
-   product       ::= unit_factor {* unit_factor}
-   unit_factor   ::= identifier [** exponent]
-   identifier    ::= letter {letter}
-   exponent      ::= ( [sign] rational )
-                   | numeral
+<pre>   external_item ::= value [ dimension ]
+   dimension     ::= * quotient | / divisor
+   quotient      ::= product [ / divisor ]
+   divisor       ::= unit_factor | ( product )
+   product       ::= unit_factor { * unit_factor }
+   unit_factor   ::= identifier [ ** exponent ]
+   identifier    ::= si_letter { si_letter }
+   exponent      ::= ( [ sign ] rational ) | numeral
    sign          ::= + | -
-   rational      ::= numeral [ / numeral]
+   rational      ::= numeral [ / numeral ]
    numeral       ::= digit {digit}</pre>
 
 <p>The exponent is included in parentheses as necessary according to normal Ada
@@ -144,7 +161,7 @@ rules.</p>
 
 <p>There may be no spaces between the string quotes.</p>
 
-<p>A <code>letter</code> is a character that is in one of the ranges
+<p>An <code>si_letter</code> is a character that is in one of the ranges
 <code>'A'..'Z'</code> or <code>'a'..'z'</code> or is <code>'&micro;'</code>.<br/>
 The <code>identifier</code> must be interpretable as <code>[prefix] symbol</code>.</p>
 
@@ -160,7 +177,7 @@ package body Generic_SI.Generic_Symbols.</p>
 <a href="https://www.bipm.org/documents/20126/41483022/SI-Brochure-9-EN.pdf">
 The International System of Units (SI)</a>
 published by the <i>Bureau International des Poids et Mesures</i>.
-Of the non-SI units listed in this document, only hectare (ha), minute (min),
+Of the non-SI units listed in that document, only hectare (ha), minute (min),
 hour (h), liter (l, L), and electronvolt (eV) are currently allowed; of these,
 only the last three may take prefixes.</p>
 
@@ -191,6 +208,10 @@ prefixes are allowed and neither e.g. &quot;ka&quot; nor the alleged 1*km<sup>2<
     1.0*&quot;m/s**2*kg&quot;                  1.0*m/s**2*kg    -- <i>illegal (misleading), would be 1.0*m*kg/s**2</i>
     1.0*&quot;m/(s**2/kg)&quot;                1.0*m/(s**2/kg)  -- <i>illegal (no / in divisor)</i></pre>
 
+<p>Note: Whether 1.0 is read as the pure number or a dimensionless item depends
+on the IO package used: For the former, use Ada.Text_IO, for the latter
+SI.Text_IO.</p>
+
 <p><font color="#008000">In the Checked variant, the
 <b>default representation</b> of the <code>dimension</code> is a product of all
 base units (m, kg, s, A, K, cd, mol in that sequence) with an exponent different
@@ -201,28 +222,55 @@ or as the unit with an integer exponent if the exponent is a whole number
 (other than 1), or as the unit with a fractional exponent.</font></p>
 
 <p><font color="#FF0000">In the Unchecked variant, the <b>default representation</b>
-of the <code>dimension</code> is empty</font></p>
+of the <code>dimension</code> is empty.</font></p>
 
 <p>In the non-default representation, unit factors may be given with any
 prefixes and symbols in any sequence and with any exponents.</p>
 
 <h3><a name="InOut">Input and Output</a></h3>
 
-<p>Additionally to the standard numeric format modifiers <code>Fore</code>,
-<code>Aft</code>, <code>Exp</code> of the <code>Get</code> operations,
-there is a dimension format modifier <code>Dim</code>.</p>
+<p>For dimensional output, the parameter profile as defined in standard
+Ada.Text_IO.Float_IO is not sufficient.
+The standard numeric format modifiers <code>Fore</code>, <code>Aft</code>,
+<code>Exp</code> of the Put operations are tightly associated with the parameter
+<code>Width</code> of the corresponding Get operations.
+It seems general consensus in the Ada Rapporteur Group (ARG) that this parameter
+is meant for reading tables (there is nothing in the original Ada 83 rationale
+as to its intended purpose).</p>
+
+<p>Thus, additionally to the standard numeric format modifiers of Put, there is
+a dimension format modifier <code>Dim</code>, which modifies the unit to be
+applied for the dimension (e.g. "km" instead of the basic "m").
+As for tables of dimensioned values, two further formatting parameters
+<code>Pad</code> and <code>Unit</code> are provided for the layout of the
+dimensional part.</p>
 
 <h4>Dimension format modifier:</h4>
 
-<p>Other than the unit strings, which have to begin with index 1, a format modifier
-may occupy any range.
-This is the syntax of a dimension format modifier after stripping any leading or
-trailing spaces (there may of course be no spaces inside the remaining string):</p>
+<p>Other than the unit strings, which have to begin with index 1, a format
+modifier may occupy any range.
+Before it is evaluated, any leading or trailing spaces are stripping except for
+the second form <code>&quot; &quot;</code> which is left untouched.
+This is the syntax of a dimension format modifier after this transformation:</p>
 
-<pre>   modifier ::= &quot;&quot; | &quot;[*]quotient&quot; | &quot;/divisor&quot;</pre>
+<pre>  modifier ::= &quot;&quot;
+             | &quot; &quot; | &quot;[*]quotient&quot; | &quot;/divisor&quot;</pre>
 
-<p>A dimension format modifier must be a valid representations of the
-dimension (see examples below).</p>
+<p><code>&quot;&quot;</code> is the default.
+It produces the default representation of the dimension.</p>
+
+<p>The other forms prescribe the unit to be used for output.
+<font color="#008000">Unit_Error is raised in the Checked variant, if it is not
+compatible with the dimension;</font> Illegal_Unit is raised if it does not have
+the correct syntax (see examples below).</p>
+
+<p><font color="#008000">In the Checked variant, <code>&quot; &quot;</code> checks
+that the item to be output is dimensionless.</font>
+<font color="#FF0000">In the Unchecked variant, it has the identical effect as
+the default.</font></p>
+
+<p>For the last two forms, the numeric value is adapted according to the prefixes
+and the modifier is output.</p>
 
 <pre>  <b>function</b> Valid_Modifier (X: Item; Dim: String) <b>return</b> Boolean;</pre>
 
@@ -232,64 +280,117 @@ is compatible with the dimension of X, else False.</font>
 It raises Illegal_Unit if Dim does not have the syntax of a dimension
 format modifier.</p>
 
-<p>If the dimension format modifier is &quot;&quot; (the default), the default
-representation of the dimension is output.
-Else the numeric value is adapted according to the prefixes and the modifier is
-output (stripped of any leading or trailing spaces).</p>
-
 <h4>Output to Files or Strings:</h4>
-
+                 
 <p>For output to files, the numeric part is output first according to the rules of
-the RM, followed by the dimension.</p>
+the RM, followed by the unit as requested by the dimension format modifier.</p>
+
+<pre>  <b>procedure </b>Put (File: <b>in </b>File_Type;
+                 X   : <b>in </b>Item;
+                 Fore: <b>in </b>Field      := Default_Fore;
+                 Aft : <b>in </b>Field      := Default_Aft;
+                 Exp : <b>in </b>Field      := Default_Exp;
+                 Dim : <b>in </b>String     := &quot;&quot;;
+                 Pad : <b>in</b> Field      := 0;
+                 Unit: <b>in</b> Field'Base := 0) <b>with</b>
+    Pre =&gt; (<b>if</b> Unit = 0 <b>then</b> Pad = 0);</pre>
+
+<p>If the value of the parameter Unit is zero, the output string has the syntax
+of an external item.
+If a nonzero value of Unit is supplied, output is in tabular form:
+The first table block holds the numeric value right aligned as specified by the
+numeric format modifiers.
+A padding block of Pad spaces follows.
+The dimension string is written to the second table block occupying
+<code><b>abs</b> Unit</code> characters, left-aligned for a negative value of
+Unit, right-aligned for a positive one, without a leading '*', but with a
+leading '/' if necessary.</p>
+
+<p>The exception Layout_Error is raised if Unit is too short.</p>
 
 <p>For output to strings, first the dimension string is output right-aligned, the
 remaining string part is used for the numeric value according to the rules of the RM.</p>
 
-<p>The precondition has been commented out because otherwise the modifier
-would be evaluated at least twice.</p>
+<pre>  <b>procedure </b>Put (To : <b>out </b>String;
+                 X  : <b>in </b>Item;
+                 Aft: <b>in </b>Field  := Default_Aft;
+                 Exp: <b>in </b>Field  := Default_Exp;
+                 Dim: <b>in </b>String := &quot;&quot;);</pre>
 
 <h4>Examples:</h4>
 
 <pre><span>  Put (1.0/&quot;ks&quot;);&nbsp; -- output <font color="#008000">in the default representation as 0.001*s**(-1) for the
                    -- checked variant</font>, <font color="#FF0000">as 0.001 for the unchecked variant</font>
                    -- (for appropriately chosen numeric format modifiers)
+  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot; &quot;);&nbsp;      -- <font color="#008000">raises Unit_Error for the checked variant</font>,
+                                    -- <font color="#FF0000">the same as above for the unchecked variant</font>
   Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;mBq&quot;);&nbsp;    -- output as 1.0*mBq in both variants
-  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot; *mBq &quot;);&nbsp; -- the same; note the stripped blanks
+  Put (1.0/&quot;ks&quot;, Dim =&gt; &quot; *mBq &quot;);&nbsp; -- the same; note the stripped spaces
   Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;/s&quot;);&nbsp;     -- output as 0.001/s in both variants
   Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;/s*2&quot;);&nbsp;   -- exception Illegal_Unit
   Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;m&quot;);&nbsp;      -- <font color="#008000">exception Unit_Error for the checked variant</font>, 
                                     -- <font color="#FF0000">output as 0.001*m for the unchecked variant</font>
   Put (1.0*&quot;&deg;C&quot;);  -- impossible, you have to use the operation in Temperatures.Text_IO
+
+  Put (1.0/"s" , Fore => 5, Aft => 1, Exp => 0, Dim => "Hz", Pad => 3, Unit => -6);  New_Line;
+  Put (1.0*"Hz", Fore => 5, Aft => 1, Exp => 0, Dim => "/s", Pad => 3, Unit => +6);  New_Line;
+  
+  <i>1234567---123456</i>
+      1.0   Hz
+      1.0       /s
 </span></pre>
+
+<p>The column numbers in italics are not output, they just show the alignment.</p>
 
 <h4>Input from Files or Strings:</h4>
 
 <p>Items may be read in any representation.</p>
 
-<p>For input from file, if the value of the parameter <code>Width</code> is
-zero, first the numeric value is read as with Get of standard Text_IO.Float_IO
-(i.e. skipping any leading blanks, line terminators, or page terminators;
-see RM A.10.9(13));</p>
+<p>If the parameter <code>Width</code> is zero, first the numeric value is read
+as with Get of standard Text_IO.Float_IO.</p>
 
-<p>For input from string, first the numeric value is read from the
-beginning of the string, following the same rule as the Get procedure
-above, but treating the end of the string as a file terminator.</p>
+<pre>  <b>procedure </b>Get (File : <b>in  </b>File_Type;
+                 X    : <b>out </b>Item;
+                 Width: <b>in  </b>Field  := 0;
+              <font color="969696"> [ Dim  : <b>in</b>  String := &quot;&quot;; ]  -- see Final Thoughts</font>
+                 Pad  : <b>in</b>  Field  := 0;
+                 Unit : <b>in</b>  Field  := 0) <b>with</b>
+    Pre => (<b>if</b> Width = 0 <b>then</b> Pad = 0 <b>and</b> Unit = 0);</pre>
 
-<p>Data_Error may be raised in these steps.</p>
+<p>For input from string, first the numeric value is read as with Get of standard
+Text_IO.Float_IO.</p>
 
-<p>In case Data_Error is not raised, then reads the longest possible sequence
-of characters matching the syntax of the dimension of an external item given
-above, or a prefix of such syntax.
+<pre>  <b>procedure </b>Get (From: <b>in  </b>String;
+                 X   : <b>out </b>Item;
+                 Last: <b>out </b>Positive);</pre>
+
+<p>Data_Error may be raised in this first step.</p>
+
+<p>In case Data_Error is not raised, both read the longest possible sequence
+of characters matching the syntax of the unit of an external item given above,
+or a prefix of such syntax.
 [This last sentence is an exact copy of RM A.10.9(13/7), applied to the unit
 string.]</p>
 
-<p>If a nonzero value of <code>Width</code> is supplied, then exactly Width
-characters are input, or the characters (possibly none) up to a line terminator,
-whichever comes first; any skipped leading blanks are included in the count.
-[This sentence is an exact copy of RM A.10.9(19).]</p>
+<p>If a nonzero value of <code>Width</code> is supplied, then for all three
+parameters Width, Pad, Unit, exactly so many characters will be input or the
+characters (possibly none) up to a line terminator, whichever comes first.</p>
 
-<p>Returns, in the parameter X, the value of type Item that corresponds to
-the sequence input.
+<p>The numeric value is evaluated from the characters read for Width as with Get
+of standard Text_IO.Float_IO.
+Data_Error is raised if less than Width characters are input because the unit
+part will be missing.</p>
+
+<p>Data_Error will be raised if less than Pad characters are input or any of
+them is nonblank.</p>
+
+<p>The sequence of characters read for Unit is evaluated according to the syntax
+of a dimension format modifier (without a leading '*') after stripping any
+leading and trailing blanks (thus there is no difference in reading left-aligned
+or right-aligned unit strings).</p>
+
+<p>Returns, in the parameter X of type Item, the value that corresponds to
+the sequence input, <font color="#008000">dimensioned in the Checked version</font>.
 For input from string, additionally returns in Last the index value such that
 From (Last) is the last character read as with Get of standard Text_IO.Float_IO.
 Illegal_Unit is raised if the sequence input does not have the required syntax.
@@ -304,7 +405,7 @@ Illegal_Unit is raised if the sequence input does not have the required syntax.
   10.0*N/m**2</pre>
 
 <p>The following will be read as the dimensionless item (or better an item with
-dimension 1); reading stops after the number (there is no operator nor a letter
+dimension 1); reading stops after the number (there is no operator nor an si_letter
 after it), the characters after the number, i.e. <code>;m/s</code> in the first
 example and <code> m/s</code> together with the leading space in the second sample
 will stay in the input stream.
