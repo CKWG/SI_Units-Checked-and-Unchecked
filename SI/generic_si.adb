@@ -35,8 +35,8 @@ package body Generic_SI is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   8.1
-  -- Date      14 March 2026
+  -- Version   8.2
+  -- Date      30 April 2026
   --====================================================================
   --
   --====================================================================
@@ -70,6 +70,8 @@ package body Generic_SI is
   --                          Generic_Strings renamed to
   --                          Generic_Unformatted_IO
   --  C.G.    8.1  14.03.2026 SI_is_Unchecked considers assertion policy
+  --  C.G.    8.2  30.04.2026 Replace Symbols.Construct by Construct in
+  --                          constructor function "/"
   --====================================================================
 
   function SI_is_Unchecked return Boolean is
@@ -275,7 +277,7 @@ package body Generic_SI is
     R: Item;
     L: Positive;
   begin
-    Symbols.Construct (String_Interface.Get'Access, R, L);
+    Construct (String_Interface.Get'Access, R, L);
     return Left * R;
   end "/";
 

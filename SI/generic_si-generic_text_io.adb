@@ -34,8 +34,8 @@ package body Generic_SI.Generic_Text_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   8.4
-  -- Date      26 January 2026
+  -- Version   9.0
+  -- Date      13 May 2026
   --====================================================================
   --
   --====================================================================
@@ -69,6 +69,7 @@ package body Generic_SI.Generic_Text_IO is
   --  C.G.    8.3  20.01.2026 Add µ in Get from file;
   --                          simplified code in Get from string
   --  C.G.    8.4  26.01.2026 Remove outdated and irritating comment
+  --  C.G.    9.0  13.05.2026 New better implementation Get (Width)
   --====================================================================
 
   use Real_Text_IO;
@@ -76,7 +77,7 @@ package body Generic_SI.Generic_Text_IO is
   function Strip (Dim: String) return String with Inline is
     use Ada.Strings, Ada.Strings.Fixed;
   begin
-    return Trim (Dim, Both);
+    return Trim (Dim, Side => Both);
   end Strip;
 
   function Valid_Modifier (X: Item; Dim: String) return Boolean is
@@ -118,21 +119,30 @@ package body Generic_SI.Generic_Text_IO is
     end Get_and_Look_Ahead;
   end Ensure_Task_Safety;
 
-  procedure Get (X: out Item; Width: in Field := 0) is
+  procedure Get (X    : out Item;
+                 Width: in Field       := 0;
+             --  Dim  : in  String     := "";
+                 Pad  : in  Field      := 0;
+                 Unit : in  Field'Base := 0) is
   begin
-    Get (Current_Input, X, Width);
+    Get (Current_Input, X, Width, Pad, Unit);
   end Get;
 
-  procedure Get (File: in File_Type; X: out Item; Width: in Field := 0) is
+  procedure Get (File : in  File_Type;
+                 X    : out Item;
+                 Width: in  Field      := 0;
+             --  Dim  : in  String     := "";
+                 Pad  : in  Field      := 0;
+                 Unit : in  Field'Base := 0) is
+    Num : Real'Base;
   begin
     if Width = 0 then
       declare
         package Get_Interface is new Ensure_Task_Safety (File'Access);
-        Num : Real'Base;
-        Unit: Item;
-        C   : Character;
-        EoF : Boolean;
-        Length: Natural := 0;  -- not needed
+        Unit  : Item;
+        C     : Character;
+        EoF   : Boolean;
+        Length: Natural;  -- not evaluated
       begin
         Get (File, Num);
         Look_Ahead (File, C, EoF);
@@ -143,46 +153,106 @@ package body Generic_SI.Generic_Text_IO is
           X := Num * Unit;
         end if;
       end;
-    else
+    else  -- Width /= 0
+      -- Value
+      Get (File, Num, Width);
+      if End_of_Line (File) then
+        raise Data_Error with "in value";
+      end if;
+      -- Padding
       declare
-        Got  : String (1 .. Width);
-        Avail: Natural := 0;
-        Last : Natural;
+        use Ada.Strings, Ada.Strings.Fixed;
+        Padding: String (1 .. Pad) := Pad *'#';
       begin
-        for C in 1 .. Width loop
+        for P of Padding loop
           exit when End_Of_Line (File);
-          Avail := Avail + 1;
-          Get (File, Got (C));
+          Get (File, P);
         end loop;
-        Get (Got (1 .. Avail), X, Last);
-        if Last < Avail then
-          raise Illegal_Unit with "string not exhausted";
+        if Padding /= Pad * Space then
+          raise Data_Error with "padding incorrect";
         end if;
       end;
-    end if;
+      -- Unit
+      declare
+        use Ada.Strings, Ada.Strings.Fixed;
+        Dim: String (1 .. abs Unit) := abs Unit * Space;
+      begin
+        for D of Dim loop
+          exit when End_Of_Line (File);
+          Get (File, D);
+        end loop;
+        declare
+          sDim: constant String := Strip (Dim);
+        begin
+          if sDim = "" then
+            X := Num * "";
+          else
+            declare
+              package String_Interface is new Generic_SI.Ensure_Task_Safety ((if sDim (1) /= '/' then "*" else "") & sDim);
+              Length: Natural;  -- not evaluated
+            begin
+              Construct (String_Interface.Get'Access, X, Length);
+              X := Num * X;
+            end;
+          end if;
+        end;
+      end;
+    end if;  -- Width
   end Get;
 
   procedure Put (X   : in Item;
-                 Fore: in Field  := Default_Fore;
-                 Aft : in Field  := Default_Aft;
-                 Exp : in Field  := Default_Exp;
-                 Dim : in String := "") is
+                 Fore: in Field      := Default_Fore;
+                 Aft : in Field      := Default_Aft;
+                 Exp : in Field      := Default_Exp;
+                 Dim : in String     := "";
+                 Pad : in Field      := 0;
+                 Unit: in Field'Base := 0) is
   begin
-    Put (Current_Output, X, Fore, Aft, Exp, Dim);
+    Put (Current_Output, X, Fore, Aft, Exp, Dim, Pad, Unit);
   end Put;
 
   procedure Put (File: in File_Type;
                  X   : in Item;
-                 Fore: in Field  := Default_Fore;
-                 Aft : in Field  := Default_Aft;
-                 Exp : in Field  := Default_Exp;
-                 Dim : in String := "") is
-    sDim: constant String := Strip (Dim);
+                 Fore: in Field      := Default_Fore;
+                 Aft : in Field      := Default_Aft;
+                 Exp : in Field      := Default_Exp;
+                 Dim : in String     := "";
+                 Pad : in Field      := 0;
+                 Unit: in Field'Base := 0) is
+    sDim: constant String := (if Dim = " " then Dim else Strip (Dim));
+    procedure Table (eDim: in String) is
+      sUnit: String (1 .. abs Unit);
+      First: Positive := 1;
+      use Ada.Strings, Ada.Strings.Fixed;
+    begin
+      if eDim /= "" and then eDim (1) = '*' then
+        First := 2;
+      end if;
+      Move (Source  => eDim (First .. eDim'Last),
+            Target  => sUnit,
+            Justify => (if Unit < 0 then Left else Right));
+      Put (File, Pad * Space);
+      Put (File, sUnit);
+    exception
+      when Length_Error => raise Layout_Error;
+    end Table;
   begin
-    if sDim = "" then
+    if sDim = "" then  -- use default representation
       Put (File, X.Value, Fore, Aft, Exp);
-      Put (File, Image (X.Unit));
-    else
+      if Unit = 0 then
+        Put (File, Image (X.Unit));
+      else
+        Table (Image (X.Unit));
+      end if;
+    elsif sDim = " " then  -- check dimensionless
+      if not has_Dimension (X, "") then
+        raise Unit_Error with "Dimensionless";
+      end if;
+      Put (File, X.Value, Fore, Aft, Exp);
+      if Unit /= 0 then
+        Table ("");
+      end if;
+    else  -- check dimension
       declare
         eDim  : constant String := (if sDim (sDim'First) in '*' | '/' then "" else "*") & sDim;
         Gauge : Item;
@@ -193,13 +263,17 @@ package body Generic_SI.Generic_Text_IO is
         Construct (String_Interface.Get'Access, Gauge, Length);
         -- If we arrive here, syntax is OK, but there might be wrong characters left.
         if Length /= eDim'Length then
-          raise Illegal_Unit with "string not exhausted";
+            raise Illegal_Unit with "string not exhausted";
         end if;
         Gauged := X / Gauge;
         Put (File, Gauged.Value, Fore, Aft, Exp);
-        Put (File, eDim);
+        if Unit = 0 then
+          Put (File, eDim);
+        else
+          Table (eDim);
+        end if;
       end;
-    end if;
+    end if;  -- sDim
   end Put;
 
   procedure Get (From: in  String;
@@ -227,16 +301,21 @@ package body Generic_SI.Generic_Text_IO is
                  Aft: in Field  := Default_Aft;
                  Exp: in Field  := Default_Exp;
                  Dim: in String := "") is
-    sDim: constant String := Strip (Dim);
+    sDim: constant String := (if Dim = " " then Dim else Strip (Dim));
   begin
-    if sDim = "" then
+    if sDim = "" then  -- use default representation
       declare
         eDim : constant String := Image (X.Unit);
       begin
         Put (To (To'First .. To'Last - eDim'Length), X.Value, Aft, Exp);
         To  (To'Last - eDim'Length + 1 .. To'Last) := eDim;
       end;
-    else
+    elsif sDim = " " then  -- check dimensionless
+      if not has_Dimension (X, "") then
+        raise Unit_Error with "Dimensionless";
+      end if;
+      Put (To, X.Value, Aft, Exp);
+    else  -- check dimension
       declare
         eDim  : constant String := (if sDim (sDim'First) in '*' | '/' then "" else "*") & sDim;
         Gauge : Item;
