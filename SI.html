@@ -107,6 +107,7 @@
                       sign typo corrected in prefixes r and q; added link to FFF system
      12.0  07.04.2026 Github release 2.0.0
                       Code: User interface changed: 'Image attribute redefined
+     12.1  23.05.2026 Interim update
 //-->
 </head>
 
@@ -121,7 +122,7 @@
 
 <p align="center"><font size="+1">First edition 9 September 2002</font><br />
 <font size="+1" color="#ff00ff"> Edition using Predicates and pragma Assertion_Policy</font><br />
-<font size="+1" color="#ff0000"><a href="#Update">Last Update</a> 7 April 2026</font></p>
+<font size="+1" color="#ff0000"><a href="#Update">Last Update</a> 23 May 2026</font></p>
 
 <h3>Contents</h3>
 
@@ -183,7 +184,8 @@ It uses dimensions as runtime attributes.</p>
 <p>There is extensive documentation included as well as test and example
 code.
 This project has always been a challenge for the GNAT compiler, so there
-has been a plethora of bug reports and fixes on problems encountered with respect to many years of GNAT releases.
+has been a plethora of bug reports and fixes on problems encountered with
+respect to many years of GNAT releases.
 If you use another compiler, I would be happy to hear about your findings.</p>
 
 <!-- ========================================================= //-->
@@ -974,6 +976,23 @@ S: In older literature also the symbol mho is in use.</a></font></p>
 <tr>
   <td width="145"><b><a name="Update" id="Update"><font color="#800000" size="+1">Updates</font></a></b></td>
   <td><b><font color="#800000" size="+1">Reason</font></b></td>
+</tr>
+<tr>
+  <td valign="top"><b><font color="#008080">23 May 2026</font></b></td>
+  <td><b>Interim update, no release</b><br/>
+      <b>Interface change:</b> <code>SI.Text_IO.Get</code> with parameter
+      <code>Width/=0</code> and corresponding <code>Put</code> have a new
+      profile and implementation adapted to reading and writing data tables.
+      This does not affect legacy code with <code>Width=0</code> since the new
+      parameters have defaults.<br/>
+      <b>Instantiation change:</b> New: A more compact instantiation possibility
+      <code>Big_Bang</code>.<br/>
+      <b>New functionality:</b> Plugged a hole in type checking: The new
+      parameter value <code>Dim&nbsp;=&gt;&nbsp;&quot;&nbsp;&quot;</code> of
+      <code>SI.Text_IO.Put</code> checks that the item to be ouput has dimension
+      One.
+      Note the difference to the default value <code>Dim&nbsp;=&gt;&nbsp;&quot;&quot;</code>.<br/>
+      <b>Documentation and Tests:</b> Updated.</td>
 </tr>
 <tr>
   <td valign="top"><b><font color="#008080">7 April 2026</font></b></td>
