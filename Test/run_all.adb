@@ -38,7 +38,8 @@ with Test_SI_Vectors;
 with Test_SI_Celsius;
 with Test_SI_Unformatted_IO;
 with Test_SI_Text_IO_Strings,
-     Test_SI_Text_IO_File,
+     Test_SI_Text_IO_Get,
+     Test_SI_Text_IO_Table,
      Test_SI_Text_IO_Put;
 
 with Test_Support;
@@ -48,8 +49,8 @@ procedure Run_All is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   2.2
-  -- Date      21 March 2026
+  -- Version   2.3
+  -- Date      9 May 2026
   --====================================================================
   -- Run all tests and display the global result.
   --====================================================================
@@ -60,6 +61,9 @@ procedure Run_All is
   --  C.G.    2.0  16.10.2025 'Image redefined
   --  C.G.    2.1  23.10.2025 Test_SI_Vectors new
   --  C.G.    2.2  21.03.2026 Test_Predicates new
+  --  C.G.    2.3  09.05.2026 Test_SI_Text_IO_Table new,
+  --                          Test_SI_Text_IO_File renamed to
+  --                          Test_SI_Text_IO_Get
   --====================================================================
 
 begin
@@ -81,7 +85,8 @@ begin
   Test_SI_Unformatted_IO;
 
   Test_SI_Text_IO_Strings;
-  Test_SI_Text_IO_File;
+  Test_SI_Text_IO_Get;
+  Test_SI_Text_IO_Table;
   Test_SI_Text_IO_Put;
 
   Global_Result;

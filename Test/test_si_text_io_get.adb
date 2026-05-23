@@ -1,0 +1,170 @@
+------------------------------------------------------------------------------
+-- Checked and Unchecked Computation with SI Units
+-- Copyright (C) 2002, 2003, 2018, 2020, 2025, 2026
+--               Christoph Karl Walter Grein
+--
+-- This program is free software; you can redistribute it and/or
+-- modify it under the terms of the GNU General Public License
+-- as published by the Free Software Foundation; either version 3
+-- of the License, or any later version.
+--
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+--
+-- You should have received a copy of the GNU General Public License
+-- along with this program; if not, write to the Free Software
+-- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+--
+-- As a special exception,  if other files  instantiate  generics from this
+-- unit, or you link this unit with other files to produce an executable,
+-- this unit does not by itself cause the resulting executable to be
+-- covered by the GNU General Public License.  This exception does not
+-- however invalidate any other reasons why the executable file might be
+-- covered by the GNU Public License.
+--
+-- Author's email address:
+--   christ-usch.grein@t-online.de
+------------------------------------------------------------------------------
+
+with Ada.Exceptions, Ada.Text_IO;
+use  Ada.Exceptions, Ada.Text_IO;
+
+with Test_Support;
+use  Test_Support;
+
+with SI.IO;
+use  SI.IO, SI;
+
+procedure Test_SI_Text_IO_Get is
+
+  --====================================================================
+  -- Author    Christoph Grein
+  -- Version   6.0
+  -- Date      7 May 2026
+  --====================================================================
+  -- Test the IO package for a set of critical items by reading file
+  -- Test_SI_Text_IO.in (Width = 0 and a lot of nonsensical units) and
+  -- comparing the out file with the Test_SI_Text_IO.out.expected.
+  -- Note: The test cannot be run with the unchecked version since
+  --       dimension output is vital.
+  --====================================================================
+  -- History
+  -- Author Version   Date    Reason for change
+  --  C.G.    1.0  25.07.2002
+  --  C.G.    1.1  04.02.2003 Syntax for reading unit symbols changed
+  --  C.G.    2.0  02.08.2018 Unit strings
+  --  C.G.    3.0  14.05.2020 Dimensions generic parameter
+  --  C.G.    4.0  05.07.2025 Add test for Width > 0
+  --  C.G.    5.0  23.08.2025 New implementation of string evaluation:
+  --                          Test for Width = 0 adapted
+  --  C.G.    5.1  22.09.2025 [UA09-009 public] fixed  in alr 2.1.0
+  --                          gnat_native=15.2.1; instead use new
+  --                          function SI_is_Unchecked
+  --  C.G.    5.2  09.10.2025 Minor output bux fix
+  --  C.G.    5.3  10.04.2026 Better output
+  --  C.G.    6.0  07.06.2026 Split test for Width > 0
+  --====================================================================
+
+  Physic, Result: File_Type;
+
+  I: Item;
+
+  procedure Compare is
+    Line_P, Line_R: String (1 .. 65);
+    Last_P, Last_R: Natural;
+    P_End: Boolean := False;
+  begin
+    loop
+      begin
+        Get_Line (Physic, Line_P, Last_P);
+      exception
+        when End_Error =>
+          P_End  := True;
+      end;
+      begin
+        Get_Line (Result, Line_R, Last_R);
+        if P_End then  -- R not yet at end
+          Assert (Condition => False,
+                  Message   => Line_R (1 .. Last_R) & " expected",
+                  Only_Report_Error => False);
+          Assert (Condition => False,
+                  Message   => "Files have same length (Expected too short).",
+                  Only_Report_Error => False);
+          exit;
+        end if;
+      exception
+        when End_Error =>  -- both at end?
+          Assert (Condition => P_End,
+                  Message   => "Files have same length" &
+                  (if not P_End then " (Result too short)" else "."),
+                  Only_Report_Error => False);
+          exit;
+      end;
+      Assert (Condition => Line_P (1 .. Last_P) = Line_R (1 .. Last_R),
+              Message   => Line_R (1 .. Last_R),
+              Only_Report_Error => False);
+    end loop;
+  end Compare;
+
+begin
+
+  Test_Header (Title => "Test SI.Text_IO_Get",
+               Description => "Test reading from and writing to a file " &
+                              "with Width=0.");
+
+  Test_Step (Title => "Assertions",
+             Description => "Test that Assertion_Policy is Check.");
+
+  Assert (Condition => not SI_is_Unchecked,
+          Message   => "Assertion_Policy is Check",
+          Only_Report_Error => False);
+
+  if SI_is_Unchecked then
+    Test_Support.Put_Line ("Switch on Assertion_Policy and use checked instantiation");
+    Test_Result;
+    return;
+  end if;
+
+  -------------------------------------------------------
+
+  Test_Step (Title => "Read as much as the syntax prescribes",
+             Description => "Compare the actual with the expected output.");
+
+  Open   (Physic, In_File , "Test_SI_Text_IO.in");
+  Create (Result, Out_File, "Test_SI_Text_IO.out");
+
+  while not End_Of_File (Physic) loop
+
+    begin
+      Get (Physic, I);
+      Put (Result, I);  New_Line (Result);
+    exception
+      when E: Data_Error | Illegal_Unit =>
+        declare
+          Line: String (1 .. 70);
+          Last: Natural;
+        begin
+          Get_Line (Physic, Line, Last);  -- unread rest of line
+          Put_Line (Result, Exception_Name (E) &
+                            (if Exception_Name (E) = "ADA.IO_EXCEPTIONS.DATA_ERROR" then ""
+                             else " => " & Exception_Message (E)) &
+                            " """ & Line (1 .. Last) & '"');
+        end;
+    end;
+
+  end loop;
+
+  Close (Physic);
+  Reset (Result, In_File);
+  Open  (Physic, In_File , "Test_SI_Text_IO.out.expected");
+
+  Compare;
+
+  Close  (Physic);
+  Delete (Result);
+
+  Test_Result;
+
+end Test_SI_Text_IO_Get;

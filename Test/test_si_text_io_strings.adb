@@ -27,8 +27,8 @@
 --   christ-usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Ada.Assertions, Ada.IO_Exceptions, Ada.Exceptions;
-use  Ada.Assertions, Ada.IO_Exceptions, Ada.Exceptions;
+with Ada.IO_Exceptions;
+use  Ada.IO_Exceptions;
 
 with SI.IO;
 use  SI.IO, SI;
@@ -40,8 +40,8 @@ procedure Test_SI_Text_IO_Strings is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   4.3
-  -- Date      20 January 2026
+  -- Version   5.0
+  -- Date      11 May 2026
   --====================================================================
   -- Test the Text_IO to and from string procedure.
   -- Note: Since output with default Dim parameter is tested, the test
@@ -59,6 +59,7 @@ procedure Test_SI_Text_IO_Strings is
   --                          function SI_is_Unchecked
   --  C.G.    4.2  12.10.2025 Allow µ
   --  C.G.    4.3  20.01.2026 Test case added "  -1.0 *km/h"
+  --  C.G.    5.0  11.05.2026 Plug hole in dimension check (Dim => " ")
   --====================================================================
 
   procedure Test_Aft_Exp (Value: Item; Expected_D, Expected_F: String) is
@@ -132,13 +133,16 @@ begin
   ------------------------------------------------------------------------------
   Test_Step (Title => "Test prefixes",
              Description => "Prefix modifies exponent.");
-  --                                                        234567890123456789012345"
+  --                                                           234567890123456789012345"
   Test_Prefix (10_000.0*"m"   , "km"            , Expected => "             1.00E+01*km");
   Test_Prefix ( 1.0*"A"       , "mA"            , Expected => "             1.00E+03*mA");
   Test_Prefix ( 2.0/"s**(1/3)", "/hs**(1/3)"    , Expected => "      9.28E+00/hs**(1/3)");
   Test_Prefix ( 2.0/"s*Em"    , "/(Ms*km**(+1))", Expected => "  2.00E-09/(Ms*km**(+1))");
   Test_Prefix (-3.0*"kV/mm"   , "V/m"           , Expected => "           -3.00E+06*V/m");
   Test_Prefix (+4.0*"uF"      , "µF"            , Expected => "             4.00E+00*µF");
+  Test_Prefix (-5.0*""        , ""              , Expected => "               -5.00E+00");
+  Test_Prefix ( 5.1*""        , " "             , Expected => "                5.10E+00");
+  Test_Prefix ( 6.0*"ukat"    , ""              , Expected => "    6.00E-06*s**(-1)*mol");
 
   ------------------------------------------------------------------------------
   Test_Step (Title => "Further Get tests",
@@ -171,7 +175,8 @@ begin
 
   ------------------------------------------------------------------------------
   Test_Step (Title => "Test exceptions",
-             Description => "String too short: Layout_Error; wrong unit: Unit_Error.");
+             Description => "String too short: Layout_Error; " &
+                            "wrong unit: Unit_Error.");
 
   declare
     Result: String (1 .. 5);
@@ -192,6 +197,28 @@ begin
     when Unit_Error =>
       Assert (Condition => True,
               Message   => "Expected Unit_Error  m vs. A",
+              Only_Report_Error => False);
+  end;
+
+  declare
+    Result: String (1 .. 5);  -- doesn't matter that string too short
+  begin
+    Put (Result, 1.0*"H", Dim => " ");
+  exception
+    when Unit_Error =>
+      Assert (Condition => True,
+              Message   => "Expected Unit_Error  H vs. dimensionless",
+              Only_Report_Error => False);
+  end;
+
+  declare
+    Result: String (1 .. 5);  -- doesn't matter that string too short
+  begin
+    Put (Result, 1.0*"", Dim => "  F ");
+  exception
+    when Unit_Error =>
+      Assert (Condition => True,
+              Message   => "Expected Unit_Error  dimensionless vs. F",
               Only_Report_Error => False);
   end;
 

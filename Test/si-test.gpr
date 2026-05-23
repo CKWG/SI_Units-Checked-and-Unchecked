@@ -28,8 +28,8 @@ project SI.Test is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   7.2
-  -- Date      21 March 2026
+  -- Version   7.3
+  -- Date      7 May 2026
   --====================================================================
   --
   --====================================================================
@@ -59,6 +59,9 @@ project SI.Test is
   --  C.G.    7.0  17.10.2025 Rework because of new 'Image attribute
   --  C.G.    7.1  23.10.2025 Add test_si_vectors
   --  C.G.    7.2  21.03.2026 Add test_predicates
+  --  C.G.    7.3  07.05.2026 test_si_text_io_file renamed to
+  --                          test_si_text_io_get,
+  --                          test_si_text_io_table new
   --====================================================================
 
   for Object_Dir use "GnatLib";
@@ -78,7 +81,8 @@ project SI.Test is
                 "test_si_celsius",
                 "test_si_unformatted_io",
                 "test_si_text_io_strings",
-                "test_si_text_io_file",
+                "test_si_text_io_get",
+                "test_si_text_io_table",
                 "test_si_text_io_put");
   for Exec_Dir use ".";
 

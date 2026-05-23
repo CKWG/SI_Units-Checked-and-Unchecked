@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2002, 2018, 2020, 2025 Christoph Karl Walter Grein
+-- Copyright (C) 2002, 2018, 2020, 2025, 2026 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -27,7 +27,6 @@
 --   christ-usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Ada.Assertions;
 with Ada.Exceptions;
 with Ada.Strings.Fixed;
 
@@ -43,8 +42,8 @@ procedure Test_SI_Text_IO_Put is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   4.1
-  -- Date      22 September 2025
+  -- Version   5.1
+  -- Date      11 May 2026
   --====================================================================
   -- The Fore, Aft, Exp format modifiers apply unchanged to the numeric
   -- value only, so no test is neede.
@@ -67,6 +66,8 @@ procedure Test_SI_Text_IO_Put is
   --  C.G.    4.1  22.09.2025 [UA09-009 public] fixed  in alr 2.1.0
   --                          gnat_native=15.2.1; instead use new
   --                          function SI_is_Unchecked
+  --  C.G.    5.0  05.05.2026 New profile for Put to file
+  --  C.G.    5.1  11.05.2026 Plug hole in dimension check (Dim => " ")
   --====================================================================
 
   package A renames Ada.Text_IO;
@@ -79,7 +80,8 @@ procedure Test_SI_Text_IO_Put is
     Put (Result, X, Dim => Dim);  A.New_Line (Result);
   exception
     when Ex: others =>
-      A.Put_Line (Result, '"' & Dim & '"' & (17 - Dim'Length) * ' ' & " => " & Exception_Name (Ex) & ": " & Exception_Message (Ex));
+      A.Put_Line (Result, '"' & Dim & '"' & (17 - Dim'Length) * ' ' & " => "
+                          & Exception_Name (Ex) & ": " & Exception_Message (Ex));
   end Test_Case;
 
 begin
@@ -110,11 +112,17 @@ begin
   A.Put_Line ("See file Test_SI_Text_IO_Put.out.expected");
   A.Put_Line (Result, "Must fail");  A.New_Line (Result);
 
-  Test_Case (1.0 * ""    , Dim => "/");
-  Test_Case (1.0 * "km/s", Dim => "km/s;");
-  Test_Case (1.0 * "km/s", Dim => "*M/ms");
-  Test_Case (1.0 * "km/s", Dim => "/(ms*m**(-1))s");
-  Test_Case (1.0 * "s"   , Dim => "S");
+  -- Unit_Error
+  Test_Case (-1.0 * "km/s", Dim => " ");
+  Test_Case (-2.0 * ""    , Dim => "km/s");
+  Test_Case (-3.0 * "s"   , Dim => "S");
+  -- Illegal_Unit
+  Test_Case (-4.0 * ""    , Dim => "/");
+  Test_Case (-5.0 * "km/s", Dim => "km/s;");
+  Test_Case (-6.0 * "km/s", Dim => "*M/ms");
+  Test_Case (-7.0 * "km/s", Dim => "/(ms*m**(-1))s");
+
+  -----------------------------------------------------------
 
   Test_Step (Title => "Modifiers that must pass",
              Description => "Only a few random samples.");
@@ -124,17 +132,49 @@ begin
   A.Put_Line (Result, "Must pass");  A.New_Line (Result);
 
   Test_Case (1.0 * "");
-  Test_Case (1.0 * ""    , Dim => " ");         -- leading and trailing spaces
-  Test_Case (1.0 * "km/s", Dim => "  km/s  ");  -- are ignored in Dim
-  Test_Case (1.0 * "km/s");
-  Test_Case (1.0 * "km/s", Dim => "*m/ms");
-  Test_Case (1.0 * "km/s", Dim => "/(ms*dm**(-1))");
+  Test_Case (2.0 * ""    , Dim => " ");
+  Test_Case (3.0 * "km/s", Dim => "  km/s  ");
+  Test_Case (4.0 * "km/s");
+  Test_Case (5.0 * "km/s", Dim => "*m/ms");
+  Test_Case (6.0 * "km/s", Dim => "/(ms*dm**(-1))");
 
   Test_Case (2.33395*10.0**(-6)*"m**(-3)*kg**(-3/2)*s**(9/2)*A**(5/2)");  -- output lines must
   Test_Case (2.33395*10.0**(-6)*"m**(-3)*kg**(-3/2)*s**(9/2)*A**(5/2)",
              Dim =>"hs**(9/2)*dam**(-3)*mA**(5/2)*dag**(-3/2)");
   Test_Case (7.38060E-08*"dam**(-3)*hs**(9/2)*dag**(-3/2)*mA**(5/2)",     -- be identical
              Dim => "*m**(-3)*kg**(-3/2)*s**(9/2)*A**(5/2)");
+
+  -----------------------------------------------------------
+
+  Test_Step (Title => "Test table output",
+             Description => "Left and right aligned and Layout_Error.");
+
+  A.New_Line (Result);
+  A.Put_Line (Result, "Left and right aligned");  A.New_Line (Result);
+
+  A.Put_Line (Result, "12345678901---1234567890");  -- Left-aligned: add '|' at end so that spaces written at line end are
+  Put (Result, 1.0/"s" , Fore => 9, Aft => 1, Exp => 0, Pad => 3, Unit => -10);               A.Put_Line (Result, "|");  -- ... visible
+  Put (Result, 1.0*"Hz", Fore => 9, Aft => 0, Exp => 0, Pad => 3, Unit => +10);               A.New_Line (Result);
+  Put (Result, 1.0/"s" , Fore => 9, Aft => 1, Exp => 0, Pad => 3, Unit => -10, Dim => "Hz");  A.Put_Line (Result, "|");  -- ... visible
+  Put (Result, 1.0*"Hz", Fore => 9, Aft => 0, Exp => 0, Pad => 3, Unit => +10, Dim => "/s");  A.New_Line (Result);
+  Put (Result, 2.0*""  , Fore => 9, Aft => 0, Exp => 0, Pad => 3, Unit => +10, Dim => ""  );  A.Put_Line (Result, "|");  -- ... visible
+  Put (Result, 3.0*""  , Fore => 9, Aft => 0, Exp => 0, Pad => 3, Unit => -10, Dim => " " );  A.Put_Line (Result, "|");  -- ... visible
+
+  begin
+    Put (Result, 4.0*"mol", Fore => 9, Aft => 0, Exp => 0, Pad => 3, Unit => -10, Dim => " " );  A.New_Line (Result);
+  exception
+    when Unit_Error => A.Put_Line (Result, "Unit_Error");
+  end;
+  begin
+    Put (Result, 1000.101*"km/h" , Fore => 3, Aft => 4, Exp => 1, Pad => 3, Unit => -8);
+  exception
+    when A.Layout_Error => A.Put_Line (Result, "   Layout_Error");
+  end;
+  begin
+    Put (Result, 1000.101*"km/h" , Fore => 3, Aft => 4, Exp => 2, Pad => 3, Unit => +8);
+  exception
+    when A.Layout_Error => A.Put_Line (Result, "   Layout_Error");
+  end;
 
   -----------------------------------------------------------
 
