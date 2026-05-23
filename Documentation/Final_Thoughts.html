@@ -15,6 +15,8 @@
       2.0  11.02.2026  Celsius
       2.1  21.03.2026  Bug Assertion_Error in assignment
       2.2  01.04.2026  Tables
+      3.0  12.05.2026  New better implementation Get (Width);
+                       bug: Gnat trailing blanks
 //-->
 </head>
 
@@ -95,9 +97,9 @@ how many characters are read from the file:</p>
                  Width: <b>in</b>  Field := 0);</pre>
 
 <p>The default 0 is for reading syntactically correct input as long as possible.
-For a nonzero value, Get reads exactly so many characters (or up to a line
-terminator, whichever comes first) irrespective of the syntax and evaluates the
-input afterwards.
+For a nonzero value, Get reads exactly so many characters (or up to a line or
+file terminator, whichever comes first) irrespective of the syntax and evaluates
+the input afterwards.
 Thus this option is ideal for reading  tabular data.
 Width corresponds roughly to the sum of Fore, Aft and Exp of the corresponding
 Put procedure.
@@ -123,7 +125,8 @@ The first block und following padding are of no interest here; we're interested
 solely in the two data blocks and the separating padding.</p>
 
 <p>As can easily be seen, such a table is impossible to write or read with the
-current SI IO features; especially the Width parameter is completely useless.</p>
+RM Get profile; additionally to the Width parameter further parameters are
+needed for the padding and the unit parts.</p>
 
 <p>In directory Examples, procedure Tables writes and reads two tables, one
 with data left-aligned starting with column 24:</p>
@@ -139,7 +142,7 @@ with data left-aligned starting with column 24:</p>
 
 <p>the other also starting at the same column (denoted by '|'), but shifted so
 that units are aligned at column 13 (counting from '|' as 1) in the second block
-denoted by '*':</p>
+(denoted by '*'):</p>
 
 <pre>  <i>12345678901234567890123|23456789012*</i>
   Earth Mass               5.9722E+24*kg
@@ -150,72 +153,42 @@ denoted by '*':</p>
   Gravitational Constant  6.67430E-11*m**3*kg**(-1)*s**(-2)
   Acceleration                 9.8203*m/s**2</pre>
 
-<p>Both are not what one would expect for a pleasant table.
-Also here, the Width parameter is useless!</p>
+<p>Both are not what one would expect for a pleasant table as shown initially.</p>
 
-<p>A better implementation is needed for a nonzero value of Width.</p>
-
-<p>So in order to split the numeric data and the unit into two blocks, the Put
-and Get operations will need additional parameters like the following.
-(Note that because of the defaults legacy code is not affected by this change.)</p>
+<p>So for a nonzero value of Width in order to split the numeric data and the
+unit into two blocks, the Put and Get operations have been provided with
+additional parameters as follows (ignore the Dim parameter of Get for now, it's
+only there as a reminder that the idea of unit input checking of above might be
+implemented):</p>
 
 <pre>  <b>procedure </b>Put (File: <b>in </b>File_Type;
                  X   : <b>in </b>Item;
-                 Fore: <b>in </b>Field  := Default_Fore;
-                 Aft : <b>in </b>Field  := Default_Aft;
-                 Exp : <b>in </b>Field  := Default_Exp;
-                 Dim : <b>in </b>String := &quot;&quot;;
-                 Pad : <b>in</b> Field  := 0;
+                 Fore: <b>in </b>Field      := Default_Fore;
+                 Aft : <b>in </b>Field      := Default_Aft;
+                 Exp : <b>in </b>Field      := Default_Exp;
+                 Dim : <b>in </b>String     := &quot;&quot;;
+                 Pad : <b>in</b> Field      := 0;
                  Unit: <b>in</b> Field'Base := 0) <b>with</b>
-    Pre => (<b>if</b> Unit = 0 <b>then</b> Pad = 0);</pre>
+    Pre => (<b>if</b> Unit = 0 <b>then</b> Pad = 0);
 
-<p>If the new parameters Pad and Unit are zero, the resulting output will be
-the same as currently: the numeric value output according to Fore, Aft, Exp,
-the unit following as requested by Dim: <code>-9.82*m/s**2</code></p>
-
-<p>For a nonzero value of Unit, however, it is the duty of the programmer to
-choose the values for Fore, Aft and Exp such that the numbers are
-right-aligned.
-The numeric value will be written as before to the first table block, followed
-by Pad spaces for the padding, then the dimension string will be written to
-the second table block with <code><b>abs</b>&nbsp;Unit</code> characters,
-right-aligned for a positive value, left-aligned for a negative one (without
-the leading '*', but with the leading '/') like in the very first example
-above.</p>
-
-<p>The corresponding Get operation also needs the same new parameters Pad and
-Unit (ignore the Dim parameter for now &ndash; it's only there as a reminder that
-the idea of unit input checking of above might be implemented):</p>
-
-<pre>  <b>procedure </b>Get (File : <b>in  </b>File_Type;
+  <b>procedure </b>Get (File : <b>in  </b>File_Type;
                  X    : <b>out </b>Item;
                  Width: <b>in  </b>Field  := 0;
               <font color="969696"> [ Dim  : <b>in</b>  String := &quot;&quot;; ] </font>
                  Pad  : <b>in</b>  Field  := 0;
                  Unit : <b>in</b>  Field  := 0) <b>with</b>
-    Pre => (<b>if</b> Width = 0 <b>then</b> Pad = 0 <b>and</b> Unit = 0);</pre>
+    Pre => ((Width = 0) = (Unit = 0));</pre>
 
-<p>If Width = 0, the result will be the same as currently, reading continues as
-long as the syntax allows.</p>
+<p>For a nonzero value of Unit, however, it is the duty of the programmer to
+choose the values for Fore, Aft and Exp such that the numbers are
+right-aligned.
+The numeric value will be written to the first table block, followed by Pad
+spaces for the padding, then the dimension string will be written to the second
+table block with <code><b>abs</b>&nbsp;Unit</code> characters, right-aligned for
+a positive value, left-aligned for a negative one (without the leading '*', but
+with the leading '/') like in the very first example above.</p>
 
-<p>For a nonzero value of Width, for all three parameters Width, Pad, Unit,
-exactly so many characters will be input or the characters (possibly none) up
-to a line terminator, whichever comes first, then reading stops.
-Then the three fields will each be evaluated.
-Contrary to the current beviour, Width applies only to the numeric value of X
-as prescribed in RM A.10.9(19).
-Data_Error will be raised if any of the Pad characters is a nonblank
-character.
-Illegal_Unit will be raised if the unit sequence does not have the syntax of
-a dimension format modifier after stripping any leading and trailing blanks
-(thus there is no difference in reading left-aligned or right-aligned unit
-strings).</p>
-
-<p>Returns in X the (dimensioned) Item.</p>
-
-<p>Proposals for other parameter profiles?</p>
-
-<p>Any thoughts?</p>
+<p>Procedure Tables provides also an example for a proper table version.</p>
 
 <h3 align="center"><a name="degC">Celsius</a></h3>
 
@@ -267,7 +240,13 @@ If you do need it, do not forget to define an appropriate IO functionality for
     This bug exists in <b>GNAT 15.2.1</b>; <b>GNAT CE 2021</b> is not affected.
     It prevents inlining and leads to extremely bad performance.<br/>
     <b>Thus use of GNAT 15.2.1 is not recommended.</b></li>
-</ul>
+<li>Ada.Text_IO.Real_IO.Get with parameter Width>0: <b>GNAT ignores trailing blanks.</b><br/>
+    This problem was detected when writing ACVC tests.
+    AI22-0151-1 takes care of this; accepted by ARG on 12 May 2026.
+    It's unclear when GNAT will comply with this new ACVC test.
+    This behaviour affects the test program Test_SI_Text_IO_Table.</li>
+<li>There is a GNAT bug in Test_Predicates.
+    Since it does not affect the SI package, it has not been reported.</li></ul>
 
 <p><a href="Table_of_Contents.html">Table_of_Contents</a></p>
 
