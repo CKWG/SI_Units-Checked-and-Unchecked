@@ -7,15 +7,10 @@
 -- Bug reports and proposals for improvements are welcome. Please send
 -- them to the eMail address below.
 --
--- Christoph Karl Walter Grein
--- Hauptstr. 42
--- D-86926 Greifenberg
--- Germany
+-- Author's email address:
+--   christ-usch.grein@t-online.de
 --
--- eMail:    Christ-Usch.Grein@T-Online.de
--- Internet: http://home.T-Online.de/home/Christ-Usch.Grein
---
--- Copyright (c) 1994, 1997, 1998, 2000, 2006, 2008
+-- Copyright (c) 1994, 1997, 1998, 2000, 2006, 2008, 2026
 -- Christoph Karl Walter Grein
 ------------------------------------------------------------------------
 
@@ -28,8 +23,8 @@ package body Test_Support is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   3.0
-  -- Date      15 May 2008
+  -- Version   3.1
+  -- Date      11 April 2026
   --====================================================================
   --
   --====================================================================
@@ -47,10 +42,10 @@ package body Test_Support is
   --  C.G.   2.0  20.10.2006  Ada 2005: Add date of test
   --  C.G.   2.1  01.12.2006  Reset with Test_Result
   --  C.G.   3.0  15.05.2008  Add Global_Result
+  --  C.G.   3.1  11.04.2026  Add number of tests, glob. ass. & fail
   --====================================================================
 
-  Steps, Assertions, Failed, Global: Natural := 0;
-  Fail: Boolean := False;
+  Steps, Assertions, Assert_Sum, Failed, Failed_Sum, Tests, Global: Natural := 0;
 
   procedure New_Line (Spacing: in Positive := 1) is
   begin
@@ -100,6 +95,7 @@ package body Test_Support is
     Put      ("Description: ");  Break_Long_Lines (Description);
     Put      ("Date       : ");  Put_Line (Ada.Calendar.Formatting.Image (Ada.Calendar.Clock, Include_Time_Fraction => True));
     Empty_Line;
+    Tests := Tests + 1;
   end Test_Header;
 
   procedure Test_Step (Title, Description: in String) is
@@ -120,7 +116,6 @@ package body Test_Support is
     if not Condition then
       Put (Message);  Set_Col (70);  Put_Line ("Failed");
       Failed := Failed + 1;
-      Fail   := True;
     elsif not Only_Report_Error then
       Put (Message);  Set_Col (70);  Put_Line ("OK");
     end if;
@@ -136,7 +131,7 @@ package body Test_Support is
     Put_Line ("Assertions:" & Integer'Image (Assertions));
     Put_Line ("Failed    :" & Integer'Image (Failed));
     Put_Line ("===========");
-    if Fail then
+    if Failed > 0 then
       Put_Line ("Test failed");
       Global := Global + 1;
     else
@@ -144,10 +139,11 @@ package body Test_Support is
     end if;
     Put_Line ("===========");
     -- Reset for next test:
+    Assert_Sum := Assert_Sum + Assertions;
+    Failed_Sum := Failed_Sum + Failed;
     Steps      := 0;
     Assertions := 0;
     Failed     := 0;
-    Fail       := False;
   end Test_Result;
 
   procedure Global_Result is
@@ -156,10 +152,14 @@ package body Test_Support is
     Put_Separator;
     Put_Line ("Global result");
     Put_Line ("=============");
+    Put_Line ("Assertions:" & Integer'Image (Assert_Sum));
+    Put_Line ("Failed    :" & Integer'Image (Failed_Sum));
+    Put_Line ("-------------");
+    Put_Line ("Tests :" & Integer'Image (Tests));
     if Global = 0 then
       Put_Line ("All tests passed.");
     else
-      Put_Line ("Failed tests:" & Integer'Image (Global));
+      Put_Line ("Failed:" & Integer'Image (Global));
     end if;
     Put_Line ("=============");
   end Global_Result;
