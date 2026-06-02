@@ -28,12 +28,13 @@
       6.2  18.04.2025  Preconditions
       6.3  18.08.2025  Bug fix and more precision in syntax; link to Bureau International des Poids et Mesures
       6.4  04.09.2025  Generic parameter is new; improved examples
-      6.5  15.09.2025  Allow  ; corrected typos in description
+      6.5  15.09.2025  Allow micro in addition to u; corrected typos in description
       6.6  11.10.2025  Presentation improved
       6.7  20.01.2026  More precision in the presentation
       6.8  27.01.2026  correct typos
       6.9  29.03.2026  Again more precision
       7.0  11.05.2026  New better implementation Get (Width); dimension format modifier " " is new
+      7.1  02.06.2026  Make trailing space characters visible in output
 //-->
 </head>
 
@@ -130,7 +131,10 @@ evaluated at least twice on each call.</p>
 unit.
 There are two forms of items: an internal one as written in programs
 (e.g. 1.0*&quot;m&quot;) and an external one as output to or read from files or
-strings (e.g. 1.0*m).</p>
+strings (e.g. 1.0*m).
+[The unit follows after a '*' or '/' character without space characters.
+This is necessary for input or else there would be no way to see where to stop
+reading, e.g. 3.6 km vs. 3.0 &euro;.]</p>
 
 <p>This is the syntax of an external item:</p>
 
@@ -303,8 +307,8 @@ numeric format modifiers.
 A padding block of Pad spaces follows.
 The dimension string is written to the second table block occupying
 <code><b>abs</b> Unit</code> characters, left-aligned for a negative value of
-Unit, right-aligned for a positive one, without a leading '*', but with a
-leading '/' if necessary.</p>
+Unit (and filling the unused characters with spaces), right-aligned for a
+positive one, without a leading '*', but with a leading '/' if necessary.</p>
 
 <p>The exception Layout_Error is raised if Unit is too short.</p>
 
@@ -335,12 +339,14 @@ remaining string part is used for the numeric value according to the rules of th
   Put (1.0/"s" , Fore => 5, Aft => 1, Exp => 0, Dim => "Hz", Pad => 3, Unit => -6);  New_Line;
   Put (1.0*"Hz", Fore => 5, Aft => 1, Exp => 0, Dim => "/s", Pad => 3, Unit => +6);  New_Line;
   
-  <i>1234567---123456</i>
-      1.0   Hz
-      1.0       /s
+  <i>1234567---123456</i>|
+      1.0   Hz    |
+      1.0       /s|
 </span></pre>
 
-<p>The column numbers in italics are not output, they just show the alignment.</p>
+<p>The column numbers in italics are not output nor the '|', they just show the
+alignment and the complete filling with (invisible) trailing space characters
+of the Unit range.</p>
 
 <h4>Input from Files or Strings:</h4>
 
