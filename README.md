@@ -23,7 +23,7 @@ There is a complete user interface documentation included in a separate director
 
 [Also see the author's [Ada Magica](https://www.ada-deutschland.de/sites/default/files/AdaTourCD/AdaTourCD2004/Ada%20Magica/Contents.html) and [Ada introductory course](https://www.ada-deutschland.de/sites/default/files/AdaKursGrein/Ada-Kurs-Course.html) at [Ada Deutschland](https://www.ada-deutschland.de/).]
 
-**This is an interim update; May 23, 2026**<br>
+**This is an interim update; June 2, 2026**<br>
 1. The previous `SI.Text_IO.Get` operation with parameter `Width/= 0` was not very plausible.
    `Ada.Text_IO.Get` with `Width/= 0` is most probably meant for reading data tables,
    so data to be read is right-aligned and trailing characters within `Width` range lead to `Data_Error`.<br>
