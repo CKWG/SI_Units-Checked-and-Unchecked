@@ -40,7 +40,8 @@ Of course the corresponding Put operation has also new defaulted parameters.
 `Put (X, Dim => "");    -- outputs the default unit, no checks`<br>
 `Put (X, Dim => "mm");  -- checks whether X has dimension Length`<br>
 `Put (X, Dim => " ");   -- new, note the space: checks whether X has dimension One`
-3. Tests have been updated. The Tables example shows the new functionality.
+3. Fixed a bug in Get for Width > 0.
+4. Tests have been updated. The Tables example shows the new functionality.
 
 **This is release 2.0.0; Apr 7, 2026.**<br>
 Incompatible User Interface change: Ada 2022 defines the 'Image attribute for any type and allows its redefinition &ndash;
