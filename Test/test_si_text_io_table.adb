@@ -40,8 +40,8 @@ procedure Test_SI_Text_IO_Table is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   1.0
-  -- Date      8 May 2026
+  -- Version   1.1
+  -- Date      3 June 2026
   --====================================================================
   -- Test the IO package for Get with Width > 0.
   -- Read the in files and compare the out files with the expected ones.
@@ -54,6 +54,7 @@ procedure Test_SI_Text_IO_Table is
   -- History
   -- Author Version   Date    Reason for change
   --  C.G.    1.0  08.05.2026
+  --  C.G.    1.1  03.06.2026 Test improved, Table_KO (4) is new
   --====================================================================
 
   type Table_Entry is record
@@ -83,17 +84,19 @@ procedure Test_SI_Text_IO_Table is
     (1 => (32, "          1995                  "),   -- padding not empty,
      2 => (32, "    1995e-1                     "),   -- value not right-aligned (*)
      3 => (32, "    -1995E-27   m/ s            "),   -- illegal unit
-     4 => (10, "   2005e-1######################"),   -- EoL in value
-     5 => (13, "      2005E+0###################"),   -- EoL after value
-     6 => (15, "      2012.09  #################"));  -- EoL in padding
+     4 => (32, "    -1995E-27   m              X"),   -- illegal character
+     5 => (10, "   2005e-1######################"),   -- EoL in value
+     6 => (13, "      2005E+0###################"),   -- EoL after value
+     7 => (15, "      2012.09  #################"));  -- EoL in padding
     --          12345678901234567890123456789012
   Expect_KO: constant Table :=
     (1 => (31, "Data_Error => padding incorrect "),
      2 => (22, "Data_Error => in value          "),  -- (*)
      3 => (31, "Illegal_Unit => divisor missing "),
-     4 => (22, "Data_Error => in value          "),
+     4 => (31, "Data_Error => illegal character "),
      5 => (22, "Data_Error => in value          "),
-     6 => (31, "Data_Error => padding incorrect "));
+     6 => (22, "Data_Error => in value          "),
+     7 => (31, "Data_Error => padding incorrect "));
 
   Physic, Result: File_Type;
 
