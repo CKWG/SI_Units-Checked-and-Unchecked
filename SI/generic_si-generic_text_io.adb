@@ -34,8 +34,8 @@ package body Generic_SI.Generic_Text_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   9.0
-  -- Date      13 May 2026
+  -- Version   9.1
+  -- Date      3 June 2026
   --====================================================================
   --
   --====================================================================
@@ -70,6 +70,7 @@ package body Generic_SI.Generic_Text_IO is
   --                          simplified code in Get from string
   --  C.G.    8.4  26.01.2026 Remove outdated and irritating comment
   --  C.G.    9.0  13.05.2026 New better implementation Get (Width)
+  --  C.G.    9.1  03.06.2026 Bug fix in Get (Width): no trailing char.
   --====================================================================
 
   use Real_Text_IO;
@@ -188,10 +189,14 @@ package body Generic_SI.Generic_Text_IO is
             X := Num * "";
           else
             declare
-              package String_Interface is new Generic_SI.Ensure_Task_Safety ((if sDim (1) /= '/' then "*" else "") & sDim);
-              Length: Natural;  -- not evaluated
+              eDim: constant String := (if sDim (1) /= '/' then "*" else "") & sDim;
+              package String_Interface is new Generic_SI.Ensure_Task_Safety (eDim);
+              Length: Natural;  -- rest of eDim must be Spaces
             begin
               Construct (String_Interface.Get'Access, X, Length);
+              if eDim (Length + 1 .. eDim'Last) /= (eDim'Last - Length) * Space then
+                raise Data_Error with "illegal character";
+              end if;
               X := Num * X;
             end;
           end if;
