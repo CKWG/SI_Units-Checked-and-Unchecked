@@ -23,7 +23,7 @@ There is a complete user interface documentation included in a separate director
 
 [Also see the author's [Ada Magica](https://www.ada-deutschland.de/sites/default/files/AdaTourCD/AdaTourCD2004/Ada%20Magica/Contents.html) and [Ada introductory course](https://www.ada-deutschland.de/sites/default/files/AdaKursGrein/Ada-Kurs-Course.html) at [Ada Deutschland](https://www.ada-deutschland.de/).]
 
-**This is an interim update; June 2, 2026**<br>
+**This is an interim update; June 3, 2026**<br>
 1. The previous `SI.Text_IO.Get` operation with parameter `Width/= 0` was not very plausible.
    `Ada.Text_IO.Get` with `Width/= 0` is most probably meant for reading data tables,
    so data to be read is right-aligned and trailing characters within `Width` range lead to `Data_Error`.<br>
@@ -36,11 +36,11 @@ Tables with dimensioned data generally split the numeric value and the unit in s
 This change does not affect legacy code since the new parameters have default values.
 Only calls of `Get` with `Width/=0` will no longer work, but those will be rare if not nonexistent (because of unusability).
 Of course the corresponding Put operation has also new defaulted parameters.
-3. Plugged a hole in type checking:<br>
+2. Plugged a hole in type checking:<br>
 `Put (X, Dim => "");    -- outputs the default unit, no checks`<br>
 `Put (X, Dim => "mm");  -- checks whether X has dimension Length`<br>
 `Put (X, Dim => " ");   -- new, note the space: checks whether X has dimension One`
-4. Tests have been updated. The Tables example shows the new functionality.
+3. Tests have been updated. The Tables example shows the new functionality.
 
 **This is release 2.0.0; Apr 7, 2026.**<br>
 Incompatible User Interface change: Ada 2022 defines the 'Image attribute for any type and allows its redefinition &ndash;
