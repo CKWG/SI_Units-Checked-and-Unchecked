@@ -35,6 +35,7 @@
       6.9  29.03.2026  Again more precision
       7.0  11.05.2026  New better implementation Get (Width); dimension format modifier " " is new
       7.1  02.06.2026  Make trailing space characters visible in output
+      7.2  17.06.2026  Comment out unused function Valid_Modifier
 //-->
 </head>
 
@@ -65,7 +66,7 @@ different from the default one.</p>
 
   pragma </b>Elaborate_Body;
 
-  <b>function</b> Valid_Modifier (X: Item; Dim: String) <b>return</b> Boolean;
+  <i>-- <b>function</b> Valid_Modifier (X: Item; Dim: String) <b>return</b> Boolean;</i>
 
   Default_Fore: Field := 2;
   Default_Aft : Field := Real'digits - 1;
@@ -276,13 +277,16 @@ the default.</font></p>
 <p>For the last two forms, the numeric value is adapted according to the prefixes
 and the modifier is output.</p>
 
-<pre>  <b>function</b> Valid_Modifier (X: Item; Dim: String) <b>return</b> Boolean;</pre>
+<pre>  <font color="#797979"><b>function</b> Valid_Modifier (X: Item; Dim: String) <b>return</b> Boolean;</font></pre>
 
 <p><font color="#008000">in the Checked variant returns True if the Dim parameter
 is compatible with the dimension of X, else False.</font>
 <font color="#FF0000">In the Unchecked variant, it returns always True.</font>
 It raises Illegal_Unit if Dim does not have the syntax of a dimension
-format modifier.</p>
+format modifier.<br/>
+This superfluous function is commented out as well as the corresponding preconditions,
+since this condition has to be checked in any case and the precondition would force
+twice the evaluation.</p>
 
 <h4>Output to Files or Strings:</h4>
                  
