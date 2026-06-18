@@ -42,7 +42,10 @@ Of course the corresponding Put operation has also new defaulted parameters.
 `Put (X, Dim => " ");   -- new, note the space: checks whether X has dimension One`
 3. Fixed a bug in Get for Width > 0.
 4. Tests have been updated. The Tables example shows the new functionality.
-5. Added pitfall examples for fractional powers in documentation.
+5. Added pitfall examples for fractional powers in documentation.<br>
+`(8.0*"m**3")**(1/3) = 2.0*"m"  -- an item (a value times a unit) to the power of x`<br>
+`8.0**(1/3)*"m**(3/3)" = 1.0*"m"  -- a value to the power of x times a unit`<br>
+`8.0**(1/3)*"m**3"**(1/3)  -- illegal: ditto times a unit to the power of x`<br>
 
 **This is release 2.0.0; Apr 7, 2026.**<br>
 Incompatible User Interface change: Ada 2022 defines the 'Image attribute for any type and allows its redefinition &ndash;
