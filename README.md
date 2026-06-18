@@ -23,7 +23,7 @@ There is a complete user interface documentation included in a separate director
 
 [Also see the author's [Ada Magica](https://www.ada-deutschland.de/sites/default/files/AdaTourCD/AdaTourCD2004/Ada%20Magica/Contents.html) and [Ada introductory course](https://www.ada-deutschland.de/sites/default/files/AdaKursGrein/Ada-Kurs-Course.html) at [Ada Deutschland](https://www.ada-deutschland.de/).]
 
-**This is an interim update; June 10, 2026**<br>
+**This is an interim update; June 18, 2026**<br>
 1. The previous `SI.Text_IO.Get` operation with parameter `Width/= 0` was not very plausible.
    `Ada.Text_IO.Get` with `Width/= 0` is most probably meant for reading data tables,
    so data to be read is right-aligned and trailing characters within `Width` range lead to `Data_Error`.<br>
@@ -42,6 +42,7 @@ Of course the corresponding Put operation has also new defaulted parameters.
 `Put (X, Dim => " ");   -- new, note the space: checks whether X has dimension One`
 3. Fixed a bug in Get for Width > 0.
 4. Tests have been updated. The Tables example shows the new functionality.
+5. Added pitfall examples for fractional powers in documentation.
 
 **This is release 2.0.0; Apr 7, 2026.**<br>
 Incompatible User Interface change: Ada 2022 defines the 'Image attribute for any type and allows its redefinition &ndash;
