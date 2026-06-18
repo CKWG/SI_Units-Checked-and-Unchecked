@@ -34,8 +34,8 @@ package body Generic_SI.Generic_Text_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   9.1
-  -- Date      3 June 2026
+  -- Version   9.3
+  -- Date      15 June 2026
   --====================================================================
   --
   --====================================================================
@@ -71,28 +71,32 @@ package body Generic_SI.Generic_Text_IO is
   --  C.G.    8.4  26.01.2026 Remove outdated and irritating comment
   --  C.G.    9.0  13.05.2026 New better implementation Get (Width)
   --  C.G.    9.1  03.06.2026 Bug fix in Get (Width): no trailing char.
+  --  C.G.    9.2  10.06.2026 A tiny bit of simplification
+  --  C.G.    9.3  15.06.2026 Comment out unused function Valid_Modifier
   --====================================================================
 
   use Real_Text_IO;
 
-  function Strip (Dim: String) return String with Inline is
+  function Strip (Dim: String) return String with
+    Post => Strip'Result'First = 1, Inline
+  is
     use Ada.Strings, Ada.Strings.Fixed;
   begin
     return Trim (Dim, Side => Both);
   end Strip;
 
-  function Valid_Modifier (X: Item; Dim: String) return Boolean is
-    sDim: constant String := Strip (Dim);
-  begin
-    if sDim = "" then
-      return True;
-    end if;
-    declare  -- "rad" = 1, i.e. dimensionless
-      S: constant String := (if sDim (sDim'First) in '*' | '/' then "rad" else "") & sDim;
-    begin
-      return has_Dimension (X, S);
-    end;
-  end Valid_Modifier;
+  --  function Valid_Modifier (X: Item; Dim: String) return Boolean is
+  --    sDim: constant String := Strip (Dim);
+  --  begin
+  --    if sDim = "" then
+  --      return True;
+  --    end if;
+  --    declare  -- "rad" = 1, i.e. dimensionless
+  --      S: constant String := (if sDim (1) in '*' | '/' then "rad" else "") & sDim;
+  --    begin
+  --      return has_Dimension (X, S);
+  --    end;
+  --  end Valid_Modifier;
 
   generic
     File: access constant File_Type;
@@ -113,10 +117,7 @@ package body Generic_SI.Generic_Text_IO is
       else
         Get (File.all, C);
       end if;
-      Look_Ahead (File.all, C, EoF);
-      if EoF then
-        First_Call := True;  -- reset for call with next unit string
-      end if;
+      Look_Ahead (File.all, C, EoF);  -- last call if EoF
     end Get_and_Look_Ahead;
   end Ensure_Task_Safety;
 
@@ -135,7 +136,7 @@ package body Generic_SI.Generic_Text_IO is
              --  Dim  : in  String     := "";
                  Pad  : in  Field      := 0;
                  Unit : in  Field'Base := 0) is
-    Num : Real'Base;
+    Num: Real'Base;
   begin
     if Width = 0 then
       declare
@@ -176,25 +177,25 @@ package body Generic_SI.Generic_Text_IO is
       -- Unit
       declare
         use Ada.Strings, Ada.Strings.Fixed;
-        Dim: String (1 .. abs Unit) := abs Unit * Space;
+        uDim: String (1 .. abs Unit) := abs Unit * Space;
       begin
-        for D of Dim loop
+        for D of uDim loop
           exit when End_Of_Line (File);
           Get (File, D);
         end loop;
         declare
-          sDim: constant String := Strip (Dim);
+          suDim: constant String := Strip (uDim);
         begin
-          if sDim = "" then
+          if suDim = "" then
             X := Num * "";
           else
             declare
-              eDim: constant String := (if sDim (1) /= '/' then "*" else "") & sDim;
-              package String_Interface is new Generic_SI.Ensure_Task_Safety (eDim);
+              esuDim: constant String := (if suDim (1) /= '/' then "*" else "") & suDim;
+              package String_Interface is new Generic_SI.Ensure_Task_Safety (esuDim);
               Length: Natural;  -- rest of eDim must be Spaces
             begin
               Construct (String_Interface.Get'Access, X, Length);
-              if eDim (Length + 1 .. eDim'Last) /= (eDim'Last - Length) * Space then
+              if esuDim (Length + 1 .. esuDim'Last) /= (esuDim'Last - Length) * Space then
                 raise Data_Error with "illegal character";
               end if;
               X := Num * X;
@@ -259,7 +260,7 @@ package body Generic_SI.Generic_Text_IO is
       end if;
     else  -- check dimension
       declare
-        eDim  : constant String := (if sDim (sDim'First) in '*' | '/' then "" else "*") & sDim;
+        eDim  : constant String := (if sDim (1) in '*' | '/' then "" else "*") & sDim;
         Gauge : Item;
         Length: Positive;
         Gauged: Dimensionless;

@@ -39,8 +39,8 @@ package Generic_SI.Generic_Text_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   9.0
-  -- Date      11 May 2026
+  -- Version   9.1
+  -- Date      15 June 2026
   --====================================================================
   -- For the numeric part, Put and Get work like the conventional
   -- operations in Ada.Text_IO, the formatting parameters Fore, Aft, Exp
@@ -144,11 +144,12 @@ package Generic_SI.Generic_Text_IO is
   --  C.G.    8.2  29.08.2025 Preconditions commented out
   --  C.G.    8.3  15.09.2025 Allow µ; corrected typos in description
   --  C.G.    9.0  11.05.2026 New better implementation Get (Width)
+  --  C.G.    9.1  15.06.2026 Comment out unused function Valid_Modifier
   --====================================================================
 
   pragma Elaborate_Body;
 
-  function Valid_Modifier (X: Item; Dim: String) return Boolean;
+  -- function Valid_Modifier (X: Item; Dim: String) return Boolean;
 
   Default_Fore: Field := 2;
   Default_Aft : Field := Real'Digits - 1;
@@ -159,14 +160,14 @@ package Generic_SI.Generic_Text_IO is
              --  Dim  : in  String     := "";
                  Pad  : in  Field      := 0;
                  Unit : in  Field'Base := 0) with
-    Pre => ((Width = 0) = (Unit = 0));
+    Pre => (Width = 0) = (Unit = 0);
   procedure Get (File : in  File_Type;
                  X    : out Item;
                  Width: in  Field      := 0;
              --  Dim  : in  String     := "";
                  Pad  : in  Field      := 0;
                  Unit : in  Field'Base := 0) with
-    Pre => ((Width = 0) = (Unit = 0));
+    Pre => (Width = 0) = (Unit = 0);
 
   procedure Put (X   : in Item;
                  Fore: in Field      := Default_Fore;
