@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2019, 2020, 2022, 2025 Christoph Karl Walter Grein
+-- Copyright (C) 2019, 2020, 2022, 2025, 2026 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -27,14 +27,12 @@
 --   christ-Usch.grein@t-online.de
 ------------------------------------------------------------------------------
 
-with Ada.Strings.Fixed;
-
 package body Generic_SI.Generic_Symbols is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   3.2
-  -- Date      20 October 2025
+  -- Version   3.3
+  -- Date      28 June 2026
   --====================================================================
   -- List of all unit symbols.
   --
@@ -59,6 +57,7 @@ package body Generic_SI.Generic_Symbols is
   --  C.G.    3.0  02.08.2025 Completely new implementation started
   --  C.G.    3.1  22.08.2025 New profile for Construct
   --  C.G.    3.2  20.10.2025 Remove useless "with Rat_Arith.Strings"
+  --  C.G.    3.3  28.06.2026 Remove Ada.Strings.Fixed
   --====================================================================
 
   subtype Symbol_Length is Positive range 1 .. 3;
@@ -122,7 +121,7 @@ package body Generic_SI.Generic_Symbols is
   femto : constant := 1.0E-15;  -- f
   pico  : constant := 1.0E-12;  -- p
   nano  : constant := 1.0E-09;  -- n
-  micro : constant := 1.0E-06;  -- µ replaced by u
+  micro : constant := 1.0E-06;  --   replaced by u
   milli : constant := 1.0E-03;  -- m
   centi : constant := 1.0E-02;  -- c
   deci  : constant := 1.0E-01;  -- d
