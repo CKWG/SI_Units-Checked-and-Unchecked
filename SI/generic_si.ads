@@ -51,8 +51,8 @@ package Generic_SI is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   8.3
-  -- Date      14 March 2026
+  -- Version   8.4
+  -- Date      8 August 2026
   --====================================================================
   -- Magnetic_Flux_Density is the classical name. Nowadays it's often
   -- just called Magnetic_Field.
@@ -119,6 +119,7 @@ package Generic_SI is
   --  C.G.    8.1  23.10.2025 Elementary_Functions generic parameter
   --  C.G.    8.2  13.02.2026 Postcondition for Arctan and Arccot
   --  C.G.    8.3  14.03.2026 Body of SI_is_Unchecked moved to pckg body
+  --  C.G.    8.4  08.08.2026 Added Min and Max
   --====================================================================
 
   type Item is private with Put_Image => Image;
@@ -223,6 +224,9 @@ package Generic_SI is
   function ">=" (Left, Right: Item) return Boolean with Pre => Same_Dimension (Left, Right) or else raise Unit_Error;
   function ">"  (Left, Right: Item) return Boolean with Pre => Same_Dimension (Left, Right) or else raise Unit_Error;
 
+  function Min (Left, Right: Item) return Item with Pre => Same_Dimension (Left, Right) or else raise Unit_Error;
+  function Max (Left, Right: Item) return Item with Pre => Same_Dimension (Left, Right) or else raise Unit_Error;
+
   -- Unit strings
 
   function "*" (Left: Real'Base; Right: String) return Item with Pre => Right'First = 1;  -- 1.0*"km"
@@ -289,6 +293,7 @@ private
                  Image, Value,
                  "abs", "+", "-", "*", "/", "**",
                  "<", "<=", ">=", ">",
+                 Min, Max,
                  Sqrt, Cbrt,
                  Log, Exp,
                  Sin, Cos, Tan, Cot,

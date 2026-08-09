@@ -35,8 +35,8 @@ package body Generic_SI is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   8.2
-  -- Date      30 April 2026
+  -- Version   8.3
+  -- Date      8 August 2026
   --====================================================================
   --
   --====================================================================
@@ -72,6 +72,7 @@ package body Generic_SI is
   --  C.G.    8.1  14.03.2026 SI_is_Unchecked considers assertion policy
   --  C.G.    8.2  30.04.2026 Replace Symbols.Construct by Construct in
   --                          constructor function "/"
+  --  C.G.    8.3  08.08.2026 Added Min and Max
   --====================================================================
 
   function SI_is_Unchecked return Boolean is
@@ -227,6 +228,16 @@ package body Generic_SI is
   begin
     return Left.Value > Right.Value;
   end ">";
+
+  function Min (Left, Right: Item) return Item is
+  begin
+    return (Left.Unit, Real'Min (Left.Value, Right.Value));
+  end Min;
+
+  function Max (Left, Right: Item) return Item is
+  begin
+    return (Left.Unit, Real'Max (Left.Value, Right.Value));
+  end Max;
 
   -- Unit strings
 
