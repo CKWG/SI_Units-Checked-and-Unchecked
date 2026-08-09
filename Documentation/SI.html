@@ -45,6 +45,7 @@
       7.4  03.03.2026  Improve description of 'Image
       7.5  16.04.2026  Higher_Derivatives
       7.6  17.06.2026  Examples and pitfalls
+      7.7  08.08.2026  Min, Max added
 //-->
 
 <script language="JavaScript">
@@ -210,6 +211,9 @@ variant, of course.</p>
   <b>function </b>&quot;&lt;=&quot; <b>(</b>Left, Right: Item<b>) return </b>Boolean <b>with </b>Pre =&gt; Same_Dimension <b>(</b>Left, Right<b>) or else raise </b>Unit_Error;
   <b>function </b>&quot;&gt;=&quot; <b>(</b>Left, Right: Item<b>) return </b>Boolean <b>with </b>Pre =&gt; Same_Dimension <b>(</b>Left, Right<b>) or else raise </b>Unit_Error;
   <b>function </b>&quot;&gt;&quot;  <b>(</b>Left, Right: Item<b>) return </b>Boolean <b>with </b>Pre =&gt; Same_Dimension <b>(</b>Left, Right<b>) or else raise </b>Unit_Error;
+
+  <b>function</b> Min (Left, Right: Item) <b>return</b> Item <b>with</b> Pre => Same_Dimension (Left, Right) <b>or else raise</b> Unit_Error;
+  <b>function</b> Max (Left, Right: Item) <b>return</b> Item <b>with</b> Pre => Same_Dimension (Left, Right) <b>or else raise</b> Unit_Error;
 
   <i>-- Unit strings
 
@@ -420,33 +424,33 @@ by the ARG for the time being, it might be resumed eventually.</p>
 
 <p>The standard attribute 'Image produces this result for
 <code>10.0*&quot;K&quot;</code>:
-<pre>(UNIT =>
- (M =>
-  (NUMERATOR =>  0,
-   DENOMINATOR =>  1),
-  KG =>
-  (NUMERATOR =>  0,
-   DENOMINATOR =>  1),
-  S =>
-  (NUMERATOR =>  0,
-   DENOMINATOR =>  1),
-  A =>
-  (NUMERATOR =>  0,
-   DENOMINATOR =>  1),
-  K =>
-  (NUMERATOR =>  1,
-   DENOMINATOR =>  1),
-  CD =>
-  (NUMERATOR =>  0,
-   DENOMINATOR =>  1),
-  MOL =>
-  (NUMERATOR =>  0,
-   DENOMINATOR =>  1)),
- VALUE =>  1.00000E+01)</pre>
+<pre>  (UNIT =>
+   (M =>
+    (NUMERATOR =>  0,
+     DENOMINATOR =>  1),
+    KG =>
+    (NUMERATOR =>  0,
+     DENOMINATOR =>  1),
+    S =>
+    (NUMERATOR =>  0,
+     DENOMINATOR =>  1),
+    A =>
+    (NUMERATOR =>  0,
+     DENOMINATOR =>  1),
+    K =>
+    (NUMERATOR =>  1,
+     DENOMINATOR =>  1),
+    CD =>
+    (NUMERATOR =>  0,
+     DENOMINATOR =>  1),
+    MOL =>
+    (NUMERATOR =>  0,
+     DENOMINATOR =>  1)),
+   VALUE =>  1.00000E+01)</pre>
  and similar output for other units.
  The following procedure is used to redefine the attribute 'Image:</p>
 
-<pre><b>procedure </b>Image <b>(</b>B: <b>in out </b>Ada.Strings.Text_Buffers.Root_Buffer_Type'Class; X: Item<b>)</b>;</pre>
+<pre>  <b>procedure </b>Image <b>(</b>B: <b>in out </b>Ada.Strings.Text_Buffers.Root_Buffer_Type'Class; X: Item<b>)</b>;</pre>
 
 <p>For the numeric part, the attribute works exactly like the corresponding
 numeric attribute where the exact format of the numeric value depends of
@@ -454,14 +458,14 @@ course on the actual floating point type; the unit is displayed in the
 <a href="SI-Text_IO.html#def">default representation</a>, for instance the
 above example produces</p>
 
-<pre>T := 10.0*&quot;K&quot;;
-T'Image = &quot; 1.00000E+01*K&quot;  <i>-- <font color="#008000">in the checked variant</font></i>
-T'Image = &quot; 1.00000E+01&quot;    <i>-- <font color="#FF0000">in the unchecked variant</font></i></pre>
+<pre>  T := 10.0*&quot;K&quot;;
+  T'Image = &quot; 1.00000E+01*K&quot;  <i>-- <font color="#008000">in the checked variant</font></i>
+  T'Image = &quot; 1.00000E+01&quot;    <i>-- <font color="#FF0000">in the unchecked variant</font></i></pre>
 
 <p>Value returns the argument as an item ignoring any leading or
 trailing blanks.</p>
 
-<pre><b>function </b>Value <b>(</b>X: String<b>) return </b>Item;</pre>
+<pre>  <b>function </b>Value <b>(</b>X: String<b>) return </b>Item;</pre>
 
 <p><font color="#008000">In the checked variant, it takes into account
 the unit in any representation.</font>
