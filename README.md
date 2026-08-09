@@ -23,7 +23,7 @@ There is a complete user interface documentation included in a separate director
 
 [Also see the author's [Ada Magica](https://www.ada-deutschland.de/sites/default/files/AdaTourCD/AdaTourCD2004/Ada%20Magica/Contents.html) and [Ada introductory course](https://www.ada-deutschland.de/sites/default/files/AdaKursGrein/Ada-Kurs-Course.html) at [Ada Deutschland](https://www.ada-deutschland.de/).]
 
-**This is an interim update; June 18, 2026**<br>
+**This is an interim update; August 9, 2026**<br>
 1. The previous `SI.Text_IO.Get` operation with parameter `Width/= 0` was not very plausible.
    `Ada.Text_IO.Get` with `Width/= 0` is most probably meant for reading data tables,
    so data to be read is right-aligned and trailing characters within `Width` range lead to `Data_Error`.<br>
@@ -46,6 +46,7 @@ Of course the corresponding Put operation has also new defaulted parameters.
 `(8.0*"m**3")**(1/3) = 2.0*"m"  -- an item (a value times a unit) to the power of x`<br>
 `8.0**(1/3)*"m**(3/3)" = 1.0*"m"  -- a value to the power of x times a unit`<br>
 `8.0**(1/3)*"m**3"**(1/3)  -- illegal: ditto times a unit to the power of x`<br>
+6. Added Min and Max functions for Item
 
 **This is release 2.0.0; Apr 7, 2026.**<br>
 Incompatible User Interface change: Ada 2022 defines the 'Image attribute for any type and allows its redefinition &ndash;
