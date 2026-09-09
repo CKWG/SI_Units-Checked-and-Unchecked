@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Checked and Generic Computation with SI Units
+-- Checked and Unchecked Computation with SI Units
 -- Copyright (C) 2026 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
@@ -37,8 +37,8 @@ procedure Tables is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   2.1
-  -- Date      19 May 2026
+  -- Version   2.2
+  -- Date      9 September 2026
   --====================================================================
   -- Three examples for tables.
   -- Write the tables, then read and verify the contents.
@@ -50,6 +50,7 @@ procedure Tables is
   --  C.G.    1.2  03.05.2026 Use new instantiation Big_Bang
   --  C.G.    2.0  13.05.2026 Elaborated table new
   --  C.G.    2.1  19.05.2026 Alternative reading of elaborated table
+  --  C.G.    2.2  09.09.2026 Added table example output
   --====================================================================
 
   use Universe;
@@ -69,6 +70,16 @@ procedure Tables is
     Procedure Set (Start: in  Positive_Count);
     procedure Put (Name : in  String; X: in  Item; Fore, Aft, Exp: in Field; Dim: in String := "");
     procedure Get (Name : out String; X: out Item);
+    -- Example output for:
+    --   Start=24
+    -- 123456789012345678901234
+    -- Mass                   5.9722E+24*kg
+    --                        5.9722E+0*Rg
+    -- Equatorial Radius      6378.1370*km
+    -- Polar Radius           6356.7523*km
+    -- Mean Radius            6371.0088*km
+    -- Gravitational Constant 6.67430E-11*m**3*kg**(-1)*s**(-2)
+    -- Acceleration           9.8203*m/s**2
   end Simple_Table;
 
   package body Simple_Table is separate;
@@ -80,6 +91,16 @@ procedure Tables is
     procedure Set (Start: in  Positive_Count; Width: in Field);
     procedure Put (Name : in  String; X: in  Item; Aft, Exp: in Field; Dim: in String := "");
     procedure Get (Name : out String; X: out Item);
+    -- Example output for:
+    --   Start=24, Width=12
+    -- 12345678901234567890123|23456789012*
+    -- Mass                     5.9722E+24*kg
+    --                              5.9722*Rg
+    -- Equatorial Radius         6378.1370*km
+    -- Polar Radius              6356.7523*km
+    -- Mean Radius               6371.0088*km
+    -- Gravitational Constant  6.67430E-11*m**3*kg**(-1)*s**(-2)
+    -- Acceleration                 9.8203*m/s**2
   end Aligned_Table;
 
   package body Aligned_Table is separate;
@@ -92,6 +113,27 @@ procedure Tables is
     procedure Set (Start: in  Positive_Count; Width, Pad: in Field; Unit: in Field'Base);
     procedure Put (Name : in  String; X: in  Item; Aft, Exp: in Field; Dim: in String := "");
     procedure Get (Name : out String; X: out Item);
+    -- Example output for:
+    --   Start=24, Width=12, Pad=3, Unit=22
+    -- 12345678901234567890123|23456789012---1234567890123456789012
+    -- Mass                     5.9722E+24                       kg
+    --                              5.9722                       Rg
+    -- Equatorial Radius         6378.1370                       km
+    -- Polar Radius              6356.7523                       km
+    -- Mean Radius               6371.0088                       km
+    -- Gravitational Constant  6.67430E-11    m**3*kg**(-1)*s**(-2)
+    -- Acceleration                 9.8203                   m/s**2
+    --
+    -- Example output for:
+    --   Start=24, Width=12, Pad=1, Unit=-21
+    -- 12345678901234567890123|23456789012-123456789012345678901
+    -- Mass                     5.9722E+24 kg
+    --                              5.9722 Rg
+    -- Equatorial Radius         6378.1370 km
+    -- Polar Radius              6356.7523 km
+    -- Mean Radius               6371.0088 km
+    -- Gravitational Constant  6.67430E-11 m**3*kg**(-1)*s**(-2)
+    -- Acceleration                 9.8203 m/s**2
   end Elaborated_Table;
 
   package body Elaborated_Table is separate;
