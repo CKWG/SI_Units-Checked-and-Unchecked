@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2002, 2003, 2025 Christoph Karl Walter Grein
+-- Copyright (C) 2002, 2003, 2025, 2026 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -31,8 +31,8 @@ package body Generic_SI.Generic_Temperatures.Generic_Text_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   3.0
-  -- Date      30 August 2025
+  -- Version   3.1
+  -- Date      24 August 2026
   --====================================================================
   --
   --====================================================================
@@ -46,6 +46,7 @@ package body Generic_SI.Generic_Temperatures.Generic_Text_IO is
   --                          rename; overhaul
   --  C.G.    2.1  03.07.2025 Get, Put for Strings
   --  C.G.    3.0  30.08.2025 Reimplemented Get
+  --  C.G.    3.1  24.08.2026 Allow 'µ' (si_letter as in SI.Text_IO)
   --====================================================================
 
   use Real_Text_IO;
@@ -75,7 +76,7 @@ package body Generic_SI.Generic_Temperatures.Generic_Text_IO is
       Get (File, G);  -- consume C
       loop
         Look_Ahead (File, C, EoL);
-        exit when EoL or else C not in 'A' .. 'Z' | 'a' .. 'z';
+        exit when EoL or else C not in 'A' .. 'Z' | 'a' .. 'z' | 'µ';
         Count := Count + 1;
         Get (File, G);  -- consume C
       end loop;
@@ -130,7 +131,7 @@ package body Generic_SI.Generic_Temperatures.Generic_Text_IO is
       raise Illegal_Unit with "wrong unit start";
     end if;
     for I in Last + 2 .. From'Last loop
-      exit when From (I) not in 'A' .. 'Z' | 'a' .. 'z';
+      exit when From (I) not in 'A' .. 'Z' | 'a' .. 'z' | 'µ';
       Last  := I;
       Count := Count + 1;
     end loop;
