@@ -46,6 +46,7 @@
       7.5  16.04.2026  Higher_Derivatives
       7.6  17.06.2026  Examples and pitfalls
       7.7  08.08.2026  Min, Max added
+      7.8  09.09.2026  Pitfall examples need explanation; further improvements
 //-->
 
 <script language="JavaScript">
@@ -80,6 +81,7 @@ variant, of course.</p>
 
 <p><a href="#Specification">Specification</a><br/>
 <a href="#Unit">Unit Subtpyes</a><br/>
+<a href="#Value">Value Construction</a><br/>
 <a href="#Operators">Operators</a><br/>
 <a href="#Math">Mathematical Functions</a><br/>
 <a href="#Unform">Unformatted IO</a><br/>
@@ -168,9 +170,9 @@ variant, of course.</p>
   <b>subtype </b>Magnetic_Field_Strength <b>is </b>Item <b>with </b>Dynamic_Predicate =&gt; has_Dimension <b>(</b>Magnetic_Field_Strength, &quot;A/m&quot;     <b>)</b>, Predicate_Failure =&gt; <b>raise </b>Unit_Error <b>with </b>&quot;Magnetic_Field_Strength&quot;;  <i>-- H field
   </i><b>subtype </b>Magnetic_Flux           <b>is </b>Item <b>with </b>Dynamic_Predicate =&gt; has_Dimension <b>(</b>Magnetic_Flux          , &quot;Wb&quot;      <b>)</b>, Predicate_Failure =&gt; <b>raise </b>Unit_Error <b>with </b>&quot;Magnetic_Flux&quot;;
   <b>subtype </b>Magnetic_Flux_Density   <b>is </b>Item <b>with </b>Dynamic_Predicate =&gt; has_Dimension <b>(</b>Magnetic_Flux_Density  , &quot;T&quot;       <b>)</b>, Predicate_Failure =&gt; <b>raise </b>Unit_Error <b>with </b>&quot;Magnetic_Flux_Density&quot;;  <i>-- B field
-  </i><b>subtype </b>Magnetic_Field          <b>is      </b>Magnetic_Flux_Density;  <i>--
+  </i><b>subtype </b>Magnetic_Field          <b>is      </b>Magnetic_Flux_Density;
 
-  </i><b>subtype </b>Temperature             <b>is </b>Item <b>with </b>Dynamic_Predicate =&gt; has_Dimension <b>(</b>Temperature            , &quot;K&quot;       <b>)</b>, Predicate_Failure =&gt; <b>raise </b>Unit_Error <b>with </b>&quot;Temperature&quot;;
+  <b>subtype </b>Temperature             <b>is </b>Item <b>with </b>Dynamic_Predicate =&gt; has_Dimension <b>(</b>Temperature            , &quot;K&quot;       <b>)</b>, Predicate_Failure =&gt; <b>raise </b>Unit_Error <b>with </b>&quot;Temperature&quot;;
 
   <b>subtype </b>Luminous_Intensity      <b>is </b>Item <b>with </b>Dynamic_Predicate =&gt; has_Dimension <b>(</b>Luminous_Intensity     , &quot;cd&quot;      <b>)</b>, Predicate_Failure =&gt; <b>raise </b>Unit_Error <b>with </b>&quot;Luminous_Intensity&quot;;
   <b>subtype </b>Luminance               <b>is </b>Item <b>with </b>Dynamic_Predicate =&gt; has_Dimension <b>(</b>Luminance              , &quot;cd/m**2&quot; <b>)</b>, Predicate_Failure =&gt; <b>raise </b>Unit_Error <b>with </b>&quot;Luminance&quot;;
@@ -354,17 +356,24 @@ multplied or divided by the unit indication in a string:</p>
 
 <pre>  27.0*&quot;km/h&quot;   4.2/&quot;s&quot;</pre>
 
+<p>Note that all operators except the very first one must be inside the quotes
+and follow Ada syntax.
+The exact syntax for a unit indication is given in package
+<a href="SI-Text_IO.html#Unit">SI.Text_IO</a>.</p>
+
 <p>Any unit names and prefixes may be used as given for the SI unit system
 in <a href="https://www.bipm.org/en/measurement-units/">BIPM</a>.
 There are two exceptions: 'u' can be used for micro instead of '&micro;';
 &quot;Ohm&quot; is used for &quot;&Omega;&quot;.
-Additionally allowed symbols by this document are &quot;min&quot;, &quot;h&quot;
-for minute and hour (no prefixes allowed) and &quot;l&quot;, &quot;L&quot; for
-liter (prefixes allowed), &quot;eV&quot; for particle mass (prefixes allowed).
+Additional symbols allowed by this document together with the SI system and
+also included here are:
+&quot;min&quot;, &quot;h&quot; for minute and hour (no prefixes allowed);
+&quot;ha&quot; for field measurement (no prefixes allowed);
+&quot;l&quot;, &quot;L&quot; for liter (prefixes allowed);
+&quot;eV&quot; for particle mass (prefixes allowed);
+the document names some more symbols which are not included here.
 Unit and prefix are case sensitive and written together like &quot;Ms&quot;,
 megasecond, or &quot;mS&quot;, millisiemens.
-The exact syntax for a unit indication is given in package
-<a href="SI-Text_IO.html">SI.Text_IO</a>.
 Internally, the numeric value will be converted to the base units, i.e.
 the speed example above will be 7.5*&quot;m/s&quot;.</p>
 
@@ -490,32 +499,66 @@ in <code>&quot; 1.00000E+01&quot;</code> <font color="#FF0000">in the unchecked 
 
 <pre>  Y: Length := 42.0*&quot;km/h&quot;;
 
-  V: Speed := Arcsin (1.0*"", Cycle =&gt; 2.0*&quot;m&quot;);  -- <i>cycle must have a speed unit</i></pre>
+  V: Speed := Arcsin (1.0*&quot;&quot;, Cycle =&gt; 2.0*&quot;m&quot;);  -- <i>cycle must have a speed unit</i></pre>
 
 <p>Unit_Error is also raised when incompatible units are combined:</p>
 
-<pre>  4.0*&quot;km/h&quot; + 30.0*"min"  -- <i>wrong operator</i>
+<pre>  4.0*&quot;km/h&quot; + 30.0*&quot;min&quot;  -- <i>wrong operator</i>
 
-  Sin (1.0*"", Cycle =&gt; 2.0*"m")  -- <i>both parameters must have same dimension</i>
+  Sin (1.0*&quot;&quot;, Cycle =&gt; 2.0*&quot;m&quot;)  -- <i>both parameters must have same dimension</i>
 
-  Put (2.0*"m", Dim =&gt; "s");  -- <i>see Text_IO</i></pre>
+  Put (2.0*&quot;m&quot;, Dim =&gt; &quot;s&quot;);  -- <i>see <a href="SI-Text_IO.html">SI.Text_IO</a></i></pre>
 
 <h3><a name="Pit">Examples and Pitfalls</a></h3>
 
-<p>Be careful with fractional exponents:</p>
+<p>An item is a numeric value multplied or divided by a unit
+(see <a href="#Value">Value Construction</a>); a unit is everyting inside the quotes
+(see <a href="SI-Text_IO.html#Unit">SI.Text_IO.Unit Syntax</a>):</p>
 
-<pre>   8.0**(1/3) * &quot;cm **(1/3)&quot; = 2.15443E-01 * &quot;m**(1/3)&quot;
-   1.0**(1/3) * &quot;cm **(1/3)&quot;   -- <i>all</i>
-   1.0        * &quot;cm **(1/3)&quot;   -- <i>  the</i>
-  (1.0E-2     * &quot;m&quot;)**(1/3)    -- <i>    same</i>
+<pre>   5.0*<font color="#FF1DE4">&quot;</font>m<font color="#FF1DE4">&quot;</font>
+   5.0*<font color="#FF1DE4">&quot;</font>m**3<font color="#FF1DE4">&quot;</font>
+  42.0*<font color="#FF1DE4">&quot;</font>km/h<font color="#FF1DE4">&quot;</font></pre>
 
-   8.0**(1/3) * &quot;cm&quot; **(1/3)      -- <i>illegal</i>
-  (8.0        * &quot;cm&quot;)**1/3) * &quot;s&quot;  -- <i>as well</i>
-       -- <i></i>
-  (8.0    * &quot;cm&quot;)**(1/3) = 2.00000E+00 * &quot;cm**(1/3)&quot;
-  (8.0E-2 *  &quot;m&quot;)**(1/3)   -- <i>the same</i>
-  (8.0    * &quot;cm&quot;)**(1/3) = 4.30887E-01 *  &quot;m**(1/3)&quot;
-  (8.0E-2 *  &quot;m&quot;)**(1/3)   -- <i>the same</i></pre>
+<p>Thus the following is illegal, there are no such operators:</p>
+
+<pre>   5.0*<font color="#FF1DE4">&quot;</font>m<font color="#FF1DE4">&quot;</font><font color="#FF0000">**</font>3
+  42.0*<font color="#FF1DE4">&quot;</font>km<font color="#FF1DE4">&quot;</font><font color="#FF0000">/</font><font color="#FF1DE4">&quot;</font>h<font color="#FF1DE4">&quot;</font></pre>
+
+<p>An exponentiation of an item must involve both parts together:</p>
+
+<pre>  (5.0*<font color="#FF1DE4">&quot;</font>m<font color="#FF1DE4">&quot;</font>)**3</pre>
+
+<p>Hence generally for an exponent <code>x</code>, the legality or interpretation
+of the following equation is questionable:</p>
+
+<pre>  (5.0*<font color="#FF1DE4">&quot;</font>m<font color="#FF1DE4">&quot;</font>)**x&nbsp;=&nbsp;5.0**x*<font color="#FF1DE4">&quot;</font>m**x<font color="#FF1DE4">&quot;</font></pre>
+
+<p>For an integer literal, it is true.
+For a real literal, both sides will <code><b>raise</b> Unit_Error <b>with</b> &quot;Dimensionless&quot;</code>.</p>
+
+<h4>Be careful with fractional exponents:</h4>
+
+<p>If the expression <code>x</code> on the left hand side of the equality above
+is a rational number (there are no rational literals, <code>a/b</code> is an
+expression), its interpretation of both occurences on the right hand side is
+completely different.
+The first exponentiation on the right hand side <code>5.0**x</code> is pure Ada,
+which does not know of exponentiation with rational numbers, the Ada operator
+<code>&quot;/&quot;</code> RM 4.5.5(2,5) prevails [for the numeric value].
+For the unit, the evaluation of the exponentiation [inside the quotes] is not by
+Ada rules even though Ada syntax is used.</p>
+
+<pre>   8.0**(1/3) * &quot;cm**(1/3)&quot; = 2.15443E-01 * &quot;m**(1/3)&quot;
+   1.0**(1/3) * &quot;cm**(1/3)&quot;   -- <i>all</i>
+   1.0        * &quot;cm**(1/3)&quot;   -- <i>  the</i>
+  (1.0E-2     * &quot;m&quot;)**(1/3)   -- <i>    same</i>
+
+   8.0**(1/3) * &quot;cm&quot;**(1/3)   -- <i>illegal</i>
+
+  (8.0    * &quot;cm&quot;)**(1/3) = 2.00000E+00 * &quot;cm**(1/3)&quot;  -- identical
+  (8.0E-2 *  &quot;m&quot;)**(1/3)   -- <i>the same</i>                -- results
+  (8.0    * &quot;cm&quot;)**(1/3) = 4.30887E-01 *  &quot;m**(1/3)&quot;  -- in different
+  (8.0E-2 *  &quot;m&quot;)**(1/3)   -- <i>the same</i>                -- units</pre>
 
 <p><a href="Table_of_Contents.html">Table_of_Contents</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <a href="SI-Text_IO.html">SI.Text_IO</a></p>

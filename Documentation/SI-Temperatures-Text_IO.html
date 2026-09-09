@@ -11,6 +11,7 @@
       2.0  03.07.2025  Redesign
       3.0  29.08.2025  New syntax based on SI syntax
       3.1  11.02.2026  Corrected character &deg;
+      3.2  24.08.2026  si_letter as in SI.Text_IO
 //-->
 </head>
 
@@ -27,7 +28,7 @@ SI items:</p>
 
 <pre>   external_item ::= value unit_factor
    unit_factor   ::= &deg; identifier
-   identifier    ::= letter {letter}</pre>
+   identifier    ::= si_letter {si_letter}</pre>
 
 <p><u>Get</u>: Reading procedes like reading for SI items according to the
 syntax above.

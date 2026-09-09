@@ -36,6 +36,8 @@
       7.0  11.05.2026  New better implementation Get (Width); dimension format modifier " " is new
       7.1  02.06.2026  Make trailing space characters visible in output
       7.2  17.06.2026  Comment out unused function Valid_Modifier
+      7.3  09.09.2026  More precision for input from files and strings;
+                       target link to Default Representation, example for it
 //-->
 </head>
 
@@ -144,8 +146,8 @@ reading, e.g. 3.6 km vs. 3.0 &euro;.]</p>
    quotient      ::= product [ / divisor ]
    divisor       ::= unit_factor | ( product )
    product       ::= unit_factor { * unit_factor }
-   unit_factor   ::= identifier [ ** exponent ]
-   identifier    ::= si_letter { si_letter }
+   unit_factor   ::= si_identifier [ ** exponent ]
+   si_identifier ::= si_letter { si_letter }
    exponent      ::= ( [ sign ] rational ) | numeral
    sign          ::= + | -
    rational      ::= numeral [ / numeral ]
@@ -168,7 +170,7 @@ rules.</p>
 
 <p>An <code>si_letter</code> is a character that is in one of the ranges
 <code>'A'..'Z'</code> or <code>'a'..'z'</code> or is <code>'&micro;'</code>.<br/>
-The <code>identifier</code> must be interpretable as <code>[prefix] symbol</code>.</p>
+The <code>si_identifier</code> must be interpretable as <code>[prefix] symbol</code>.</p>
 
 <p><code>prefix</code> and <code>symbol</code> are as defined in SI
 (case sensitive); <code>'u'</code> may be used for micro instead of
@@ -208,7 +210,8 @@ prefixes are allowed and neither e.g. &quot;ka&quot; nor the alleged 1*km<sup>2<
     1.0*&quot;&quot;                           1.0              -- <i>dimension 1</i>
     1.0                                               -- <i>illegal (a value, not an item)</i>
     1.0/  &quot;km &quot;;                                      -- <i>illegal (space in string)</i>
-    1.0*&quot;km&quot;/&quot;h&quot;                                      -- <i>illegal (no units on items), an expression is needed 1.0*&quot;km&quot;/(1.0*&quot;h&quot;)</i>
+    1.0*&quot;km&quot;/&quot;h&quot;                                      -- <i>illegal (no units on items),</i>
+                                                      -- <i>an expression is needed 1.0*&quot;km&quot;/(1.0*&quot;h&quot;)</i>
     1.0*&quot;W/m/K&quot;                      1.0*W/m/K        -- <i>illegal (ugly), correct W/(m*K)</i>
     1.0*&quot;m/s**2*kg&quot;                  1.0*m/s**2*kg    -- <i>illegal (misleading), would be 1.0*m*kg/s**2</i>
     1.0*&quot;m/(s**2/kg)&quot;                1.0*m/(s**2/kg)  -- <i>illegal (no / in divisor)</i></pre>
@@ -217,14 +220,19 @@ prefixes are allowed and neither e.g. &quot;ka&quot; nor the alleged 1*km<sup>2<
 on the IO package used: For the former, use Ada.Text_IO, for the latter
 SI.Text_IO.</p>
 
+<h4><a name="def">Default Representation</a></h4>
+
 <p><font color="#008000">In the Checked variant, the
 <b>default representation</b> of the <code>dimension</code> is a product of all
 base units (m, kg, s, A, K, cd, mol in that sequence) with an exponent different
 from 0.
 If the dimension is 1, the default representation is empty.
-Each base unit is given either as the pure unit (if the exponent is 1),
+Each base unit is given either as the pure unit if the exponent is 1,
 or as the unit with an integer exponent if the exponent is a whole number
 (other than 1), or as the unit with a fractional exponent.</font></p>
+
+<pre>  -- <i>default representation of the constant part of the Schottky-Langmuir equation</i>
+  m**(-3)*kg**(-3/2)*s**(9/2)*A**(5/2)</pre>
 
 <p><font color="#FF0000">In the Unchecked variant, the <b>default representation</b>
 of the <code>dimension</code> is empty.</font></p>
@@ -233,6 +241,8 @@ of the <code>dimension</code> is empty.</font></p>
 prefixes and symbols in any sequence and with any exponents.</p>
 
 <h3><a name="InOut">Input and Output</a></h3>
+
+<p>Items may be input in any representation.</p>
 
 <p>For dimensional output, the parameter profile as defined in standard
 Ada.Text_IO.Float_IO is not sufficient.
@@ -248,13 +258,15 @@ a dimension format modifier <code>Dim</code>, which modifies the unit to be
 applied for the dimension (e.g. "km" instead of the basic "m").
 As for tables of dimensioned values, two further formatting parameters
 <code>Pad</code> and <code>Unit</code> are provided for the layout of the
-dimensional part.</p>
+dimensional part.
+Program <code>Examples/tables.adb</code> presents different forms ot tabular
+output.</p>
 
 <h4>Dimension format modifier:</h4>
 
 <p>Other than the unit strings, which have to begin with index 1, a format
 modifier may occupy any range.
-Before it is evaluated, any leading or trailing spaces are stripping except for
+Before it is evaluated, any leading or trailing spaces are stripped except for
 the second form <code>&quot; &quot;</code> which is left untouched.
 This is the syntax of a dimension format modifier after this transformation:</p>
 
@@ -327,7 +339,10 @@ remaining string part is used for the numeric value according to the rules of th
 
 <h4>Examples:</h4>
 
-<pre><span>  Put (1.0/&quot;ks&quot;);&nbsp; -- output <font color="#008000">in the default representation as 0.001*s**(-1) for the
+<pre><span>  Put (X, Dim => &quot;&quot;);   -- output in default representation, no checks
+  Put (X, Dim => &quot; &quot;);  -- <font color="#008000">in the checked variant, check that X is dimensionless, if so,</font> output
+
+  Put (1.0/&quot;ks&quot;);&nbsp; -- output <font color="#008000">in the default representation as 0.001*s**(-1) for the
                    -- checked variant</font>, <font color="#FF0000">as 0.001 for the unchecked variant</font>
                    -- (for appropriately chosen numeric format modifiers)
   Put (1.0/&quot;ks&quot;, Dim =&gt; &quot; &quot;);&nbsp;      -- <font color="#008000">raises Unit_Error for the checked variant</font>,
@@ -338,23 +353,26 @@ remaining string part is used for the numeric value according to the rules of th
   Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;/s*2&quot;);&nbsp;   -- exception Illegal_Unit
   Put (1.0/&quot;ks&quot;, Dim =&gt; &quot;m&quot;);&nbsp;      -- <font color="#008000">exception Unit_Error for the checked variant</font>, 
                                     -- <font color="#FF0000">output as 0.001*m for the unchecked variant</font>
-  Put (1.0*&quot;&deg;C&quot;);  -- impossible, you have to use the operation in Temperatures.Text_IO
+  Put (1.0*&quot;&deg;C&quot;);  -- impossible (Unit_Error), you have to use the operation of Temperatures.Text_IO
+  Put (1.0);       -- impossible (won't compile), you have to use the operation of Ada.Text_IO
+  Put (1.0*"");    -- OK
+</span></pre>
 
-  Put (1.0/"s" , Fore => 5, Aft => 1, Exp => 0, Dim => "Hz", Pad => 3, Unit => -6);  New_Line;
+<h4>Tabular Output:</h4>
+
+<pre>  Put (1.0/"s" , Fore => 5, Aft => 1, Exp => 0, Dim => "Hz", Pad => 3, Unit => -6);  New_Line;
   Put (1.0*"Hz", Fore => 5, Aft => 1, Exp => 0, Dim => "/s", Pad => 3, Unit => +6);  New_Line;
   
   <i>1234567---123456</i>|
       1.0   Hz    |
       1.0       /s|
-</span></pre>
+</pre>
 
 <p>The column numbers in italics are not output nor the '|', they just show the
 alignment and the complete filling with (invisible) trailing space characters
 of the Unit range.</p>
 
-<h4>Input from Files or Strings:</h4>
-
-<p>Items may be read in any representation.</p>
+<h4>Input from Files:</h4>
 
 <p>If the parameter <code>Width</code> is zero, first the numeric value is read
 as with Get of standard Text_IO.Float_IO.</p>
@@ -365,29 +383,23 @@ as with Get of standard Text_IO.Float_IO.</p>
               <font color="969696"> [ Dim  : <b>in</b>  String := &quot;&quot;; ]  -- see Final Thoughts</font>
                  Pad  : <b>in</b>  Field  := 0;
                  Unit : <b>in</b>  Field  := 0) <b>with</b>
-    Pre => (<b>if</b> Width = 0 <b>then</b> Pad = 0 <b>and</b> Unit = 0);</pre>
-
-<p>For input from string, first the numeric value is read as with Get of standard
-Text_IO.Float_IO.</p>
-
-<pre>  <b>procedure </b>Get (From: <b>in  </b>String;
-                 X   : <b>out </b>Item;
-                 Last: <b>out </b>Positive);</pre>
+    Pre => ((Width = 0) = (Unit = 0));</pre>
 
 <p>Data_Error may be raised in this first step.</p>
 
-<p>In case Data_Error is not raised, both read the longest possible sequence
-of characters matching the syntax of the unit of an external item given above,
-or a prefix of such syntax.
+<p>In case Data_Error is not raised, read the longest possible sequence of
+characters matching the syntax of the unit of an external item, or a prefix of
+such syntax.
 [This last sentence is an exact copy of RM A.10.9(13/7), applied to the unit
-string.]</p>
+string.]
+The parameter <code>Pad</code> is ignored in this case.</p>
 
 <p>If a nonzero value of <code>Width</code> is supplied, then for all three
 parameters Width, Pad, Unit, exactly so many characters will be input or the
 characters (possibly none) up to a line terminator, whichever comes first.</p>
 
 <p>The numeric value is evaluated from the characters read for Width as with Get
-of standard Text_IO.Float_IO.
+of standard Ada.Text_IO.Float_IO.
 Data_Error is raised if less than Width characters are input because the unit
 part will be missing.</p>
 
@@ -401,8 +413,6 @@ or right-aligned unit strings).</p>
 
 <p>Returns, in the parameter X of type Item, the value that corresponds to
 the sequence input, <font color="#008000">dimensioned in the Checked version</font>.
-For input from string, additionally returns in Last the index value such that
-From (Last) is the last character read as with Get of standard Text_IO.Float_IO.
 Illegal_Unit is raised if the sequence input does not have the required syntax.
 [This sentence is an adaptation of RM A.10.9(21).]</p>
 
@@ -414,11 +424,11 @@ Illegal_Unit is raised if the sequence input does not have the required syntax.
   273.15*K
   10.0*N/m**2</pre>
 
-<p>The following will be read as the dimensionless item (or better an item with
-dimension 1); reading stops after the number (there is no operator nor an si_letter
-after it), the characters after the number, i.e. <code>;m/s</code> in the first
-example and <code> m/s</code> together with the leading space in the second sample
-will stay in the input stream.
+<p>The following will be read as the dimensionless item (an item with dimension 1);
+reading stops after the number (there is no operator nor an si_letter after it),
+the characters after the number, i.e. <code>;m/s</code> in the first example and
+<code> m/s</code> together with the leading space in the second sample will stay
+in the input stream.
 [A <i>dimensionless item</i> is not a floating point value (those are read as with
 <code>Ada.Text_IO.Float_IO</code>, but this is <code>SI.Text_IO</code>, not
 <code>Ada.Text_IO</code>)!]
@@ -451,7 +461,7 @@ stream.</p>
   42.0*m-3/kg</pre>
 
 <p>The string <code>abcd</code> will be completely read because it is an
-<code>identifier</code> and thus legal syntax, but will raise <code>Illegal_Unit</code>
+<code>si_identifier</code> and thus legal syntax, but will raise <code>Illegal_Unit</code>
 because there is no such unit (leaving the exponent operator in the input stream).
 The same holds for the second example because <code>A</code> is an unknown prefix
 (Ampere-second would need an operator).</p>
@@ -463,6 +473,39 @@ The same holds for the second example because <code>A</code> is an unknown prefi
 <code>si_item</code> and has to be read with <code>Temperatures.Text_IO</code>.</p>
 
 <pre>  0.0&deg;C</pre>
+
+<h4>Tabular Input:</h4>
+
+<p>The following lines can be read in multiple ways (italics and '|' show the alignment):</p>
+
+<pre>  <i>1234567---123456</i>|
+      1.0   Hz    |
+      1.0   Hz <i>&lt;EoL&gt;</i>
+
+  Get (X, Width => 7, Pad => 3, Unit => 6);
+  Get (X, Width => 7, Pad => 3, Unit => 4);
+  Get (X, Width => 7, Pad => 0, Unit => 5);
+
+  Get (X, Width => 7, Pad => 4, Unit => 5);  -- raise
+  Get (X, Width => 8, Pad => 2, Unit => 6);  --   Data_Error</pre>
+
+<h4>Input from Strings:</h4>
+
+<p>First the numeric value is read as with Get of standard Ada.Text_IO.Float_IO.</p>
+
+<pre>  <b>procedure </b>Get (From: <b>in  </b>String;
+                 X   : <b>out </b>Item;
+                 Last: <b>out </b>Positive);</pre>
+
+<p>Data_Error may be raised in this first step.</p>
+
+<p>In case Data_Error is not raised, reads like for input from files the longest
+possible sequence of characters.
+Returns, in the parameter X of type Item, the value that corresponds to the
+sequence input, <font color="#008000">dimensioned in the Checked version</font>.
+Illegal_Unit is raised if the sequence input does not have the required syntax.
+Additionally returns in Last the index value such that <code>From&nbsp;(Last)</code>
+is the last character read as with Get of standard Ada.Text_IO.Float_IO.</p>
 
 <p><a href="Table_of_Contents.html">Table_of_Contents</a></p>
 
