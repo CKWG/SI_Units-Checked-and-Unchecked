@@ -34,8 +34,8 @@ package body Generic_SI.Generic_Text_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   9.3
-  -- Date      15 June 2026
+  -- Version   9.4
+  -- Date      28 September 2026
   --====================================================================
   --
   --====================================================================
@@ -73,6 +73,7 @@ package body Generic_SI.Generic_Text_IO is
   --  C.G.    9.1  03.06.2026 Bug fix in Get (Width): no trailing char.
   --  C.G.    9.2  10.06.2026 A tiny bit of simplification
   --  C.G.    9.3  15.06.2026 Comment out unused function Valid_Modifier
+  --  C.G.    9.4  28.09.2026 Bug fix in Get (Width): early EoL
   --====================================================================
 
   use Real_Text_IO;
@@ -156,24 +157,31 @@ package body Generic_SI.Generic_Text_IO is
         end if;
       end;
     else  -- Width /= 0
-      -- Value
-      Get (File, Num, Width);
-      if End_of_Line (File) then
-        raise Data_Error with "in value";
-      end if;
-      -- Padding
+      -- If less than the requested Width and Pad is present,
+      -- the missing unit part leads to Data_Error.
+      Early_EoL:
       declare
-        use Ada.Strings, Ada.Strings.Fixed;
-        Padding: String (1 .. Pad) := Pad *'#';
+        Start: Positive_Count := Col (File);
       begin
-        for P of Padding loop
-          exit when End_Of_Line (File);
-          Get (File, P);
-        end loop;
-        if Padding /= Pad * Space then
-          raise Data_Error with "padding incorrect";
+        -- Value
+        Get (File, Num, Width);
+        if Col (File) - Start + 1 < Count (Width) then
+          raise Data_Error with "in value";
         end if;
-      end;
+        -- Padding
+        declare
+          use Ada.Strings, Ada.Strings.Fixed;
+          Padding: String (1 .. Pad) := Pad * '#';
+        begin
+          for P of Padding loop
+            exit when End_Of_Line (File);
+            Get (File, P);
+          end loop;
+          if Padding /= Pad * Space then
+            raise Data_Error with "padding incorrect";
+          end if;
+        end;
+      end Early_EoL;
       -- Unit
       declare
         use Ada.Strings, Ada.Strings.Fixed;
@@ -202,7 +210,7 @@ package body Generic_SI.Generic_Text_IO is
             end;
           end if;
         end;
-      end;
+      end;  -- Unit
     end if;  -- Width
   end Get;
 
@@ -230,6 +238,7 @@ package body Generic_SI.Generic_Text_IO is
       sUnit: String (1 .. abs Unit);
       First: Positive := 1;
       use Ada.Strings, Ada.Strings.Fixed;
+      pragma Warnings (Off);
     begin
       if eDim /= "" and then eDim (1) = '*' then
         First := 2;
