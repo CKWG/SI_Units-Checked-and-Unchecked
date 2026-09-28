@@ -17,6 +17,7 @@
       2.2  01.04.2026  Tables
       3.0  12.05.2026  New better implementation Get (Width);
                        bug: Gnat trailing blanks
+      3.1  23.09.2026  Remove Tables
 //-->
 </head>
 
@@ -40,7 +41,6 @@ directory.
 I will add them together with your name as author.</p>
 
 <p><a href="#Input">Input from Files</a><br/>
-<a href="#Table">Tables</a><br/>
 <a href="#degC">Celsius</a><br/>
 <a href="#Bugs">GNAT Bugs</a></p>
 
@@ -54,18 +54,22 @@ so that you can safely switch to the unchecked variant for deployment.</p>
 
 <p>There is however one hole in this reasoning: <i>input from external
 devices</i>!
-When you read data with the wrong dimension, there is no way in the unchecked
-variant to prove that the input is correct.
+When you read data with the wrong dimension, there is no way in the
+<font color="#FF0000">unchecked</font> variant to prove that the input is
+dimensionally correct.
 (This is like outputting a distance with a dimension format modifier for
 seconds &ndash; also this cannot be caught in the unchecked variant.)</p>
 
 <p>This input deficiency can be remedied by also adding a dimension format
 modifier for the Get operations:</p>
 
-<pre>  <b>procedure </b>Get (File : <b>in  </b>File_Type;
-                 X    : <b>out </b>Item;
-                 Width: <b>in  </b>Field  := 0;
-                 Dim  : <b>in</b>  String := &quot;&quot;);</pre>
+<pre><span>  <b>procedure </b>Get (File : <b>in  </b>File_Type;
+                 X    : <b>ou</b>  Item;
+                 Width: <b>in</b>  Field  := 0;
+                 <font color="#FF0000">Dim  : <b>in</b>  String := &quot;&quot;;</font>
+                 Pad  : <b>in</b>  Field  := 0;
+                 Unit : <b>in</b>  Field  := 0) <b>with</b>
+    Pre => ((Width = 0) = (Unit = 0));</span></pre>
 
 <p>The dimension format modifier, if given, will ignore any prefixes and
 verify the unit string input, raising <code>Unit_Error</code> in case of
@@ -74,7 +78,7 @@ This is not a restriction since normally you have to know what to read and
 can select the proper dimension.
 If for some reason, you do not know the expected dimension (when for instance
 reading table data), you simply omit the parameter.
-(The modifier will of course be ignored in the checked variant.)</p>
+(The modifier will of course have little effect in the checked variant.)</p>
 
 <p>For example, a modifier <code>&quot;m/s&quot;</code> as well as
 <code>&quot;km/h&quot;</code> will check that the input has dimension
@@ -87,108 +91,6 @@ be needed.</p>
 
 <p>Any thoughts?</p>
 
-<h3 align="center"><a name="Table">Tables</a></h3>
-
-<p>The Get procedure of RM A.10.9(12) offers the parameter Width that defines
-how many characters are read from the file:</p>
-
-<pre>  <b>procedure </b>Get (File : <b>in</b>  File_Type;
-                 Item : <b>out</b> Num;
-                 Width: <b>in</b>  Field := 0);</pre>
-
-<p>The default 0 is for reading syntactically correct input as long as possible.
-For a nonzero value, Get reads exactly so many characters (or up to a line or
-file terminator, whichever comes first) irrespective of the syntax and evaluates
-the input afterwards.
-Thus this option is ideal for reading  tabular data.
-Width corresponds roughly to the sum of Fore, Aft and Exp of the corresponding
-Put procedure.
-Such a table might look like this (the first line is not data, it just shows the
-layout):</p>
-
-<pre>  <i>12345678901234567890--123456789012345----123456789012345</i>
-  Earth Mass                 5.9722E+24    kg
-  Equatorial Radius           6378.1370    km
-  Polar Radius                6356.7523    km
-  Mean Radius                 6371.0088    km
-  Gravitational Const.      6.67430E-11    m**3*/(kg*s**2)
-  Acceleration                   9.8203    m/s**2</pre>
-
-<p>The first block with the data description occupies the first 20 columns;
-a padding of 2 blanks follows as a block separator;
-then Width&nbsp;=&nbsp;15 characters of numeric data, right-aligned in the second
-block;
-another padding of 4 blanks;
-the physical dimension is given in the third block (left-aligned as shown here
-or right-aligned).
-The first block und following padding are of no interest here; we're interested
-solely in the two data blocks and the separating padding.</p>
-
-<p>As can easily be seen, such a table is impossible to write or read with the
-RM Get profile; additionally to the Width parameter further parameters are
-needed for the padding and the unit parts.</p>
-
-<p>In directory Examples, procedure Tables writes and reads two tables, one
-with data left-aligned starting with column 24:</p>
-
-<pre>  <i>123456789012345678901234</i>
-  Earth Mass             5.9722E+24*kg
-                         5.9722E+0*Rg
-  Equatorial Radius      6378.1370*km
-  Polar Radius           6356.7523*km
-  Mean Radius            6371.0088*km
-  Gravitational Constant 6.67430E-11*m**3*kg**(-1)*s**(-2)
-  Acceleration           9.8203*m/s**2</pre>
-
-<p>the other also starting at the same column (denoted by '|'), but shifted so
-that units are aligned at column 13 (counting from '|' as 1) in the second block
-(denoted by '*'):</p>
-
-<pre>  <i>12345678901234567890123|23456789012*</i>
-  Earth Mass               5.9722E+24*kg
-                               5.9722*Rg
-  Equatorial Radius         6378.1370*km
-  Polar Radius              6356.7523*km
-  Mean Radius               6371.0088*km
-  Gravitational Constant  6.67430E-11*m**3*kg**(-1)*s**(-2)
-  Acceleration                 9.8203*m/s**2</pre>
-
-<p>Both are not what one would expect for a pleasant table as shown initially.</p>
-
-<p>So for a nonzero value of Width in order to split the numeric data and the
-unit into two blocks, the Put and Get operations have been provided with
-additional parameters as follows (ignore the Dim parameter of Get for now, it's
-only there as a reminder that the idea of unit input checking of above might be
-implemented):</p>
-
-<pre>  <b>procedure </b>Put (File: <b>in </b>File_Type;
-                 X   : <b>in </b>Item;
-                 Fore: <b>in </b>Field      := Default_Fore;
-                 Aft : <b>in </b>Field      := Default_Aft;
-                 Exp : <b>in </b>Field      := Default_Exp;
-                 Dim : <b>in </b>String     := &quot;&quot;;
-                 Pad : <b>in</b> Field      := 0;
-                 Unit: <b>in</b> Field'Base := 0) <b>with</b>
-    Pre => (<b>if</b> Unit = 0 <b>then</b> Pad = 0);
-
-  <b>procedure </b>Get (File : <b>in  </b>File_Type;
-                 X    : <b>out </b>Item;
-                 Width: <b>in  </b>Field  := 0;
-              <font color="969696"> [ Dim  : <b>in</b>  String := &quot;&quot;; ] </font>
-                 Pad  : <b>in</b>  Field  := 0;
-                 Unit : <b>in</b>  Field  := 0) <b>with</b>
-    Pre => ((Width = 0) = (Unit = 0));</pre>
-
-<p>For a nonzero value of Unit, however, it is the duty of the programmer to
-choose the values for Fore, Aft and Exp such that the numbers are
-right-aligned.
-The numeric value will be written to the first table block, followed by Pad
-spaces for the padding, then the dimension string will be written to the second
-table block with <code><b>abs</b>&nbsp;Unit</code> characters, right-aligned for
-a positive value, left-aligned for a negative one (without the leading '*', but
-with the leading '/') like in the very first example above.</p>
-
-<p>Procedure Tables provides also an example for a proper table version.</p>
 
 <h3 align="center"><a name="degC">Celsius</a></h3>
 

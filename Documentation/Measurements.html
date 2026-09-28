@@ -16,6 +16,7 @@
       1.4  26.10.2025  GNAT 15.2.1 optimized -O3, but -gnatn (Inline) does not link:
                        only assertion effect
       1.5  24.01.2026  Final measurement interpretation
+      1.6  23.09.2026  Correct HTML bugs
 //-->
 </head>
 
@@ -51,7 +52,7 @@ representative.
     and probably never will be).</li>
 </ul>
 
-<hr width="100%">
+<hr width="100%"/>
 
 <p>The Schottky Langmuir equation is used for execution time
 measurements because it has rational exponents.
@@ -69,7 +70,7 @@ transformations but need much more time.</p>
 Bugzilla 122574): <b>The switch -gnatn for inlining prevents linking because
 it produces unresolved references.</b>
 Inlining function calls is essential for this library &ndash; without it,
-execution time literally explodes.</b>
+execution time literally explodes.
 The correction is expected in the next GNAT generation 16.</p>
 
 <p>Loops are used with one million repetitions.</p>
@@ -219,7 +220,7 @@ Its performance of the Schottky Langmuir equation is a real disaster!</p>
 <p>In the measurements below, please take into account the
 distortion.</p>
 
-<hr width="100%">
+<hr width="100%"/>
 
 <!-- ============= Schottky Langmuir Equation ============ -->
 
@@ -263,9 +264,9 @@ The results are quite astonishing.
 (Of course the absolute values depend on the speed of the machine
 in use; important are the relative speed values only.)</p>
 
-<hr width="100%">
+<hr width="100%"/>
 <h4 align="center">Comparing Nude and Optimized</h4>
-<hr width="100%">
+<hr width="100%"/>
 
 <!-- ================= Schottky Langmuir CE 8.1 ================ -->
 <!-- ========================= Unchecked ======================= -->
@@ -513,9 +514,9 @@ since the computation of the dimension components consumes most of the time,
 whereas in the unchecked version, only the dimension string evaluation is
 left.</p>
 
-<hr width="100%">
+<hr width="100%"/>
 <h4 align="center">Comparing Unchecked and Checked</h4>
-<hr width="100%">
+<hr width="100%"/>
 
 <!-- ==================== Unchecked v. Checked ================= -->
 <!-- ================== Schottky Langmuir CE 8.1 =============== -->
@@ -631,7 +632,7 @@ left.</p>
 You again can see the big effect of suppressing the dimension
 checking.</p>
 
-<hr width="100%">
+<hr width="100%"/>
 
 <!-- ============= Matrix and Quaternion ============ -->
 

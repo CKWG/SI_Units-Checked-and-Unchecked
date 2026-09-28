@@ -47,14 +47,15 @@
       7.6  17.06.2026  Examples and pitfalls
       7.7  08.08.2026  Min, Max added
       7.8  09.09.2026  Pitfall examples need explanation; further improvements
+      7.9  23.09.2026  Correct HTML bugs
 //-->
 
-<script language="JavaScript">
+<script language="JavaScript" type="text/javascript">
   <!--
    var Derivatives;
    function OpenWindow()
    {
-     Derivatives = window.open("SI-Higher_Derivatives.html", "", "width=515,height=580");
+     Derivatives = window.open("SI-Higher_Derivatives.html", "", "width=515,height=630");
    }
    // -->
 </script>
@@ -341,11 +342,11 @@ It raises <code>Illegal_Unit</code> if Symbol does not have the syntax of a
 <i>dimension format modifier</i> (see package <a href="SI-Text_IO.html">SI.Text_IO</a>).
 <font color="#FF0000">In the unchecked variant, it returns always <code>True</code>.</font></p>
 
-<p><u>Notes:</u><br>Magnetic_Flux_Density is the classical name.
+<p><u>Notes:</u><br/>Magnetic_Flux_Density is the classical name.
 Nowadays it's often just called Magnetic_Field because this is the
 fundamental one.
 The subtype name reflects this.
-If you find the name annoying, just remove it.<br>
+If you find the name annoying, just remove it.<br/>
 Computer screen luminance is measured in Nit (nt), from Latin <i>nitere</i> glitter,
 which is exactly cd/m<sup>2</sup>, but this is not an SI unit and thus not included.</p>
 
@@ -425,14 +426,15 @@ the replacement must be done where the type is defined.
 Hence Generic_Strings, now osolete, has been removed.
 Also Value, the partner of 'Image, has therefore been moved here.</p>
 
-<pre>  <b>type </b>Item <b>is private <font color="#0000F0">with </b>Put_Image =&gt; Image</font>;</pre>
+<pre><span>  <b>type </b>Item <b>is private</b> <font color="#0000F0"><b>with</b> Put_Image =&gt; Image</font>;</span></pre>
 
 <p>'Value is still not available.
 The idea to redefine also this attribute as the inverse has been dropped
 by the ARG for the time being, it might be resumed eventually.</p>
 
 <p>The standard attribute 'Image produces this result for
-<code>10.0*&quot;K&quot;</code>:
+<code>10.0*&quot;K&quot;</code>:</p>
+
 <pre>  (UNIT =>
    (M =>
     (NUMERATOR =>  0,
@@ -456,7 +458,8 @@ by the ARG for the time being, it might be resumed eventually.</p>
     (NUMERATOR =>  0,
      DENOMINATOR =>  1)),
    VALUE =>  1.00000E+01)</pre>
- and similar output for other units.
+
+<p>and similar output for other units.
  The following procedure is used to redefine the attribute 'Image:</p>
 
 <pre>  <b>procedure </b>Image <b>(</b>B: <b>in out </b>Ada.Strings.Text_Buffers.Root_Buffer_Type'Class; X: Item<b>)</b>;</pre>
@@ -485,7 +488,7 @@ correct format, Illegal_Unit is raised if the unit string does not
 have the correct format.</p>
 
 <p><code>Value (&quot;3.6*km/h&quot;)'Image</code> will result in
-<code>&quot; 1.00000E+01*m*s**(-1)&quot;</code> <font color="#008000">in the checked variant</font>,<br>
+<code>&quot; 1.00000E+01*m*s**(-1)&quot;</code> <font color="#008000">in the checked variant</font>,<br/>
 in <code>&quot; 1.00000E+01&quot;</code> <font color="#FF0000">in the unchecked variant</font>
 (with the default number of digits after the dot).</p>
 
@@ -515,23 +518,23 @@ in <code>&quot; 1.00000E+01&quot;</code> <font color="#FF0000">in the unchecked 
 (see <a href="#Value">Value Construction</a>); a unit is everyting inside the quotes
 (see <a href="SI-Text_IO.html#Unit">SI.Text_IO.Unit Syntax</a>):</p>
 
-<pre>   5.0*<font color="#FF1DE4">&quot;</font>m<font color="#FF1DE4">&quot;</font>
+<pre><span>   5.0*<font color="#FF1DE4">&quot;</font>m<font color="#FF1DE4">&quot;</font>
    5.0*<font color="#FF1DE4">&quot;</font>m**3<font color="#FF1DE4">&quot;</font>
-  42.0*<font color="#FF1DE4">&quot;</font>km/h<font color="#FF1DE4">&quot;</font></pre>
+  42.0*<font color="#FF1DE4">&quot;</font>km/h<font color="#FF1DE4">&quot;</font></span></pre>
 
 <p>Thus the following is illegal, there are no such operators:</p>
 
-<pre>   5.0*<font color="#FF1DE4">&quot;</font>m<font color="#FF1DE4">&quot;</font><font color="#FF0000">**</font>3
-  42.0*<font color="#FF1DE4">&quot;</font>km<font color="#FF1DE4">&quot;</font><font color="#FF0000">/</font><font color="#FF1DE4">&quot;</font>h<font color="#FF1DE4">&quot;</font></pre>
+<pre><span>   5.0*<font color="#FF1DE4">&quot;</font>m<font color="#FF1DE4">&quot;</font><font color="#FF0000">**</font>3
+  42.0*<font color="#FF1DE4">&quot;</font>km<font color="#FF1DE4">&quot;</font><font color="#FF0000">/</font><font color="#FF1DE4">&quot;</font>h<font color="#FF1DE4">&quot;</font></span></pre>
 
 <p>An exponentiation of an item must involve both parts together:</p>
 
-<pre>  (5.0*<font color="#FF1DE4">&quot;</font>m<font color="#FF1DE4">&quot;</font>)**3</pre>
+<pre><span>  (5.0*<font color="#FF1DE4">&quot;</font>m<font color="#FF1DE4">&quot;</font>)**3</span></pre>
 
 <p>Hence generally for an exponent <code>x</code>, the legality or interpretation
 of the following equation is questionable:</p>
 
-<pre>  (5.0*<font color="#FF1DE4">&quot;</font>m<font color="#FF1DE4">&quot;</font>)**x&nbsp;=&nbsp;5.0**x*<font color="#FF1DE4">&quot;</font>m**x<font color="#FF1DE4">&quot;</font></pre>
+<pre><span>  (5.0*<font color="#FF1DE4">&quot;</font>m<font color="#FF1DE4">&quot;</font>)**x&nbsp;=&nbsp;5.0**x*<font color="#FF1DE4">&quot;</font>m**x<font color="#FF1DE4">&quot;</font></span></pre>
 
 <p>For an integer literal, it is true.
 For a real literal, both sides will <code><b>raise</b> Unit_Error <b>with</b> &quot;Dimensionless&quot;</code>.</p>

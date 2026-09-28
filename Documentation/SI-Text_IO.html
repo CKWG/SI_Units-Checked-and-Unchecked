@@ -38,6 +38,7 @@
       7.2  17.06.2026  Comment out unused function Valid_Modifier
       7.3  09.09.2026  More precision for input from files and strings;
                        target link to Default Representation, example for it
+      7.4  25.09.2026  Correct HTML errors
 //-->
 </head>
 
@@ -57,7 +58,7 @@ different from the default one.</p>
 
 <h3 align="left"><a name="Specification">Specification</a></h3>
 
-<pre><b>with </b>Ada.Text_IO;
+<pre><span><b>with </b>Ada.Text_IO;
 <b>use  </b>Ada.Text_IO;
 
 <b>generic
@@ -117,7 +118,7 @@ different from the default one.</p>
                  Exp: <b>in </b>Field  := Default_Exp;
                  Dim: <b>in </b>String := &quot;&quot;);  <i>-- with Pre =&gt; Valid_Modifier (X, Dim) or else raise Unit_Error</i>
 
-<b>end </b>Generic_SI.Generic_Text_IO;</pre>
+<b>end </b>Generic_SI.Generic_Text_IO;</span></pre>
 
 <p>For the numeric part, Put and Get work like the conventional operations
 in Ada.Text_IO, the formatting parameters Fore, Aft, Exp apply to the numeric
@@ -132,12 +133,12 @@ evaluated at least twice on each call.</p>
 
 <p>An item is a value of generic type <code>Real'Base</code> multiplied by its
 unit.
-There are two forms of items: an internal one as written in programs
-(e.g. 1.0*&quot;m&quot;) and an external one as output to or read from files or
-strings (e.g. 1.0*m).
+There are two forms of items: an <i>internal</i> one as written in programs
+(e.g. 1.0*&quot;m&quot;) and an <i>external</i> one as output to or read from
+files or strings (e.g. 1.0*m).
 [The unit follows after a '*' or '/' character without space characters.
-This is necessary for input or else there would be no way to see where to stop
-reading, e.g. 3.6 km vs. 3.0 &euro;.]</p>
+This is necessary for input or else there would be no way to decide where to
+stop reading, e.g. 3.6&nbsp;km vs. 3.0&nbsp;&euro;.]</p>
 
 <p>This is the syntax of an external item:</p>
 
@@ -289,7 +290,7 @@ the default.</font></p>
 <p>For the last two forms, the numeric value is adapted according to the prefixes
 and the modifier is output.</p>
 
-<pre>  <font color="#797979"><b>function</b> Valid_Modifier (X: Item; Dim: String) <b>return</b> Boolean;</font></pre>
+<pre><span>  <font color="#797979"><b>function</b> Valid_Modifier (X: Item; Dim: String) <b>return</b> Boolean;</font></span></pre>
 
 <p><font color="#008000">in the Checked variant returns True if the Dim parameter
 is compatible with the dimension of X, else False.</font>
@@ -377,13 +378,13 @@ of the Unit range.</p>
 <p>If the parameter <code>Width</code> is zero, first the numeric value is read
 as with Get of standard Text_IO.Float_IO.</p>
 
-<pre>  <b>procedure </b>Get (File : <b>in  </b>File_Type;
+<pre><span>  <b>procedure </b>Get (File : <b>in  </b>File_Type;
                  X    : <b>out </b>Item;
                  Width: <b>in  </b>Field  := 0;
               <font color="969696"> [ Dim  : <b>in</b>  String := &quot;&quot;; ]  -- see Final Thoughts</font>
                  Pad  : <b>in</b>  Field  := 0;
                  Unit : <b>in</b>  Field  := 0) <b>with</b>
-    Pre => ((Width = 0) = (Unit = 0));</pre>
+    Pre => ((Width = 0) = (Unit = 0));</span></pre>
 
 <p>Data_Error may be raised in this first step.</p>
 
