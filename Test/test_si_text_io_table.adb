@@ -33,28 +33,31 @@ use  Ada.Exceptions, Ada.Text_IO;
 with Test_Support;
 use  Test_Support;
 
-with SI.IO;
-use  SI.IO, SI;
+with SI.IO, SI.Nat;
+use  SI.IO, SI.Nat, SI;
 
 procedure Test_SI_Text_IO_Table is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   1.1
-  -- Date      3 June 2026
+  -- Version   1.2
+  -- Date      28 September 2026
   --====================================================================
   -- Test the IO package for Get with Width > 0.
   -- Read the in files and compare the out files with the expected ones.
   -- Note: The test cannot be run with the unchecked version since
   --       dimension output is vital.
-  -- There is a GNAT bug still in the latest edition (don't know the
-  -- version number), see (*) in Table_KO below: It accepts trainling
-  -- blanks. AI22-0151-1 takes care of this.
+  -- There is a GNAT bug still in the latest edition, see (*) in
+  -- Table_KO below: It accepts trailing blanks. AI22-0151-1 takes care
+  -- of this. I don't know when the corresponding new ACATS will be
+  -- effective. Until then, step 7 line 2 will fail with result
+  -- "  1.99500E+2".
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
   --  C.G.    1.0  08.05.2026
   --  C.G.    1.1  03.06.2026 Test improved, Table_KO (4) is new
+  --  C.G.    1.2  28.09.2026 Added test for dimensionless
   --====================================================================
 
   type Table_Entry is record
@@ -79,6 +82,11 @@ procedure Test_SI_Text_IO_Table is
      4 => (32, "  1.98300E+2*m**(-3)*s**(-1)*mol"),
      5 => (23, "  1.98322E+10*mol**(-1)         "));
 
+  Expect_Dimensionless: constant Table :=
+    --          1234567
+    (1 => ( 7, "  0.008                         "),
+     2 => ( 7, " 1836.2                         "));
+
   Table_KO: constant Table :=
     --          1234567890123---1234567890123456
     (1 => (32, "          1995                  "),   -- padding not empty,
@@ -95,7 +103,7 @@ procedure Test_SI_Text_IO_Table is
      3 => (31, "Illegal_Unit => divisor missing "),
      4 => (31, "Data_Error => illegal character "),
      5 => (22, "Data_Error => in value          "),
-     6 => (22, "Data_Error => in value          "),
+     6 => (31, "Data_Error => padding incorrect "),
      7 => (31, "Data_Error => padding incorrect "));
 
   Physic, Result: File_Type;
@@ -160,6 +168,43 @@ begin
   Reset (Result, In_File);
 
   Compare (Expect_OK);
+
+  -----------------------------------------------------------
+
+  Test_Step (Title => "Test a dimensionless table",
+             Description => "Short units block is accepted.");
+
+  -- There are a lot of fundamental dimensionless constants in phsics, see
+  -- https://en.wikipedia.org/wiki/Dimensionless_physical_constant
+  -- Two are selected here for test:
+  --
+  -- Alpha: fine-structure constant approximately 1/137, this is
+  -- approximately 0.007 (James Bond's number;-), here in the test 0.008.
+  -- The discrepancy is due to the level of accuracy.
+  --
+  -- Beta: proton-to-electron mass ratio approximately 1836
+
+  Reset (Physic, Out_File);
+
+  Put (Physic, Alpha  , Fore  => 3, Aft => 3, Exp => 0, Unit => 5);  New_Line (Physic);
+  Put (Physic, m_p/m_e, Fore  => 5, Aft => 0, Exp => 0           );  New_Line (Physic);
+                                 -- Aft => 0 is the same as Aft => 1
+  Reset (Physic, In_File );
+  Reset (Result, Out_File);
+
+  Get (Physic, I, Width => 7,           Unit => 5);  Skip_Line (Physic);  -- Alpha
+  Put (Result, I, Fore  => 3, Aft => 3, Exp  => 0);  New_Line  (Result);
+  Get (Physic, I, Width => 7,           Unit => 5);  Skip_Line (Physic);  -- Beta
+  Put (Result, I, Fore  => 5, Aft => 0, Exp  => 0);  New_Line  (Result);
+
+  -----------------------------------------------------------
+
+  Test_Step (Title => "Compare dimensionless result with expectation",
+             Description => "");
+
+  Reset (Result, In_File);
+
+  Compare (Expect_Dimensionless);
 
   -----------------------------------------------------------
 
