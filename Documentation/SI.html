@@ -48,6 +48,7 @@
       7.7  08.08.2026  Min, Max added
       7.8  09.09.2026  Pitfall examples need explanation; further improvements
       7.9  23.09.2026  Correct HTML bugs
+      7.10 29.09.2026  Correct typo; 8.0**(1/3) = 8.0**0 = 1.0
 //-->
 
 <script language="JavaScript" type="text/javascript">
@@ -420,11 +421,12 @@ Unit_Error is raised in case of wrong dimensions.</p>
 <p>In older versions of this library, the attributes 'Image and 'Value
 (which then did not exist for private types) were emulated by homonymous
 functions in the child package Generic_Strings (a rather unfortunate name).
-In Ada 2022, 'Image has been defined for any type and is now
-<font color="#0000F0">user-definable</font>;
+In Ada 2022, <font color="#0000F0">'Image</font> has been defined for any type
+and is now <font color="#0000F0">user-definable</font>;
 the replacement must be done where the type is defined.
-Hence Generic_Strings, now osolete, has been removed.
-Also Value, the partner of 'Image, has therefore been moved here.</p>
+Hence Generic_Strings, now obsolete, has been removed.
+Also <font color="#0000F0">Value</font>, the partner of 'Image, has therefore
+been moved here.</p>
 
 <pre><span>  <b>type </b>Item <b>is private</b> <font color="#0000F0"><b>with</b> Put_Image =&gt; Image</font>;</span></pre>
 
@@ -468,7 +470,7 @@ by the ARG for the time being, it might be resumed eventually.</p>
 numeric attribute where the exact format of the numeric value depends of
 course on the actual floating point type; the unit is displayed in the
 <a href="SI-Text_IO.html#def">default representation</a>, for instance the
-above example produces</p>
+above example produces (with the default number of digits after the dot)</p>
 
 <pre>  T := 10.0*&quot;K&quot;;
   T'Image = &quot; 1.00000E+01*K&quot;  <i>-- <font color="#008000">in the checked variant</font></i>
@@ -551,8 +553,8 @@ which does not know of exponentiation with rational numbers, the Ada operator
 For the unit, the evaluation of the exponentiation [inside the quotes] is not by
 Ada rules even though Ada syntax is used.</p>
 
-<pre>   8.0**(1/3) * &quot;cm**(1/3)&quot; = 2.15443E-01 * &quot;m**(1/3)&quot;
-   1.0**(1/3) * &quot;cm**(1/3)&quot;   -- <i>all</i>
+<pre>   8.0**(1/3) * &quot;cm**(1/3)&quot; = 2.15443E-01 * &quot;m**(1/3)&quot;  -- oops!
+   8.0**  0   * &quot;cm**(1/3)&quot;   -- <i>all</i>
    1.0        * &quot;cm**(1/3)&quot;   -- <i>  the</i>
   (1.0E-2     * &quot;m&quot;)**(1/3)   -- <i>    same</i>
 
