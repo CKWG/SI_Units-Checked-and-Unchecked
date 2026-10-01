@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Checked and Generic Computation with SI Units
+-- Checked and Unchecked Computation with SI Units
 -- Copyright (C) 2026 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
@@ -32,8 +32,8 @@ package body Elaborated_Table is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   1.0
-  -- Date      13 May 2026
+  -- Version   1.1
+  -- Date      1 October 2026
   --====================================================================
   -- Column 1 .. Start-1 => Name
   -- Column Start        => Width characers for X in given numeric
@@ -43,9 +43,10 @@ package body Elaborated_Table is
   -- History
   -- Author Version   Date    Reason for change
   --  C.G.    1.0  13.05.2026
+  --  C.G.    1.1  01.10.2026 Bug fix: Aft=0 same as Aft=1; Unset added
   --====================================================================
 
-  S   : Positive_Count;
+  S   : Count := 0;
   W, P: Field;
   U   : Field'Base;
 
@@ -57,18 +58,33 @@ package body Elaborated_Table is
     U := Unit;
   end Set;
 
-  procedure Put (Name : in  String; X: in  Item; Aft, Exp: in Field; Dim: in String := "") is
-    E: constant Field := (if Exp > 0 then Field'Max (3, Exp) else 0);
-    F: constant Field := W - Aft - E - 1 - (if Exp = 0 then 0 else 1);  -- -1 for sign and exponent character E
+  procedure Unset is
   begin
-    Put (Name);
-    Set_Col (S);
-    Put (X, F, Aft, E, Dim, P, U);
-    New_Line;
+    S := 0;
+  end Unset;
+
+  procedure Put (Name : in  String; X: in  Item; Aft, Exp: in Field; Dim: in String := "") is
+  begin
+    if S = 0 then
+      raise Table_Error;
+    end if;
+    declare
+      A: constant Field := Field'Max (1, Aft);
+      E: constant Field := (if Exp > 0 then Field'Max (3, Exp) else 0);
+      F: constant Field := W - A - E - 1 - (if Exp = 0 then 0 else 1);  -- -1 for sign and exponent character E
+    begin
+      Put (Name);
+      Set_Col (S);
+      Put (X, Fore => F, Aft => A, Exp => E, Dim => Dim, Pad => P, Unit => U);
+      New_Line;
+    end;
   end Put;
 
   procedure Get (Name : out String; X: out Item) is
   begin
+    if S = 0 then
+      raise Table_Error;
+    end if;
     Get (Name (Name'First .. Name'First + Positive (S) - 2));
     Get (X, W, P, U);
     Skip_Line;

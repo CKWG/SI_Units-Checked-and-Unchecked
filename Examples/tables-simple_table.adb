@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Checked and Generic Computation with SI Units
+-- Checked and Unchecked Computation with SI Units
 -- Copyright (C) 2026 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
@@ -32,8 +32,8 @@ package body Simple_Table is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   1.1
-  -- Date      12 May 2026
+  -- Version   1.2
+  -- Date      1 October 2026
   --====================================================================
   -- Column 1 .. Start-1 => Name
   -- Column Start        => X in given format
@@ -42,17 +42,26 @@ package body Simple_Table is
   -- Author Version   Date    Reason for change
   --  C.G.    1.0  04.05.2026 Made separate
   --  C.G.    1.1  12.05.2026 Bug fix
+  --  C.G.    1.2  01.10.2026 Unset added
   --====================================================================
 
-  S: Positive_Count;
+  S: Count := 0;
 
   procedure Set (Start: in Positive_Count) is
   begin
     S := Start;
   end Set;
 
+  procedure Unset is
+  begin
+    S := 0;
+  end Unset;
+
   procedure Put (Name: in String; X: in Item; Fore, Aft, Exp: in Field; Dim: in String := "") is
   begin
+    if S = 0 then
+      raise Table_Error;
+    end if;
     Put (Name);
     Set_Col (S);
     Put (X, Fore, Aft, Exp, Dim => Dim);
@@ -61,6 +70,9 @@ package body Simple_Table is
 
   procedure Get (Name: out String; X: out Item) is
   begin
+    if S = 0 then
+      raise Table_Error;
+    end if;
     Get (Name (Name'First .. Name'First + Positive (S) - 2));
     Get (X);
     Skip_Line;
