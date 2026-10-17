@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
--- Checked and Generic Computation with SI Units
--- Copyright (C) 2002, 2005, 2008, 2018, 2020, 2021, 2025
+-- Checked and Unchecked Computation with SI Units
+-- Copyright (C) 2002, 2005, 2008, 2018, 2020, 2021, 2025, 2026
 --               Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
@@ -42,8 +42,8 @@ procedure Measure is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   5.0
-  -- Date      15 June 2025
+  -- Version   5.1
+  -- Date      17 October 2026
   --====================================================================
   -- Measurements of relative speeds.
   -- Schottky-Langmuir; Matrix and Quaternion rotations.
@@ -60,6 +60,7 @@ procedure Measure is
   --  C.G.    3.0  15.05.2020 Dimensions generic parameter
   --  C.G.    4.0  04.10.2021 Measurement improved
   --  C.G.    5.0  15.06.2025 Reworked for Preconditions
+  --  C.G.    5.1  17.10.2026 Loop names added
   --====================================================================
 
   package Duration_Text_IO is new Ada.Text_IO.Fixed_IO (Duration);
@@ -108,6 +109,7 @@ begin
 
   -- Schottky Langmuir
 
+  Naked:
   declare
     J: Float;
   begin
@@ -119,8 +121,9 @@ begin
                                    20.0E-2 * (1.0 - Float (R) * 1.0E-6));
     end loop;
     Nude_End := Clock;
-  end;
+  end Naked;
 
+  Optimized:
   declare
     use SI;
     Volt: constant Voltage := 50.0 * "daV";
@@ -133,8 +136,9 @@ begin
                                        Dist * (1.0 - Float (R) * 1.0E-6));
     end loop;
     Opti_End := Clock;
-  end;
+  end Optimized;
 
+  Stringless:
   declare
     use SI;
     Volt: constant Voltage := 50.0 * "daV";
@@ -147,8 +151,9 @@ begin
                                    Dist * (1.0 - Float (R) * 1.0E-6));
     end loop;
     Strl_End := Clock;
-  end;
+  end Stringless;
 
+  Dressed:
   declare
     use SI;
     J: Current_Density;
@@ -159,7 +164,7 @@ begin
                                    20.0 * "cm"  * (1.0 - Float (R) * 1.0E-6));
     end loop;
     Drsd_End := Clock;
-  end;
+  end Dressed;
 
   -- Evaluation
 

@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Checked and Generic Computation with SI Units
+-- Checked and Unchecked Computation with SI Units
 -- Copyright (C) 2026 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
@@ -37,14 +37,15 @@ procedure Higgs is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   1.0
-  -- Date      28 February 2026
+  -- Version   1.1
+  -- Date      17 October 2026
   --====================================================================
   -- From:
   -- Spektrum der Wissenschaft 3.26 (the German edition of Scientific
-  -- American)
-  -- Manon Bischoff - When the Simpsons predicted the mass of the Higgs
-  -- boson.
+  -- American, see Higgs.pdf in German)
+  -- Manon Bischoff
+  -- Als die Simpsons die Masse des Higgs-Bosons vorhersagten
+  -- [When the Simpsons predicted the mass of the Higgs boson]
   --
   -- This is just for fun.
   -- Float (digits 6) is not exact enough to produce the correct values,
@@ -53,6 +54,7 @@ procedure Higgs is
   --====================================================================
   -- History
   -- Author Version   Date    Reason for change
+  --  C.G.    1.1  17.10.2026 Improved comments
   --  C.G.    1.0  28.02.2026 Just for fun
   --====================================================================
 
