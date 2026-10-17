@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Checked and Generic Computation with SI Units
+-- Checked and Unchecked Computation with SI Units
 -- Copyright (C) 2026 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
