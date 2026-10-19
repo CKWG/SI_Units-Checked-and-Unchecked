@@ -1,6 +1,6 @@
 ------------------------------------------------------------------------------
 -- Checked and Unchecked Computation with SI Units
--- Copyright (C) 2025 Christoph Karl Walter Grein
+-- Copyright (C) 2025, 2026 Christoph Karl Walter Grein
 --
 -- This program is free software; you can redistribute it and/or
 -- modify it under the terms of the GNU General Public License
@@ -33,8 +33,8 @@ package body Generic_SI.Generic_Temperatures.Generic_Unformatted_IO is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   2.0
-  -- Date      17 October 2025
+  -- Version   2.1
+  -- Date      19 October 2026
   --====================================================================
   --
   --====================================================================
@@ -42,6 +42,7 @@ package body Generic_SI.Generic_Temperatures.Generic_Unformatted_IO is
   -- Author Version   Date    Reason for change
   --  C.G.    1.0  02.07.2025
   --  C.G.    2.0  17.10.2025 Renamed from Generic_Strings
+  --  C.G.    2.1  19.10.2026 Corrected style error (-gnatyOr)
   --====================================================================
 
   function Image (X: Celsius) return String is
@@ -61,6 +62,6 @@ package body Generic_SI.Generic_Temperatures.Generic_Unformatted_IO is
     begin
       return Num * Ada.Strings.Fixed.Trim (X (Unit_Start .. X'Last), Ada.Strings.Right);  -- will raise Unit_Error if unit is not OK
     end;
-  end value;
+  end Value;
 
 end Generic_SI.Generic_Temperatures.Generic_Unformatted_IO;
