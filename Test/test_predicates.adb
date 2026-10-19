@@ -40,8 +40,8 @@ procedure Test_Predicates is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   1.0
-  -- Date      21 March 2026
+  -- Version   1.1
+  -- Date      19 October 2026
   --====================================================================
   -- This test shows that even subtypes with identical dimension can
   -- raise Unit_Error with different subtype-specific messages.
@@ -51,6 +51,7 @@ procedure Test_Predicates is
   -- History
   -- Author Version   Date    Reason for change
   --  C.G.    1.0  21.03.2026
+  --  C.G.    1.1  19.10.2026 Test output improved
   --====================================================================
 
   ------------------------------------------------------------------------------
@@ -61,8 +62,8 @@ procedure Test_Predicates is
   -- over the time, the doubt that it will work with more complex tpyes like
   -- SI.Item is obvious.
   -- Contrary to the expectations above:
-  --  * GNAT CE2021 passes Step 2, fails  Step 3; passes Step 4.
-  --  * GNAT 15.2.1 fails  Step 2, passes Step 3; passes Step 4.
+  --  * GNAT CE 2021 passes Step 2, fails  Step 3; passes Step 4.
+  --  * GNAT  15.2.1 fails  Step 2, passes Step 3; passes Step 4.
   -- Since Step 2 does not affect the SI library, the bug has not been reported
   -- to Bugzilla.
 
@@ -72,6 +73,7 @@ procedure Test_Predicates is
                                Predicate_Failure => raise Not_Even with "Even subtype";
 
   procedure Test_Even_Exception is
+    pragma Warnings (Off);
   begin
     declare
       X: Even := 2;
@@ -80,7 +82,7 @@ procedure Test_Predicates is
     exception
       when E: others =>
         Put_Line (Exception_Name (E) & " => " & Exception_Message (E));
-        Assert (Condition => Exception_Name (E) = "TEST_PREDICATE.NOT_EVEN",
+        Assert (Condition => Exception_Name (E) = "TEST_PREDICATES.NOT_EVEN",
                 Message   => "Exception as expected in assignment",
                 Only_Report_Error => False);
         New_Line;
@@ -93,7 +95,7 @@ procedure Test_Predicates is
   exception
     when E: others =>
       Put_Line (Exception_Name (E) & " => " & Exception_Message (E));
-      Assert (Condition => Exception_Name (E) = "TEST_PREDICATE.NOT_EVEN",
+      Assert (Condition => Exception_Name (E) = "TEST_PREDICATES.NOT_EVEN",
               Message   => "Exception as expected in initialization",
               Only_Report_Error => False);
   end Test_Even_Exception;
@@ -124,12 +126,16 @@ procedure Test_Predicates is
       New_Line;
     exception
       when E: others =>
+        Assert (Condition => True,
+                Message   => "Dimensionless: Assignment with wrong unit m",
+                Only_Report_Error => False);
+        Put_Line (Exception_Name (E) & " => " & Exception_Message (E));
         Put_Line (Exception_Name (E) & " => " & Exception_Message (E));
         Assert (Condition => Exception_Name (E) = "SI.UNIT_ERROR",
                 Message   => "Exception as expected in assignment",
                 Only_Report_Error => False);
         Assert (Condition => Exception_Message (E) = "Dimensionless",
-                Message   => "Message as expected in assignment",
+                Message   => "Message   as expected in assignment",
                 Only_Report_Error => False);
         New_Line;
     end;
@@ -142,12 +148,15 @@ procedure Test_Predicates is
       New_Line;
     exception
       when E: others =>
+        Assert (Condition => True,
+                Message   => "Angle: Assignment with wrong unit m",
+                Only_Report_Error => False);
         Put_Line (Exception_Name (E) & " => " & Exception_Message (E));
         Assert (Condition => Exception_Name (E) = "SI.UNIT_ERROR",
                 Message   => "Exception as expected in assignment",
                 Only_Report_Error => False);
         Assert (Condition => Exception_Message (E) = "Angle",
-                Message   => "Message as expected in assignment",
+                Message   => "Message   as expected in assignment",
                 Only_Report_Error => False);
         New_Line;
     end;
@@ -162,9 +171,9 @@ procedure Test_Predicates is
       Assert (Condition => Exception_Name (E) = "SI.UNIT_ERROR",
               Message   => "Exception as expected in initialization",
               Only_Report_Error => False);
-        Assert (Condition => Exception_Message (E) = "Area",
-                Message   => "Message as expected in initialization",
-                Only_Report_Error => False);
+      Assert (Condition => Exception_Message (E) = "Area",
+              Message   => "Message   as expected in initialization",
+              Only_Report_Error => False);
   end Test_Item_Exception;
 
   ------------------------------------------------------------------------------
