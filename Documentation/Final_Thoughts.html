@@ -18,6 +18,7 @@
       3.0  12.05.2026  New better implementation Get (Width);
                        bug: Gnat trailing blanks
       3.1  23.09.2026  Remove Tables
+      3.2  19.10.2026  GNAT bug description corrected
 //-->
 </head>
 
@@ -134,14 +135,15 @@ If you do need it, do not forget to define an appropriate IO functionality for
     What is astonishing is that exactly this code is used in function SI_is_Unchecked,
     where it works correctly.<br/>
     This bug does not occur in <b>GNAT 15.2.1</b>.</li>
-<li>Work-around for <b>[T526-002 public]</b> in generic_si.generic_vector_space.adb:<br/>
-    reported 26.05.2020: fixed in <b>GNAT 15.2.1</b>; [T520-013 public] did not fix it.</li>
+<li>Work-around for <b>[T526-002 public]</b> in generic_si.generic_vector_space.adb removed:<br/>
+    fixed in <b>GNAT CE 2021</b>; does not appear in <b>GNAT 15.2.1</b>;
+    [T520-013 public] did not fix it.</li>
 <li>Work-around for <b>Bugzilla 122161</b> in generic_si.generic_vector_space.ads:<br/>
     reported 04.10.2025: being fixed.</li>
 <li><b>Bugzilla 122574</b>, reported 05.11.2025: being fixed.<br/>
-    This bug exists in <b>GNAT 15.2.1</b>; <b>GNAT CE 2021</b> is not affected.
+    This bug exists in <b>GNAT 15.2.1</b> and <b>GNAT CE 2021</b>.
     It prevents inlining and leads to extremely bad performance.<br/>
-    <b>Thus use of GNAT 15.2.1 is not recommended.</b></li>
+    <b>Thus use of GNAT 15.2.1 is not recommended; GNAT CE 2021 performs acceptably.</b></li>
 <li>Ada.Text_IO.Real_IO.Get with parameter Width>0: <b>GNAT ignores trailing blanks.</b><br/>
     This problem was detected when writing ACVC tests.
     AI22-0151-1 takes care of this; accepted by ARG on 12 May 2026.
