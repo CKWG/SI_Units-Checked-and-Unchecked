@@ -27,8 +27,8 @@ project Examples is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   6.6
-  -- Date      3 May 2026
+  -- Version   6.7
+  -- Date      24 October 2026
   --====================================================================
   --
   --====================================================================
@@ -50,6 +50,7 @@ project Examples is
   --  C.G.    6.4  30.03.2026 Tables new
   --  C.G.    6.5  28.04.2026 Precision new
   --  C.G.    6.6  03.05.2026 Big_Bang new
+  --  C.G.    6.7  24.10.2026 Project files consolidated
   --====================================================================
 
   for Object_Dir use "GnatLib";
@@ -69,21 +70,19 @@ project Examples is
                 "measure");
   for Exec_Dir use ".";
 
-  Assertion := "";
-
-  case SI.Safety is
-    when "Checked"   => Assertion := "-gnata";  -- assertions enabled
-    when "Unchecked" => Assertion := "";
-  end case;
-
   for Source_Dirs use (".",
                        "../Instantiations/", "../Instantiations/" & SI.Safety,
                        "../Instantiations/Big_Bang");
 
-  package Compiler is
-    for Default_Switches ("Ada") use ("-gnatn", "-O2", "-gnat2022", "-gnatyOr",
-                                      "-gnato", "-fstack-check") &
-                                      Assertion;
-  end Compiler;
+  package Compiler renames SI.Compiler;
+
+  --  package Compiler is
+  --    -- This is identical to SI.Compiler.
+  --    for Default_Switches ("ada") use ("-gnatn",    -- inlining
+  --                                      "-gnato",    -- overflow
+  --                                      "-gnatyOr",  -- Style: Overriding, references
+  --                                      "-O2", "-gnat2022", "-fstack-check") &
+  --                                      SI.Assertion;
+  --  end Compiler;
 
 end Examples;
