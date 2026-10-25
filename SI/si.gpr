@@ -25,8 +25,8 @@ project SI is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   7.2
-  -- Date      19 October 2026
+  -- Version   7.3
+  -- Date      24 October 2026
   --====================================================================
   --
   --====================================================================
@@ -50,6 +50,8 @@ project SI is
   --  C.G.    7.0  16.04.2025 Safety_Choice added
   --  C.G.    7.1  17.08.2025 -gnat2022
   --  C.G.    7.2  19.10.2026 -gnatyOr Style: Overriding, references
+  --  C.G.    7.3  24.10.2026 -O2 (-O3: provokes problems with -gnatn
+  --                          (inlining) and instantiations)
   --====================================================================
 
   for Source_Dirs use (".", "Rational_Arithmetics", "Dimensions");
@@ -69,7 +71,7 @@ project SI is
     for Default_Switches ("ada") use ("-gnatn",    -- inlining
                                       "-gnato",    -- overflow
                                       "-gnatyOr",  -- Style: Overriding, references
-                                      "-O3", "-gnat2022", "-fstack-check") &
+                                      "-O2", "-gnat2022", "-fstack-check") &
                                       Assertion;
   end Compiler;
 
