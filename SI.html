@@ -113,6 +113,8 @@
      12.4  09.09.2026 Link to Documentation; doc improved, no code change
      12.5  21.09.2026 Correct HTML img tag - no History change
      12.6  28.09.2026 Bug fix in Get for Width > 0 (early EoL)
+     12.7  25.10.2026 Interim update: Project files consolidated --> prevent -O3 and
+                      -gnatn problems --> -O2
 //-->
 </head>
 
@@ -127,7 +129,7 @@
 
 <p align="center"><font size="+1">First edition 9 September 2002</font><br />
 <font size="+1" color="#ff00ff"> Edition using Predicates and pragma Assertion_Policy</font><br />
-<font size="+1" color="#ff0000"><a href="#Update">Last Update</a> 28 September 2026</font></p>
+<font size="+1" color="#ff0000"><a href="#Update">Last Update</a> 25 October 2026</font></p>
 
 <h3>Contents</h3>
 
@@ -982,6 +984,15 @@ S: In older literature also the symbol mho is in use.</a></font></p>
   <td><b><font color="#800000" size="+1">Reason</font></b></td>
 </tr>
 <tr>
+  <td valign="top"><b><font color="#008080">25 October 2026</font></b></td>
+  <td><b>GitHub release 2.0.1</b><br/>
+      No interface change; GNAT project files SI, Examples and SI.Test consolidated:
+      Optimization level -O2 and inlining -gnatn.<br/>
+      Finally <b>culprit</b> for linking and inlining problems <b>unmasked:</b><br/>
+      -O3 provokes errors with -gnatn and instantiations &#129058 Work-around for
+      GNAT bug in <code>Generic_Vector_Space'Body</code> removed</td>
+</tr>
+<tr>
   <td valign="top"><b><font color="#008080">28 September 2026</font></b></td>
   <td>No interface change; bug fix in Get for Width > 0 (early EoL),
       corresponding test adapted; documentation improved</td>
@@ -1014,7 +1025,7 @@ S: In older literature also the symbol mho is in use.</a></font></p>
 </tr>
 <tr>
   <td valign="top"><b><font color="#008080">7 April 2026</font></b></td>
-  <td><b>GitHub release 2.0.0.</b><br/>
+  <td><b>GitHub release 2.0.0</b><br/>
       <b>Interface change:</b> 'Image attribute redefined (replacement packages for Image and Value removed;
       this is the only incompatible change affecting the user interface).<br/>
       <b>Instantiation change:</b> Elementary_Functions is now a generic parameter, corresponding instantiation
