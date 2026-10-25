@@ -28,8 +28,8 @@ project SI.Test is
 
   --====================================================================
   -- Author    Christoph Grein
-  -- Version   7.4
-  -- Date      19 October 2026
+  -- Version   7.5
+  -- Date      24 October 2026
   --====================================================================
   --
   --====================================================================
@@ -64,6 +64,8 @@ project SI.Test is
   --                          test_si_text_io_table new
   --  C.G.    7.4  19.10.2026 Harmonysing compiler switches with SI
   --                          project: -gnatn evokes link error!
+  --  C.G.    7.5  24.10.2026 -O2 (-O3: provokes problems with -gnatn
+  --                          (inlining) and instantiations)
   --====================================================================
 
   for Object_Dir use "GnatLib";
@@ -90,14 +92,15 @@ project SI.Test is
 
   for Source_Dirs use (".", "../Instantiations/", "../Instantiations/" & SI.Safety);
 
-  -- package Compiler renames SI.Compiler;  --> evokes link error
+  package Compiler renames SI.Compiler;
 
-  package Compiler is
-    for Default_Switches ("ada") use (--"-gnatn",    -- inlining  --> evokes link error
-                                      "-gnato",    -- overflow
-                                      "-gnatyOr",  -- Style: Overriding, references
-                                      "-O3", "-gnat2022", "-fstack-check") &
-                                      SI.Assertion;
-  end Compiler;
+  --  package Compiler is
+  --    -- This is identical to SI.Compiler.
+  --    for Default_Switches ("ada") use ("-gnatn",    -- inlining
+  --                                      "-gnato",    -- overflow
+  --                                      "-gnatyOr",  -- Style: Overriding, references
+  --                                      "-O2", "-gnat2022", "-fstack-check") &
+  --                                      SI.Assertion;
+  --  end Compiler;
 
 end SI.Test;
